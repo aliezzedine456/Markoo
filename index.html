@@ -14,7 +14,7 @@
         // Import Firebase modular SDK
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
         import { getFirestore, collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-        import { getAuth, signInWithPhoneNumber, signOut, onAuthStateChanged, RecaptchaVerifier } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
         
         const firebaseConfig = {
             apiKey: "AIzaSyCfzWZEAq7rjpnXfjznTOJ25skrStZ4FHY",
@@ -73,16 +73,91 @@
         .product-info-h h6 { font-size: 0.9rem; margin: 0 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-price-h { font-weight: bold; color: black; font-size: 1rem; }
 
-        /* product card grid */
-        .product-card { background:var(--card-bg); border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:all 0.3s; margin-bottom:20px; overflow:hidden; border:1px solid rgba(0,47,52,0.05); cursor:pointer; display:flex; flex-direction:column; height:100%; }
-        .product-card:hover { transform:translateY(-4px); box-shadow:0 12px 24px rgba(0,0,0,0.12); border-color:black; }
-        .product-img-container { height:180px; overflow:hidden; background:#f8f9fa; border-bottom:1px solid rgba(0,0,0,0.05); }
-        .product-img { width:100%; height:100%; object-fit:cover; transition:transform 0.5s; }
-        .product-card:hover .product-img { transform:scale(1.05); }
-        .product-badge { position:absolute; top:10px; left:10px; background:var(--accent-color); color:var(--dark-color); padding:3px 10px; border-radius:4px; font-size:0.8rem; font-weight:600; }
-        .product-price { font-weight:bold; color:black; font-size:1.2rem; }
-        .add-to-cart-btn { background-color:black; color:white; border:none; border-radius:30px; padding:8px 16px; font-size:0.9rem; width:100%; transition:0.3s; display:flex; align-items:center; justify-content:center; gap:5px; margin-top:10px; }
-        .add-to-cart-btn:hover { background-color:var(--dark-color); transform:translateY(-2px); }
+        /* product card grid - UPDATED for 2 columns */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            padding: 8px 0;
+        }
+        
+        .product-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            transition: all 0.3s; 
+            overflow: hidden; 
+            border: 1px solid rgba(0,47,52,0.05); 
+            cursor: pointer; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100%; 
+            width: 100%;
+        }
+        
+        .product-card:hover { 
+            transform: translateY(-4px); 
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12); 
+            border-color: black; 
+        }
+        
+        .product-img-container { 
+            width: 100%; 
+            aspect-ratio: 1/1; 
+            overflow: hidden; 
+            background: #f8f9fa; 
+            border-bottom: 1px solid rgba(0,0,0,0.05); 
+        }
+        
+        .product-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: transform 0.5s; 
+        }
+        
+        .product-card:hover .product-img { 
+            transform: scale(1.05); 
+        }
+        
+        .product-badge { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            background: var(--accent-color); 
+            color: var(--dark-color); 
+            padding: 3px 10px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+            font-weight: 600; 
+        }
+        
+        .product-price { 
+            font-weight: bold; 
+            color: black; 
+            font-size: 1.1rem; 
+        }
+        
+        .add-to-cart-btn { 
+            background-color: black; 
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            padding: 8px 12px; 
+            font-size: 0.85rem; 
+            width: 100%; 
+            transition: 0.3s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 5px; 
+            margin-top: 10px; 
+        }
+        
+        .add-to-cart-btn:hover { 
+            background-color: var(--dark-color); 
+            transform: translateY(-2px); 
+        }
 
         /* search bar */
         .search-wrapper { background:white; border-radius:25px; padding:4px 10px 4px 18px; box-shadow:0 4px 12px rgba(0,0,0,0.03); border:1px solid #e5e5e5; display:flex; align-items:center; }
@@ -123,9 +198,13 @@
         .btn-outline-red { background:transparent; border:1px solid #ff6b6b; color:#ff6b6b; border-radius:30px; padding:8px; }
         .btn-dark { background:black; color:white; border-radius:30px; padding:12px; }
         
-        /* OTP input */
-        .otp-input { letter-spacing: 8px; font-size: 1.5rem; text-align: center; }
-        .recaptcha-container { margin: 20px 0; display: flex; justify-content: center; }
+        /* Auth form styles - UPDATED (removed OTP) */
+        .auth-form { padding: 20px; }
+        .auth-tab { display: flex; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+        .auth-tab-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 1rem; font-weight: 500; color: #999; cursor: pointer; }
+        .auth-tab-btn.active { color: black; border-bottom: 2px solid black; }
+        .auth-view { display: block; }
+        .auth-view.hidden { display: none; }
     </style>
 </head>
 <body>
@@ -157,7 +236,7 @@
     <!-- categories horizontal scroll -->
     <div class="categories-wrapper" id="categoriesContainer" style="display:none;"></div>
     
-    <!-- products grid (default view) -->
+    <!-- products grid (default view) - UPDATED for 2 columns -->
     <div id="productsView">
         <div class="product-grid" id="productsGrid"></div>
     </div>
@@ -249,32 +328,57 @@
 <!-- TERMS PANEL -->
 <div class="slide-panel" id="termsPanel"><div class="panel-header"><i class="fas fa-arrow-left" id="backFromTerms"></i> Terms</div><div class="p-4">Terms and conditions...</div></div>
 
-<!-- AUTH PANEL (Phone Login) -->
+<!-- AUTH PANEL (Phone + Password Login) - UPDATED (removed OTP) -->
 <div class="slide-panel" id="authPanel">
-    <div class="panel-header"><i class="fas fa-arrow-left" id="backFromAuth"></i> Sign in</div>
-    <div class="p-4" id="authPhoneView">
-        <div class="mb-3">
-            <label>Phone Number</label>
-            <input class="form-control" id="authPhone" placeholder="e.g., 76647488">
-            <small class="text-muted">Enter Lebanese phone number</small>
-        </div>
-        <div class="mb-3">
-            <div id="recaptcha-container" class="recaptcha-container"></div>
-        </div>
-        <div class="mb-3">
-            <button class="btn btn-dark w-100" id="sendOtpBtn">Send OTP</button>
+    <div class="panel-header"><i class="fas fa-arrow-left" id="backFromAuth"></i> Sign in / Sign up</div>
+    
+    <!-- Auth tabs -->
+    <div class="auth-tab">
+        <button class="auth-tab-btn active" id="loginTabBtn">Login</button>
+        <button class="auth-tab-btn" id="signupTabBtn">Sign Up</button>
+    </div>
+    
+    <!-- Login View -->
+    <div class="auth-view" id="loginView">
+        <div class="p-4">
+            <div class="mb-3">
+                <label>Phone Number</label>
+                <input class="form-control" id="loginPhone" placeholder="e.g., 76647488">
+                <small class="text-muted">Enter Lebanese phone number</small>
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" class="form-control" id="loginPassword" placeholder="Enter password">
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-dark w-100" id="loginBtn">Login</button>
+            </div>
         </div>
     </div>
-    <div class="p-4" id="authOtpView" style="display:none;">
-        <div class="mb-3">
-            <label>Enter OTP</label>
-            <input class="form-control otp-input" id="otpInput" placeholder="------" maxlength="6">
-        </div>
-        <div class="mb-3">
-            <button class="btn btn-dark w-100" id="verifyOtpBtn">Verify OTP</button>
-        </div>
-        <div class="text-center">
-            <a href="#" id="backToPhone">← Back</a>
+    
+    <!-- Sign Up View -->
+    <div class="auth-view hidden" id="signupView">
+        <div class="p-4">
+            <div class="mb-3">
+                <label>Full Name</label>
+                <input class="form-control" id="signupName" placeholder="Your name">
+            </div>
+            <div class="mb-3">
+                <label>Phone Number</label>
+                <input class="form-control" id="signupPhone" placeholder="e.g., 76647488">
+                <small class="text-muted">Enter Lebanese phone number</small>
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <input type="password" class="form-control" id="signupPassword" placeholder="Create password (min 6 characters)">
+            </div>
+            <div class="mb-3">
+                <label>Confirm Password</label>
+                <input type="password" class="form-control" id="signupConfirmPassword" placeholder="Confirm password">
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-dark w-100" id="signupBtn">Sign Up</button>
+            </div>
         </div>
     </div>
 </div>
@@ -291,10 +395,10 @@
 
 <script type="module">
     import { getDoc, doc, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-    import { getAuth, signInWithPhoneNumber, signOut, onAuthStateChanged, RecaptchaVerifier } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
     
-     db = window.db;
-     auth = window.auth;
+   db = window.db;
+    auth = window.auth;
 
     // ---------- GLOBAL STATE ----------
     let products = [];
@@ -307,7 +411,6 @@
     let shopData = null;
     let shopOwnerPhone = '+96176647488'; // Default
     let currentUserInitial = 'G';
-    let confirmationResult = null;
 
     // ---------- DOM ----------
     const loadingScreen = document.getElementById('loadingScreen');
@@ -331,14 +434,23 @@
     const privacyPanel = document.getElementById('privacyPanel');
     const termsPanel = document.getElementById('termsPanel');
 
-    // auth views
-    const authPhoneView = document.getElementById('authPhoneView');
-    const authOtpView = document.getElementById('authOtpView');
-    const authPhone = document.getElementById('authPhone');
-    const otpInput = document.getElementById('otpInput');
-    const sendOtpBtn = document.getElementById('sendOtpBtn');
-    const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-    const backToPhone = document.getElementById('backToPhone');
+    // auth views - UPDATED
+    const loginView = document.getElementById('loginView');
+    const signupView = document.getElementById('signupView');
+    const loginTabBtn = document.getElementById('loginTabBtn');
+    const signupTabBtn = document.getElementById('signupTabBtn');
+    
+    // login fields
+    const loginPhone = document.getElementById('loginPhone');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    // signup fields
+    const signupName = document.getElementById('signupName');
+    const signupPhone = document.getElementById('signupPhone');
+    const signupPassword = document.getElementById('signupPassword');
+    const signupConfirmPassword = document.getElementById('signupConfirmPassword');
+    const signupBtn = document.getElementById('signupBtn');
 
     // product detail
     const detailModal = document.getElementById('productDetailModal');
@@ -377,82 +489,55 @@
         return phone;
     }
 
-    // ---------- Authentication ----------
-    function setupRecaptcha() {
-        if (!window.recaptchaVerifier) {
-            window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-                'size': 'normal',
-                'callback': (response) => {}
-            }, auth);
-        }
-        return window.recaptchaVerifier;
-    }
+    // ---------- Authentication - UPDATED (removed OTP) ----------
+    
+    // Tab switching
+    loginTabBtn.addEventListener('click', () => {
+        loginTabBtn.classList.add('active');
+        signupTabBtn.classList.remove('active');
+        loginView.classList.remove('hidden');
+        signupView.classList.add('hidden');
+    });
+    
+    signupTabBtn.addEventListener('click', () => {
+        signupTabBtn.classList.add('active');
+        loginTabBtn.classList.remove('active');
+        signupView.classList.remove('hidden');
+        loginView.classList.add('hidden');
+    });
 
-    sendOtpBtn.addEventListener('click', async () => {
-        const phone = authPhone.value.trim();
-        if (!phone) {
-            alert('Please enter phone number');
+    // Login
+    loginBtn.addEventListener('click', async () => {
+        const phone = loginPhone.value.trim();
+        const password = loginPassword.value.trim();
+        
+        if (!phone || !password) {
+            alert('Please enter phone number and password');
             return;
         }
 
         const formattedPhone = formatPhoneNumber(phone);
         
         try {
-            const recaptcha = setupRecaptcha();
-            sendOtpBtn.disabled = true;
-            sendOtpBtn.innerHTML = 'Sending...';
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = 'Logging in...';
 
-            confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, recaptcha);
-            
-            authPhoneView.style.display = 'none';
-            authOtpView.style.display = 'block';
-            
-            sendOtpBtn.disabled = false;
-            sendOtpBtn.innerHTML = 'Send OTP';
-            
-        } catch (error) {
-            console.error('OTP Error:', error);
-            alert('Error sending OTP: ' + error.message);
-            sendOtpBtn.disabled = false;
-            sendOtpBtn.innerHTML = 'Send OTP';
-        }
-    });
+            // Sign in with email/password (using phone as email)
+            const userCredential = await signInWithEmailAndPassword(
+                auth, 
+                `${formattedPhone}@shop.com`, 
+                password
+            );
 
-    verifyOtpBtn.addEventListener('click', async () => {
-        const otp = otpInput.value.trim();
-        if (!otp || otp.length < 6) {
-            alert('Please enter 6-digit OTP');
-            return;
-        }
-
-        try {
-            verifyOtpBtn.disabled = true;
-            verifyOtpBtn.innerHTML = 'Verifying...';
-
-            const credential = await confirmationResult.confirm(otp);
-            
             // User is signed in
-            const user = credential.user;
+            const user = userCredential.user;
             
-            // Check if user profile exists in Firestore
+            // Get user profile from Firestore
             const usersRef = collection(db, 'users');
-            const q = query(usersRef, where('phone', '==', user.phoneNumber));
+            const q = query(usersRef, where('phone', '==', user.phoneNumber || formattedPhone));
             const querySnapshot = await getDocs(q);
             
-            if (querySnapshot.empty) {
-                // Create new user profile
-                const userData = {
-                    phone: user.phoneNumber,
-                    name: 'User',
-                    email: '',
-                    address: '',
-                    favorites: [],
-                    createdAt: new Date().toISOString(),
-                    uid: user.uid
-                };
-                await addDoc(collection(db, 'users'), userData);
-                userProfile = userData;
-            } else {
+            if (!querySnapshot.empty) {
                 userProfile = querySnapshot.docs[0].data();
                 userProfile.id = querySnapshot.docs[0].id;
             }
@@ -464,21 +549,88 @@
             alert('Successfully logged in!');
             
         } catch (error) {
-            console.error('Verification Error:', error);
-            alert('Error verifying OTP: ' + error.message);
+            console.error('Login Error:', error);
+            alert('Error logging in: ' + error.message);
         } finally {
-            verifyOtpBtn.disabled = false;
-            verifyOtpBtn.innerHTML = 'Verify OTP';
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = 'Login';
         }
     });
 
-    backToPhone.addEventListener('click', (e) => {
-        e.preventDefault();
-        authPhoneView.style.display = 'block';
-        authOtpView.style.display = 'none';
-        if (window.recaptchaVerifier) {
-            window.recaptchaVerifier.clear();
-            window.recaptchaVerifier = null;
+    // Sign Up
+    signupBtn.addEventListener('click', async () => {
+        const name = signupName.value.trim();
+        const phone = signupPhone.value.trim();
+        const password = signupPassword.value.trim();
+        const confirmPassword = signupConfirmPassword.value.trim();
+        
+        if (!name || !phone || !password) {
+            alert('Please fill all fields');
+            return;
+        }
+        
+        if (password.length < 6) {
+            alert('Password must be at least 6 characters');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+
+        const formattedPhone = formatPhoneNumber(phone);
+        
+        try {
+            signupBtn.disabled = true;
+            signupBtn.innerHTML = 'Creating account...';
+
+            // Check if phone number already exists
+            const existingUser = await getDocs(
+                query(collection(db, 'users'), where('phone', '==', formattedPhone))
+            );
+
+            if (!existingUser.empty) {
+                alert('Phone number already registered');
+                signupBtn.disabled = false;
+                signupBtn.innerHTML = 'Sign Up';
+                return;
+            }
+
+            // Create Firebase Auth user with email/password
+            const userCredential = await createUserWithEmailAndPassword(
+                auth, 
+                `${formattedPhone}@shop.com`, 
+                password
+            );
+
+            // Create user profile in Firestore
+            const userData = {
+                name: name,
+                phone: formattedPhone,
+                email: '',
+                address: '',
+                favorites: [],
+                createdAt: new Date().toISOString(),
+                uid: userCredential.user.uid
+            };
+
+            const docRef = await addDoc(collection(db, 'users'), userData);
+            userData.id = docRef.id;
+            
+            userProfile = userData;
+            currentUser = userCredential.user;
+            setUser(userProfile);
+            closeAllPanels();
+            
+            alert('Account created successfully!');
+            
+        } catch (error) {
+            console.error('Signup Error:', error);
+            alert('Error creating account: ' + error.message);
+        } finally {
+            signupBtn.disabled = false;
+            signupBtn.innerHTML = 'Sign Up';
         }
     });
 
@@ -501,7 +653,7 @@
         if (user) {
             // User is signed in
             const usersRef = collection(db, 'users');
-            const q = query(usersRef, where('phone', '==', user.phoneNumber));
+            const q = query(usersRef, where('uid', '==', user.uid));
             const querySnapshot = await getDocs(q);
             
             if (!querySnapshot.empty) {
@@ -734,7 +886,7 @@
         }
     }
 
-    // ---------- Load All Products (for search or no categories) ----------
+    // ---------- Load All Products (for search or no categories) - UPDATED for 2 columns ----------
     async function loadAllProducts() {
         try {
             const productsRef = collection(db, 'products');
@@ -770,6 +922,7 @@
         }
     }
 
+    // UPDATED renderProducts function
     function renderProducts(arr) {
         productsGrid.innerHTML = '';
         arr.forEach(p => {
@@ -781,10 +934,10 @@
                     <img src="${img}" class="product-img" onerror="this.src='https://via.placeholder.com/300'">
                 </div>
                 <div class="p-3">
-                    <h6>${p.name || ''}</h6>
+                    <h6 style="font-size: 0.9rem; margin-bottom: 5px;">${p.name || ''}</h6>
                     <span class="product-price">$${(p.price || 0).toFixed(2)}</span>
                     <button class="add-to-cart-btn" data-id="${p.id}">
-                        <i class="fas fa-cart-plus"></i> Add to cart
+                        <i class="fas fa-cart-plus"></i> Add
                     </button>
                 </div>
             `;
@@ -973,12 +1126,19 @@
     // ---------- Panel Navigation ----------
     function showAuthPanel() { 
         authPanel.classList.add('show'); 
-        if (window.recaptchaVerifier) {
-            window.recaptchaVerifier.clear();
-            window.recaptchaVerifier = null;
-        }
-        authPhoneView.style.display = 'block';
-        authOtpView.style.display = 'none';
+        // Reset to login tab
+        loginTabBtn.classList.add('active');
+        signupTabBtn.classList.remove('active');
+        loginView.classList.remove('hidden');
+        signupView.classList.add('hidden');
+        
+        // Clear fields
+        loginPhone.value = '';
+        loginPassword.value = '';
+        signupName.value = '';
+        signupPhone.value = '';
+        signupPassword.value = '';
+        signupConfirmPassword.value = '';
     }
 
     function closeAllPanels() { 
