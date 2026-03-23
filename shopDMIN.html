@@ -32,6 +32,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <!-- AWS SDK for JavaScript (required for R2) -->
 <script src="https://cdn.jsdelivr.net/npm/@aws-sdk/client-s3@3.525.0/dist/index.min.js"></script>
+<script src="https://unpkg.com/@aws-sdk/client-s3@3.525.0/dist/index.js"></script>
+<!-- AWS SDK v2 (more stable) -->
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1591.0.min.js"></script>
+<!-- AWS SDK v2 -->
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1591.0.min.js"></script>
     
    <style>
      * {
@@ -2766,17 +2771,15 @@
             }
         };
 
-   const R2_CONFIG = {
-    accessKeyId: '11e16062f2963c227a844e88365313f5',      // Get from Cloudflare Dashboard
-    secretAccessKey: '50770f267a9a9bc495d8301ebfa123664edc9bcc9bf403f5738a1677c9283cba', // Get from Cloudflare Dashboard
-    endpoint: 'https://3732813e81859bdecafdd5726576dd1e.r2.cloudflarestorage.com', // Your R2 endpoint
-    bucketName: 'shop-managment',          // Your bucket name
-    publicUrl: 'https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev' // Public URL for your bucket (enable public access)
+const R2_CONFIG = {
+    accessKeyId: '11e16062f2963c227a844e88365313f5',
+    secretAccessKey: '50770f267a9a9bc495d8301ebfa123664edc9bcc9bf403f5738a1677c9283cba',
+    endpoint: 'https://3732813e81859bdecafdd5726576dd1e.r2.cloudflarestorage.com',
+    bucketName: 'shop-managment',
+    publicUrl: 'https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev'
 };
 
-// Initialize R2 client (using AWS SDK)
 let r2Client = null;
-let S3Client, PutObjectCommand, DeleteObjectCommand;
 
 function initR2Client() {
     if (!r2Client) {
@@ -2786,19 +2789,17 @@ function initR2Client() {
             throw new Error('AWS SDK not loaded. Please check your internet connection and try again.');
         }
         
-        // Get the required classes from AWS SDK
-        S3Client = AWS.S3Client;
-        PutObjectCommand = AWS.PutObjectCommand;
-        DeleteObjectCommand = AWS.DeleteObjectCommand;
-        
-        r2Client = new S3Client({
+        // Configure AWS SDK for R2
+        AWS.config.update({
+            accessKeyId: R2_CONFIG.accessKeyId,
+            secretAccessKey: R2_CONFIG.secretAccessKey,
             region: 'auto',
             endpoint: R2_CONFIG.endpoint,
-            credentials: {
-                accessKeyId: R2_CONFIG.accessKeyId,
-                secretAccessKey: R2_CONFIG.secretAccessKey
-            }
+            s3ForcePathStyle: true, // Required for R2
+            signatureVersion: 'v4'
         });
+        
+        r2Client = new AWS.S3();
     }
     return r2Client;
 }
@@ -2821,15 +2822,15 @@ async function uploadToR2(file, folder = 'products') {
         // Convert file to buffer/array buffer
         const buffer = await file.arrayBuffer();
         
-        const command = new PutObjectCommand({
+        const params = {
             Bucket: R2_CONFIG.bucketName,
             Key: key,
-            Body: Buffer.from(buffer),
+            Body: buffer,
             ContentType: file.type,
             ACL: 'public-read' // Make file publicly accessible
-        });
+        };
         
-        await client.send(command);
+        const result = await client.upload(params).promise();
         
         // Return the public URL
         const publicUrl = `${R2_CONFIG.publicUrl}/${key}`;
@@ -2848,7 +2849,7 @@ async function uploadMultipleToR2(files, folder = 'products') {
     return urls;
 }
 
-// Delete image from R2 (optional - for when images are removed)
+// Delete image from R2
 async function deleteFromR2(imageUrl) {
     try {
         // Extract key from URL
@@ -2856,12 +2857,13 @@ async function deleteFromR2(imageUrl) {
         const key = urlParts.slice(3).join('/');
         
         const client = initR2Client();
-        const command = new DeleteObjectCommand({
+        
+        const params = {
             Bucket: R2_CONFIG.bucketName,
             Key: key
-        });
+        };
         
-        await client.send(command);
+        await client.deleteObject(params).promise();
         console.log('Image deleted from R2:', key);
         
     } catch (error) {
