@@ -2766,110 +2766,41 @@
             }
         };
 
-const R2_CONFIG = {
-    accessKeyId: '11e16062f2963c227a844e88365313f5',
-    secretAccessKey: '50770f267a9a9bc495d8301ebfa123664edc9bcc9bf403f5738a1677c9283cba',
-    endpoint: 'https://3732813e81859bdecafdd5726576dd1e.r2.cloudflarestorage.com',
-    bucketName: 'shop-managment',
-    publicUrl: 'https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev'
+   const R2_CONFIG = {
+    accessKeyId: '11e16062f2963c227a844e88365313f5',      // Get from Cloudflare Dashboard
+    secretAccessKey: '50770f267a9a9bc495d8301ebfa123664edc9bcc9bf403f5738a1677c9283cba', // Get from Cloudflare Dashboard
+    endpoint: 'https://3732813e81859bdecafdd5726576dd1e.r2.cloudflarestorage.com', // Your R2 endpoint
+    bucketName: 'shop-managment',          // Your bucket name
+    publicUrl: 'https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev' // Public URL for your bucket (enable public access)
 };
 
-// Improved upload function with proper CORS handling
-async function uploadToR2(file, folder = 'products') {
-    try {
-        const fileName = generateUniqueFilename(file.name);
-        const key = `${folder}/${fileName}`;
-        
-        // Use the S3-compatible endpoint format
-        const url = `${R2_CONFIG.endpoint}/${R2_CONFIG.bucketName}/${key}`;
-        
-        console.log('Uploading to:', url);
-        
-        // Convert file to buffer
-        const buffer = await file.arrayBuffer();
-        
-        // Attempt upload with proper headers
-        const response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': file.type,
-                'Access-Control-Request-Method': 'PUT',
-                'Access-Control-Request-Headers': 'content-type'
-            },
-            body: buffer,
-            mode: 'cors',
-            credentials: 'omit'  // Don't send credentials for CORS requests
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+// Initialize R2 client (using AWS SDK)
+let r2Client = null;
+let S3Client, PutObjectCommand, DeleteObjectCommand;
+
+function initR2Client() {
+    if (!r2Client) {
+        // Check if AWS SDK is loaded
+        if (typeof AWS === 'undefined') {
+            console.error('AWS SDK not loaded');
+            throw new Error('AWS SDK not loaded. Please check your internet connection and try again.');
         }
         
-        // Return the public URL
-        return `${R2_CONFIG.publicUrl}/${key}`;
+        // Get the required classes from AWS SDK
+        S3Client = AWS.S3Client;
+        PutObjectCommand = AWS.PutObjectCommand;
+        DeleteObjectCommand = AWS.DeleteObjectCommand;
         
-    } catch (error) {
-        console.error('Error uploading to R2:', error);
-        
-        // Fallback to alternative upload method
-        return await uploadToR2Alternative(file, folder);
-    }
-}
-
-// Alternative upload method using XMLHttpRequest (sometimes more reliable for CORS)
-async function uploadToR2Alternative(file, folder) {
-    return new Promise(async (resolve, reject) => {
-        const fileName = generateUniqueFilename(file.name);
-        const key = `${folder}/${fileName}`;
-        const url = `${R2_CONFIG.endpoint}/${R2_CONFIG.bucketName}/${key}`;
-        
-        const buffer = await file.arrayBuffer();
-        
-        const xhr = new XMLHttpRequest();
-        xhr.open('PUT', url, true);
-        xhr.setRequestHeader('Content-Type', file.type);
-        
-        xhr.onload = function() {
-            if (xhr.status === 200 || xhr.status === 201) {
-                resolve(`${R2_CONFIG.publicUrl}/${key}`);
-            } else {
-                reject(new Error(`Upload failed with status ${xhr.status}: ${xhr.statusText}`));
+        r2Client = new S3Client({
+            region: 'auto',
+            endpoint: R2_CONFIG.endpoint,
+            credentials: {
+                accessKeyId: R2_CONFIG.accessKeyId,
+                secretAccessKey: R2_CONFIG.secretAccessKey
             }
-        };
-        
-        xhr.onerror = function() {
-            reject(new Error('Network error during upload'));
-        };
-        
-        xhr.upload.onprogress = function(e) {
-            if (e.lengthComputable) {
-                const percentComplete = (e.loaded / e.total) * 100;
-                console.log(`Upload progress: ${percentComplete}%`);
-            }
-        };
-        
-        xhr.send(buffer);
-    });
-}
-
-// Upload multiple images with progress tracking
-async function uploadMultipleToR2(files, folder = 'products', onProgress = null) {
-    const uploadPromises = [];
-    let completed = 0;
-    
-    for (const file of files) {
-        const promise = uploadToR2(file, folder).then(url => {
-            completed++;
-            if (onProgress) {
-                onProgress(completed, files.length);
-            }
-            return url;
         });
-        uploadPromises.push(promise);
     }
-    
-    const urls = await Promise.all(uploadPromises);
-    return urls;
+    return r2Client;
 }
 
 // Generate unique filename
@@ -2880,43 +2811,62 @@ function generateUniqueFilename(originalName) {
     return `${timestamp}-${random}.${extension}`;
 }
 
-// Delete image from R2
+// Upload image to Cloudflare R2
+async function uploadToR2(file, folder = 'products') {
+    try {
+        const client = initR2Client();
+        const fileName = generateUniqueFilename(file.name);
+        const key = `${folder}/${fileName}`;
+        
+        // Convert file to buffer/array buffer
+        const buffer = await file.arrayBuffer();
+        
+        const command = new PutObjectCommand({
+            Bucket: R2_CONFIG.bucketName,
+            Key: key,
+            Body: Buffer.from(buffer),
+            ContentType: file.type,
+            ACL: 'public-read' // Make file publicly accessible
+        });
+        
+        await client.send(command);
+        
+        // Return the public URL
+        const publicUrl = `${R2_CONFIG.publicUrl}/${key}`;
+        return publicUrl;
+        
+    } catch (error) {
+        console.error('Error uploading to R2:', error);
+        throw new Error('Failed to upload image: ' + error.message);
+    }
+}
+
+// Upload multiple images to R2
+async function uploadMultipleToR2(files, folder = 'products') {
+    const uploadPromises = files.map(file => uploadToR2(file, folder));
+    const urls = await Promise.all(uploadPromises);
+    return urls;
+}
+
+// Delete image from R2 (optional - for when images are removed)
 async function deleteFromR2(imageUrl) {
     try {
         // Extract key from URL
         const urlParts = imageUrl.split('/');
         const key = urlParts.slice(3).join('/');
         
-        const url = `${R2_CONFIG.endpoint}/${R2_CONFIG.bucketName}/${key}`;
-        
-        const response = await fetch(url, {
-            method: 'DELETE',
-            mode: 'cors',
-            credentials: 'omit'
+        const client = initR2Client();
+        const command = new DeleteObjectCommand({
+            Bucket: R2_CONFIG.bucketName,
+            Key: key
         });
         
-        if (!response.ok && response.status !== 404) {
-            console.warn('Delete failed:', response.statusText);
-        }
-        
-        return true;
+        await client.send(command);
+        console.log('Image deleted from R2:', key);
         
     } catch (error) {
         console.error('Error deleting from R2:', error);
-        return false;
-    }
-}
-
-// Test R2 connection
-async function testR2Connection() {
-    try {
-        const testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
-        const url = await uploadToR2(testFile, 'test');
-        console.log('R2 connection successful! URL:', url);
-        return true;
-    } catch (error) {
-        console.error('R2 connection failed:', error);
-        return false;
+        // Don't throw - we don't want to block the main operation if deletion fails
     }
 }
         // Revenue tracking
@@ -4593,8 +4543,7 @@ function loadShopTab() {
             }
         }
 
-// Update the shop banner upload handler
-function uploadShopBanner() {
+  function uploadShopBanner() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -4606,10 +4555,10 @@ function uploadShopBanner() {
                 return;
             }
             
-            const loadingToast = showToast('Uploading banner...', 'info', 'Uploading', 0);
-            
             try {
-                // Upload to R2 with progress
+                showToast('Uploading image...', 'info');
+                
+                // Upload to R2
                 const imageUrl = await uploadToR2(file, 'banners');
                 
                 await db.collection('shops').doc(currentShopData.id).update({
@@ -4621,8 +4570,7 @@ function uploadShopBanner() {
                 showToast(`Banner uploaded successfully!`, 'success');
                 
             } catch (error) {
-                console.error('Upload error:', error);
-                showToast(`Upload failed: ${error.message}`, 'error');
+                showToast(error.message, 'error');
             }
         }
     };
@@ -5015,7 +4963,7 @@ function uploadShopBanner() {
             document.getElementById('addProductForm').addEventListener('submit', handleAddProduct);
         });
 }
- function addProductImages() {
+       function addProductImages() {
     const maxImages = planDetails[currentShopData.plan || 'basic'].maxImagesPerProduct;
     
     if (productImages.length >= maxImages) {
@@ -5039,6 +4987,9 @@ function uploadShopBanner() {
             let validFiles = [];
             for (const file of files) {
                 if (validateImageSize(file, 5)) {
+                    // Optional: Compress image if needed
+                    // const compressedFile = await compressImage(file, 5);
+                    // validFiles.push(compressedFile);
                     validFiles.push(file);
                 } else {
                     showToast(`Skipping "${file.name}" - file too large (max 5MB)`, 'warning');
@@ -5048,13 +4999,10 @@ function uploadShopBanner() {
         }
         
         updateProductImagePreview();
-        
-        if (productImages.length > 0) {
-            showToast(`${productImages.length} image(s) ready to upload`, 'success');
-        }
     };
     input.click();
 }
+
         function updateProductImagePreview() {
             const preview = document.getElementById('productImagePreview');
             if (!preview) return;
