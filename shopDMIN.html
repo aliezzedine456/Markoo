@@ -2969,36 +2969,35 @@ async function deleteFromR2(imageUrl) {
             }
         });
 
-        // OTP Functions
-        async function sendOtpEmail(email, name) {
-            try {
-                const response = await fetch(`${FUNCTIONS_URL}/sendOtp`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, name })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    pendingOtp = data.otp; // In production, you'd verify on backend
-                    pendingEmail = email;
-                    pendingName = name;
-                    
-                    showToast(`Verification code sent to ${email}`, 'success', 'Code Sent');
-                    return true;
-                } else {
-                    showToast('Error sending verification code: ' + (data.error || 'Unknown error'), 'error');
-                    return false;
-                }
-            } catch (error) {
-                console.error('Error calling sendOtp function:', error);
-                showToast('Error connecting to server. Please try again.', 'error');
-                return false;
-            }
+      async function sendOtpEmail(email, name) {
+    try {
+        const response = await fetch(`${FUNCTIONS_URL}/sendOtp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, name })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            pendingOtp = null; // Don't store OTP locally anymore
+            pendingEmail = email;
+            pendingName = name;
+            
+            showToast(`Verification code sent to ${email}`, 'success', 'Code Sent');
+            return true;
+        } else {
+            showToast('Error sending verification code: ' + (data.error || 'Unknown error'), 'error');
+            return false;
         }
+    } catch (error) {
+        console.error('Error calling sendOtp function:', error);
+        showToast('Error connecting to server. Please try again.', 'error');
+        return false;
+    }
+}
 
         // Setup OTP inputs
         const otpInputs = ['otp1', 'otp2', 'otp3', 'otp4', 'otp5', 'otp6'].map(id => document.getElementById(id));
@@ -3225,88 +3224,119 @@ async function deleteFromR2(imageUrl) {
             btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Verification Code';
         });
 
-        document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
-            const otp = otpInputs.map(inp => inp.value).join('');
-            
-            if (otp.length !== 6) {
-                showToast('Please enter the 6-digit code', 'warning');
-                return;
-            }
-            
-            const btn = document.getElementById('verifyOtpBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="btn-spinner"></span> Verifying...';
-            
-            // Verify OTP (in production, you'd call your backend)
-            // For demo, we'll accept any 6-digit code or match with pendingOtp
-            if (otp === pendingOtp || otp === '123456') { // Allow 123456 for testing
-                try {
-                    const email = pendingEmail;
-                    const name = pendingName;
+      document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+    const otp = otpInputs.map(inp => inp.value).join('');
+    
+    if (otp.length !== 6) {
+        showToast('Please enter the 6-digit code', 'warning');
+        return;
+    }
+    
+    const btn = document.getElementById('verifyOtpBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Verifying...';
+    
+    try {
+        const email = pendingEmail;
+        const name = pendingName;
+        
+        // Call verify endpoint
+        const response = await fetch(`${FUNCTIONS_URL}/verifyOtp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, otp })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.isNewUser) {
+                // New user - create account
+                const createResult = await createNewUser(email, name);
+                
+                if (createResult.success) {
+                    // Clear OTP inputs
+                    otpInputs.forEach(inp => { inp.value = ''; });
                     
-                    // Check if user exists
-                    const result = await findUserByEmail(email);
+                    // Show main app
+                    document.getElementById('authScreen').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
                     
-                    if (result.exists) {
-                        // Existing user
-                        const userData = result.doc.data();
-                        userData.id = result.doc.id;
-                        
-                        // Clear OTP inputs
-                        otpInputs.forEach(inp => { inp.value = ''; });
-                        
-                        // Show main app first
-                        document.getElementById('authScreen').classList.add('hidden');
-                        document.getElementById('mainApp').classList.remove('hidden');
-                        
-                        // Then set user session which will load shop data and refresh the tab
-                        setUserSession(userData);
-                        
-                        showToast(`Welcome back, ${userData.name}!`, 'success');
-                    } else {
-                        // New user - create account
-                        const createResult = await createNewUser(email, name);
-                        
-                        if (createResult.success) {
-                            // Clear OTP inputs
-                            otpInputs.forEach(inp => { inp.value = ''; });
-                            
-                            // Show main app first
-                            document.getElementById('authScreen').classList.add('hidden');
-                            document.getElementById('mainApp').classList.remove('hidden');
-                            
-                            // Then set user session
-                            setUserSession(createResult.data);
-                            
-                            showToast(`Welcome, ${name}! Your account has been created.`, 'success');
-                            
-                            // Load shop tab for new users (since they need to create a shop)
-                            setTimeout(() => {
-                                switchTab(1);
-                            }, 100);
-                        } else {
-                            throw new Error('Failed to create account');
-                        }
-                    }
+                    // Set user session
+                    setUserSession(createResult.data);
                     
-                } catch (error) {
-                    showToast(error.message || 'Error during authentication', 'error');
-                    showLoginScreen();
+                    showToast(`Welcome, ${name}! Your account has been created.`, 'success');
+                    
+                    // Load shop tab for new users
+                    setTimeout(() => {
+                        switchTab(1);
+                    }, 100);
+                } else {
+                    throw new Error('Failed to create account');
                 }
             } else {
-                showToast('Invalid verification code', 'error');
+                // Existing user
+                const userData = data.userData;
+                
+                // Clear OTP inputs
+                otpInputs.forEach(inp => { inp.value = ''; });
+                
+                // Show main app
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                
+                // Set user session
+                setUserSession(userData);
+                
+                showToast(`Welcome back, ${userData.name}!`, 'success');
             }
+        } else {
+            showToast(data.error || 'Invalid verification code', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Auth error:', error);
+        showToast('Error during verification. Please try again.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Continue';
+    }
+});
+
+
+     document.getElementById('resendOtpBtn').addEventListener('click', async () => {
+    if (pendingEmail) {
+        const btn = document.getElementById('resendOtpBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Sending...';
+        
+        try {
+            const response = await fetch(`${FUNCTIONS_URL}/resendOtp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: pendingEmail, name: pendingName })
+            });
             
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Continue';
-        });
-
-        document.getElementById('resendOtpBtn').addEventListener('click', async () => {
-            if (pendingEmail) {
-                await sendOtpEmail(pendingEmail, pendingName);
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast(`New verification code sent to ${pendingEmail}`, 'success', 'Code Sent');
+            } else {
+                showToast('Error sending new code: ' + data.error, 'error');
             }
-        });
-
+        } catch (error) {
+            console.error('Error resending OTP:', error);
+            showToast('Error connecting to server', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Resend Code';
+        }
+    }
+});
         document.getElementById('backToEmailBtn').addEventListener('click', () => {
             document.getElementById('authStep1').style.display = 'block';
             document.getElementById('authStep2').style.display = 'none';

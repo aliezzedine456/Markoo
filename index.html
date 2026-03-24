@@ -244,36 +244,37 @@
             animation: slideOutRight 0.3s ease forwards;
         }
         
-        /* LOADING SCREEN */
-        .loading-screen { 
-            position: fixed; 
-            top:0; 
-            left:0; 
-            width:100%; 
-            height:100%; 
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary));
-            display:flex; 
-            align-items:center; 
-            justify-content:center; 
-            z-index:9999; 
-            transition: opacity 0.3s ease;
-            will-change: opacity;
-            pointer-events: all;
-        }
+       .loading-screen { 
+    position: fixed; 
+    top:0; 
+    left:0; 
+    width:100%; 
+    height:100%; 
+    background: white; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    z-index:9999; 
+    transition: opacity 0.3s ease;
+    will-change: opacity;
+    pointer-events: all;
+}
+
+.loading-circle { 
+    width: 44px; 
+    height: 44px; 
+    border: 2px solid rgba(0,0,0,0.1);
+    border-radius: 50%; 
+    border-top-color: black; 
+    animation: spin 0.7s linear infinite; 
+}
         
         .loading-screen.hidden { 
             opacity:0; 
             pointer-events:none; 
         }
         
-        .loading-circle { 
-            width: 44px; 
-            height: 44px; 
-            border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 50%; 
-            border-top-color: white; 
-            animation: spin 0.7s linear infinite; 
-        }
+       
         
         @keyframes spin { 
             to { transform: rotate(360deg); } 
@@ -2821,30 +2822,67 @@ body.panel-open .detail-gallery-container {
         return phone;
     }
 
-    function updateMapPreview(address) {
+       function updateMapPreview(address) {
+        const mapPreviewContainer = document.getElementById('mapPreviewContainer');
+        const mapPreview = document.getElementById('mapPreview');
         const openGoogleMapsLink = document.getElementById('openGoogleMapsLink');
         
-        if (address && address !== 'Not set' && !address.startsWith('lat:')) {
+        if (address && address !== 'Not set' && address !== '') {
             mapPreviewContainer.style.display = 'block';
-            mapPreview.style.backgroundImage = `url('https://picsum.photos/400/150?random=8&text=Map)`;
             
-            if (openGoogleMapsLink) {
-                openGoogleMapsLink.style.display = 'none';
-            }
-        } else if (address && address.startsWith('lat:')) {
-            mapPreviewContainer.style.display = 'block';
-            mapPreview.style.backgroundImage = `url('https://via.placeholder.com/400x150?text=Location+on+Map')`;
+            // Create a Google Maps static map image preview
+            let mapImageUrl = '';
+            let mapLinkUrl = '';
             
-            if (openGoogleMapsLink) {
-                openGoogleMapsLink.style.display = 'inline-flex';
-                
+            if (address.startsWith('lat:')) {
+                // GPS coordinates
                 const coords = address.replace('lat:', '').split(', lng:');
                 if (coords.length === 2) {
                     const lat = parseFloat(coords[0]);
                     const lng = parseFloat(coords[1]);
-                    openGoogleMapsLink.href = `https://www.google.com/maps?q=${lat},${lng}`;
+                    mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=400x150&maptype=roadmap&markers=color:red%7C${lat},${lng}&key=YOUR_API_KEY`;
+                    mapLinkUrl = `https://www.google.com/maps?q=${lat},${lng}`;
                 }
+            } else {
+                // Text address
+                const encodedAddress = encodeURIComponent(address);
+                mapImageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${encodedAddress}&zoom=15&size=400x150&maptype=roadmap&markers=color:red%7C${encodedAddress}&key=YOUR_API_KEY`;
+                mapLinkUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
             }
+            
+            // Create a green-themed custom map simulation with clickable link
+            mapPreview.innerHTML = `
+                <a href="${mapLinkUrl}" target="_blank" style="text-decoration: none; display: block; width: 100%; height: 100%;">
+                    <div style="
+                        width: 100%;
+                        height: 150px;
+                        background: linear-gradient(135deg, #2e7d32, #1b5e20);
+                        border-radius: 12px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        color: white;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        cursor: pointer;
+                    " 
+                    onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';"
+                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
+                        <i class="fas fa-map-marker-alt" style="font-size: 2.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></i>
+                        <div style="font-weight: 600; font-size: 1rem;">View on Map</div>
+                        <div style="font-size: 0.7rem; opacity: 0.9;"><i class="fas fa-external-link-alt"></i> Google Maps</div>
+                    </div>
+                </a>
+            `;
+            
+            // Update the link for the address display card
+            if (openGoogleMapsLink) {
+                openGoogleMapsLink.style.display = 'inline-flex';
+                openGoogleMapsLink.href = mapLinkUrl;
+            }
+            
         } else {
             mapPreviewContainer.style.display = 'none';
             if (openGoogleMapsLink) {
@@ -3086,38 +3124,37 @@ body.panel-open .detail-gallery-container {
         }
     });
 
-    // ---------- OTP Functions ----------
-    async function sendOtpEmail(email, name = '', phone = '') {
-        try {
-            const response = await fetch(`${FUNCTIONS_URL}/sendOtp`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, name })
-            });
+   async function sendOtpEmail(email, name = '', phone = '') {
+    try {
+        const response = await fetch(`${FUNCTIONS_URL}/sendOtp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, name })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Store email for verification
+            pendingEmail = email;
+            pendingName = name;
+            pendingPhone = phone;
             
-            const data = await response.json();
-            
-            if (data.success) {
-                pendingOtp = data.otp;
-                pendingEmail = email;
-                pendingName = name;
-                pendingPhone = phone;
-                
-                showToast(`Verification code sent to ${email}`, 'success', 'Code Sent');
-                return true;
-            } else {
-                console.error('Error sending OTP:', data.error);
-                showToast('Error sending verification code: ' + data.error, 'error');
-                return false;
-            }
-        } catch (error) {
-            console.error('Error calling sendOtp function:', error);
-            showToast('Error connecting to server. Please try again.', 'error');
+            showToast(`Verification code sent to ${email}`, 'success', 'Code Sent');
+            return true;
+        } else {
+            console.error('Error sending OTP:', data.error);
+            showToast('Error sending verification code: ' + data.error, 'error');
             return false;
         }
+    } catch (error) {
+        console.error('Error calling sendOtp function:', error);
+        showToast('Error connecting to server. Please try again.', 'error');
+        return false;
     }
+}
 
     function setupOtpInputs(inputs, nextCallback) {
         inputs.forEach((input, index) => {
@@ -3172,62 +3209,99 @@ body.panel-open .detail-gallery-container {
         sendOtpBtn.innerHTML = 'Send Verification Code';
     });
 
-    verifyOtpBtn.addEventListener('click', async () => {
-        const otp = otpInputs.map(inp => inp.value).join('');
+   verifyOtpBtn.addEventListener('click', async () => {
+    const otp = otpInputs.map(inp => inp.value).join('');
+    
+    if (otp.length !== 6) {
+        showToast('Please enter the 6-digit code', 'warning', 'Invalid Code');
+        return;
+    }
+    
+    const btn = verifyOtpBtn;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-spinner"></span> Verifying...';
+    
+    try {
+        const email = pendingEmail;
+        const name = pendingName;
+        const phone = pendingPhone;
         
-        if (otp.length !== 6) {
-            showToast('Please enter the 6-digit code', 'warning', 'Invalid Code');
-            return;
-        }
+        // Call verify endpoint
+        const response = await fetch(`${FUNCTIONS_URL}/verifyOtp`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, otp })
+        });
         
-        if (otp === pendingOtp) {
-            try {
-                const email = pendingEmail;
-                const name = pendingName;
-                const phone = pendingPhone;
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.isNewUser) {
+                // New user - show address selection
+                pendingAddress = null;
+                authStep2.style.display = 'none';
+                authStep3.style.display = 'block';
                 
-                const usersRef = collection(db, 'users');
-                const q = query(usersRef, where('email', '==', email));
-                const snapshot = await getDocs(q);
+                document.querySelectorAll('.address-option').forEach(opt => opt.classList.remove('selected'));
+                manualAddressSignup.style.display = 'none';
+            } else {
+                // Existing user
+                userProfile = data.userData;
+                currentUser = { email: data.userData.email, uid: data.userData.id };
+                setUser(userProfile);
                 
-                if (snapshot.empty) {
-                    pendingAddress = null;
-                    authStep2.style.display = 'none';
-                    authStep3.style.display = 'block';
-                    
-                    document.querySelectorAll('.address-option').forEach(opt => opt.classList.remove('selected'));
-                    manualAddressSignup.style.display = 'none';
-                } else {
-                    const userData = snapshot.docs[0].data();
-                    userData.id = snapshot.docs[0].id;
-                    
-                    userProfile = userData;
-                    currentUser = { email: email, uid: userData.id };
-                    setUser(userData);
-                    
-                    localStorage.setItem('userProfile', JSON.stringify(userData));
-                    
-                    otpInputs.forEach(inp => inp.value = '');
-                    
-                    closeAllPanels();
-                    showToast(`Welcome back, ${userData.name}!`, 'success', 'Welcome Back');
-                }
+                localStorage.setItem('userProfile', JSON.stringify(userProfile));
                 
-            } catch (error) {
-                console.error('Auth error:', error);
-                showToast('Error during authentication', 'error');
+                otpInputs.forEach(inp => inp.value = '');
+                
+                closeAllPanels();
+                showToast(`Welcome back, ${userProfile.name}!`, 'success', 'Welcome Back');
             }
         } else {
-            showToast('Invalid verification code', 'error', 'Verification Failed');
+            showToast(data.error || 'Invalid verification code', 'error', 'Verification Failed');
         }
-    });
+        
+    } catch (error) {
+        console.error('Auth error:', error);
+        showToast('Error during verification. Please try again.', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Verify & Continue';
+    }
+});
 
-    resendOtpBtn.addEventListener('click', async () => {
-        if (pendingEmail) {
-            await sendOtpEmail(pendingEmail, pendingName, pendingPhone);
+   resendOtpBtn.addEventListener('click', async () => {
+    if (pendingEmail) {
+        const btn = resendOtpBtn;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="btn-spinner"></span> Sending...';
+        
+        try {
+            const response = await fetch(`${FUNCTIONS_URL}/resendOtp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: pendingEmail, name: pendingName })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast(`New verification code sent to ${pendingEmail}`, 'success', 'Code Sent');
+            } else {
+                showToast('Error sending new code: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error connecting to server', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Resend Code';
         }
-    });
-
+    }
+});
     useCurrentLocationOption.addEventListener('click', () => {
         document.querySelectorAll('.address-option').forEach(opt => opt.classList.remove('selected'));
         useCurrentLocationOption.classList.add('selected');
