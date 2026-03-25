@@ -50,7 +50,51 @@
             overflow-x: hidden;
         }
 
-        /* Container to fix right gap */
+        /* Fix for right gap - ensure no horizontal scroll */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        /* REDUCED SECTION SPACING - compact design */
+        section {
+            padding: 2rem 2rem !important;
+        }
+        
+        /* Hero gets slightly more padding but reduced from original */
+        .hero {
+            padding: 70px 2rem 2rem !important;
+            min-height: auto;
+        }
+        
+        /* Slider section spacing reduced */
+        .slider-section {
+            padding: 2rem 2rem !important;
+        }
+        
+        /* Features spacing reduced */
+        .features {
+            padding: 2rem 2rem !important;
+        }
+        
+        /* Pricing spacing reduced */
+        .pricing {
+            padding: 2rem 2rem !important;
+        }
+        
+        /* About spacing reduced */
+        .about {
+            padding: 2rem 2rem !important;
+        }
+        
+        /* Section title margin reduced */
+        .section-title {
+            margin-bottom: 1.5rem !important;
+            font-size: 1.8rem;
+        }
+        
+        /* Container to fix right gap - no overflow issues */
         .container {
             max-width: 1280px;
             margin: 0 auto;
@@ -67,7 +111,7 @@
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
             z-index: 1000;
-            padding: 1rem 2rem;
+            padding: 0.8rem 2rem;
             box-shadow: var(--shadow-sm);
         }
         .nav-container {
@@ -109,12 +153,10 @@
 
         /* Hero */
         .hero {
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 100px 2rem 3rem;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
         .hero-content { max-width: 900px; }
@@ -126,28 +168,28 @@
             font-size: 0.85rem;
             font-weight: 600;
             display: inline-block;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
         .hero h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 800;
             line-height: 1.2;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             background: linear-gradient(135deg, var(--dark) 0%, var(--primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         .hero p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--gray-600);
             max-width: 600px;
-            margin: 0 auto 2rem;
+            margin: 0 auto 1.5rem;
         }
         .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
         .btn-primary {
             background: var(--primary);
             color: white;
-            padding: 1rem 2rem;
+            padding: 0.9rem 1.8rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
@@ -164,7 +206,7 @@
             background: transparent;
             border: 2px solid var(--primary);
             color: var(--primary);
-            padding: 1rem 2rem;
+            padding: 0.9rem 1.8rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: 600;
@@ -173,18 +215,27 @@
         }
         .btn-outline:hover { background: var(--primary); color: white; }
 
-        /* Slider - Reduced spacing */
-        .slider-section { padding: 3rem 2rem; background: white; }
-        .section-title { text-align: center; font-size: 2rem; font-weight: 700; margin-bottom: 2rem; }
+        /* Slider Section - RECTANGULAR BOX with CAPTIONS BELOW (text not on pic) */
+        .slider-section { 
+            background: white;
+            overflow: visible;
+        }
         .slider-container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             position: relative;
-            border-radius: var(--border-radius);
+            border-radius: 28px;
             overflow: hidden;
             box-shadow: var(--shadow-lg);
+            aspect-ratio: 16 / 9;
+            background: #1e293b;
         }
-        .slider { position: relative; height: 500px; overflow: hidden; }
+        .slider { 
+            position: relative; 
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
         .slide {
             position: absolute;
             top: 0;
@@ -192,42 +243,66 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 0.8s ease-in-out;
+            transition: opacity 0.6s ease-in-out;
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
         }
         .slide.active { opacity: 1; }
-        .slide-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            padding: 2rem;
-            color: white;
+        
+        /* TEXT MOVED OUTSIDE THE PICTURE - caption below slider */
+        .slide-caption-wrapper {
+            max-width: 1100px;
+            margin: 0.8rem auto 0;
             text-align: center;
+            padding: 0.3rem 1rem;
         }
+        .slide-caption {
+            background: var(--primary-light);
+            border-radius: 60px;
+            padding: 0.6rem 1.5rem;
+            display: inline-block;
+            box-shadow: var(--shadow-sm);
+        }
+        .slide-caption h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 0;
+            letter-spacing: -0.2px;
+        }
+        .slide-caption p {
+            font-size: 0.8rem;
+            color: var(--gray-700);
+            margin: 0.15rem 0 0;
+        }
+        
         .slider-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.9);
             border: none;
-            width: 45px;
-            height: 45px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             cursor: pointer;
             z-index: 10;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            color: var(--primary);
+            font-size: 1.2rem;
         }
-        .prev-btn { left: 20px; }
-        .next-btn { right: 20px; }
+        .slider-btn:hover { background: white; transform: translateY(-50%) scale(1.05); }
+        .prev-btn { left: 16px; }
+        .next-btn { right: 16px; }
         .slider-dots {
             position: absolute;
-            bottom: 20px;
+            bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px;
+            gap: 10px;
             z-index: 10;
         }
         .dot {
@@ -236,21 +311,22 @@
             border-radius: 50%;
             background: rgba(255,255,255,0.5);
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .dot.active { background: white; width: 25px; border-radius: 10px; }
+        .dot.active { background: white; width: 24px; border-radius: 10px; }
 
-        /* Features - 2 COLUMN GRID - Reduced spacing */
-        .features { padding: 3rem 2rem; background: linear-gradient(135deg, #f8fafc, #ffffff); }
+        /* Features - 2 COLUMN GRID */
+        .features { background: linear-gradient(135deg, #f8fafc, #ffffff); }
         .features-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
+            gap: 1.2rem;
             max-width: 1200px;
             margin: 0 auto;
         }
         .feature-card {
             background: white;
-            padding: 1.5rem;
+            padding: 1.2rem;
             border-radius: var(--border-radius-sm);
             text-align: center;
             transition: 0.3s;
@@ -259,49 +335,53 @@
         }
         .feature-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); }
         .feature-icon {
-            width: 55px;
-            height: 55px;
+            width: 50px;
+            height: 50px;
             background: var(--primary-light);
-            border-radius: 18px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.6rem;
+            margin: 0 auto 0.8rem;
+            font-size: 1.5rem;
             color: var(--primary);
         }
-        .feature-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; }
-        .feature-card p { font-size: 0.85rem; color: var(--gray-600); line-height: 1.4; }
+        .feature-card h3 { font-size: 1rem; margin-bottom: 0.4rem; }
+        .feature-card p { font-size: 0.8rem; color: var(--gray-600); line-height: 1.4; }
 
-        /* Responsive: Keep 2 columns on mobile */
         @media (max-width: 640px) {
             .features-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
+                gap: 0.8rem;
             }
-            .feature-card { padding: 1rem; }
-            .feature-icon { width: 45px; height: 45px; font-size: 1.3rem; }
-            .feature-card h3 { font-size: 0.9rem; }
-            .feature-card p { font-size: 0.75rem; }
+            .feature-card { padding: 0.9rem; }
+            .feature-icon { width: 42px; height: 42px; font-size: 1.2rem; }
+            .feature-card h3 { font-size: 0.85rem; }
+            .feature-card p { font-size: 0.7rem; }
         }
 
-        /* Pricing - 3 IN SAME ROW - Fixed right gap */
-        .pricing { padding: 3rem 2rem; background: white; }
+        /* ========== FIXED PRICING SECTION - BADGE FULLY VISIBLE ========== */
+        .pricing { 
+            background: white;
+            overflow: visible; /* Critical: allows badge to overflow outside section */
+        }
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            gap: 2rem; /* Increased gap to accommodate badge overflow */
             max-width: 1200px;
             margin: 0 auto;
+            overflow: visible;
         }
         .pricing-card {
             background: white;
             border-radius: var(--border-radius-sm);
-            padding: 1.8rem;
+            padding: 1.8rem 1.5rem 1.5rem;
             text-align: center;
             border: 1px solid var(--gray-200);
             position: relative;
             transition: 0.3s;
+            overflow: visible; /* Allow badge to be visible outside card bounds */
         }
         .pricing-card:hover {
             transform: translateY(-5px);
@@ -310,113 +390,251 @@
         .pricing-card.popular {
             border: 2px solid var(--primary);
             transform: scale(1.02);
+            background: linear-gradient(135deg, #ffffff 0%, #fef9e6 100%);
+            overflow: visible;
+            margin-top: 0; /* Reset any margin that might clip badge */
         }
         .pricing-card.popular:hover {
             transform: scale(1.02) translateY(-5px);
         }
+        
+        /* FIXED: Popular badge - fully visible outside the card with proper spacing */
         .popular-badge {
             position: absolute;
-            top: -12px;
+            top: -18px; /* Increased negative value to push badge further up */
             left: 50%;
             transform: translateX(-50%);
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 0.25rem 0.8rem;
-            border-radius: 30px;
-            font-size: 0.7rem;
-            font-weight: 600;
+            padding: 0.5rem 1.4rem;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            font-weight: 800;
             white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(79, 109, 122, 0.35);
+            letter-spacing: 0.5px;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .pricing-card h3 { font-size: 1.3rem; margin-bottom: 0.5rem; }
-        .price { font-size: 2rem; font-weight: 800; color: var(--primary); margin: 0.8rem 0; }
-        .price span { font-size: 0.9rem; font-weight: 400; color: var(--gray-600); }
-        .pricing-features { list-style: none; margin: 1.2rem 0; text-align: left; }
+        
+        .popular-badge i {
+            font-size: 0.7rem;
+            color: #ffd966;
+        }
+        
+        /* Add extra spacing above popular card to prevent badge from being clipped by section padding */
+        .pricing-card.popular {
+            margin-top: 0;
+            padding-top: 1.8rem;
+        }
+        
+        /* Ensure parent containers don't clip the badge */
+        .pricing-grid,
+        .pricing,
+        section.pricing {
+            overflow: visible !important;
+        }
+        
+        .pricing-card h3 { 
+            font-size: 1.4rem; 
+            margin-bottom: 0.5rem; 
+            margin-top: 0.3rem;
+        }
+        .price { 
+            font-size: 2rem; 
+            font-weight: 800; 
+            color: var(--primary); 
+            margin: 0.8rem 0; 
+        }
+        .price span { 
+            font-size: 0.9rem; 
+            font-weight: 400; 
+            color: var(--gray-600); 
+        }
+        .pricing-features { 
+            list-style: none; 
+            margin: 1.2rem 0; 
+            text-align: left; 
+        }
         .pricing-features li { 
             padding: 0.4rem 0; 
             display: flex; 
             align-items: center; 
-            gap: 8px;
+            gap: 10px;
             font-size: 0.85rem;
         }
-        .pricing-features i.fa-check { color: var(--secondary); font-size: 0.8rem; width: 18px; }
+        .pricing-features i.fa-check { 
+            color: var(--secondary); 
+            font-size: 0.85rem; 
+            width: 20px;
+            background: rgba(6, 214, 160, 0.1);
+            border-radius: 50%;
+            padding: 2px;
+        }
         .btn-price {
             background: var(--primary-light);
             color: var(--primary);
-            padding: 0.7rem;
-            border-radius: 40px;
+            padding: 0.75rem;
+            border-radius: 50px;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
             display: block;
             cursor: pointer;
             border: none;
             width: 100%;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: 0.2s;
+            margin-top: 0.5rem;
         }
-        .btn-price:hover { background: var(--primary); color: white; }
+        .btn-price:hover { 
+            background: var(--primary); 
+            color: white; 
+            transform: translateY(-2px);
+        }
 
-        /* Responsive Pricing - 3 columns on desktop, 2 on tablet, 1 on mobile */
         @media (max-width: 900px) {
             .pricing-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 1.5rem;
-            }
-        }
-        @media (max-width: 600px) {
-            .pricing-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 1.8rem;
             }
             .pricing-card.popular {
                 transform: scale(1);
             }
+            .pricing-card.popular:hover {
+                transform: translateY(-5px);
+            }
+            .popular-badge {
+                top: -16px;
+                padding: 0.4rem 1.2rem;
+                font-size: 0.75rem;
+            }
+        }
+        @media (max-width: 640px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                max-width: 380px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .pricing-card.popular {
+                transform: scale(1);
+            }
+            .popular-badge {
+                top: -16px;
+                padding: 0.4rem 1.2rem;
+                font-size: 0.7rem;
+                white-space: nowrap;
+            }
+            .pricing-card {
+                padding: 1.5rem;
+            }
         }
 
-        /* About - Reduced spacing */
-        .about { padding: 3rem 2rem; background: var(--primary-light); }
+        /* About */
+        .about { background: var(--primary-light); }
         .about-container {
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 3rem;
+            gap: 2rem;
             align-items: center;
         }
         .about-image img { width: 100%; border-radius: var(--border-radius); box-shadow: var(--shadow-lg); }
-        .about-content h2 { font-size: 1.8rem; margin-bottom: 1rem; }
-        .about-content p { color: var(--gray-700); line-height: 1.6; margin-bottom: 1rem; }
+        .about-content h2 { font-size: 1.6rem; margin-bottom: 0.8rem; }
+        .about-content p { color: var(--gray-700); line-height: 1.5; margin-bottom: 0.8rem; font-size: 0.95rem; }
 
         /* Footer */
         .footer {
             background: var(--dark);
             color: white;
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
         }
-        .footer-content .logo { justify-content: center; color: white; margin-bottom: 1rem; }
+        .footer-content .logo { justify-content: center; color: white; margin-bottom: 0.8rem; }
         .footer-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.8rem;
             justify-content: center;
-            margin: 1rem 0;
+            margin: 0.8rem 0;
             flex-wrap: wrap;
         }
         .footer-links a {
             color: var(--gray-300);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         .footer-links a:hover { color: white; }
-        .copyright { color: var(--gray-500); font-size: 0.8rem; }
+        .copyright { color: var(--gray-500); font-size: 0.75rem; }
 
+        /* Responsive fixes */
         @media (max-width: 768px) {
-            .nav-links { display: none; position: absolute; top: 70px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; box-shadow: var(--shadow-md); }
+            .nav-links { display: none; position: absolute; top: 70px; left: 0; right: 0; background: white; flex-direction: column; padding: 2rem; box-shadow: var(--shadow-md); z-index: 1000; }
             .nav-links.active { display: flex; }
             .mobile-menu { display: block; }
-            .hero h1 { font-size: 2rem; }
-            .about-container { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
-            .slider { height: 300px; }
-            .section-title { font-size: 1.6rem; }
+            .hero h1 { font-size: 1.8rem; }
+            .hero { padding: 60px 1rem 1.5rem !important; }
+            .about-container { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; }
+            .slider-container { border-radius: 20px; }
+            .section-title { font-size: 1.5rem !important; margin-bottom: 1rem !important; }
+            .slider-btn { width: 36px; height: 36px; font-size: 0.9rem; }
+            .prev-btn { left: 8px; }
+            .next-btn { right: 8px; }
+            .slide-caption-wrapper { margin-top: 0.6rem; }
+            .slide-caption h3 { font-size: 0.95rem; }
+            .slide-caption p { font-size: 0.7rem; }
+            section {
+                padding: 1.5rem 1rem !important;
+            }
+            .features-grid {
+                gap: 0.8rem;
+            }
+            .pricing {
+                overflow: visible !important;
+            }
+            .pricing-grid {
+                gap: 2rem;
+            }
+        }
+        
+        /* Ensure all pricing containers allow overflow */
+        .pricing, .pricing-grid, .pricing-card, .pricing-card.popular {
+            overflow: visible !important;
+        }
+        
+        /* Preload images for faster loading */
+        .img-preload {
+            display: none;
+        }
+        
+        /* Ensure container never overflows */
+        section, div {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        
+        /* Fix for popular card top spacing to ensure badge fully visible */
+        .pricing-card.popular {
+            margin-top: 0;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Add breathing room for the badge on small screens */
+        @media (max-width: 480px) {
+            .popular-badge {
+                top: -14px;
+                padding: 0.3rem 1rem;
+                font-size: 0.65rem;
+            }
+            .pricing-card.popular {
+                margin-top: 6px;
+            }
         }
     </style>
 </head>
@@ -438,7 +656,7 @@
         </div>
     </nav>
 
-    <!-- Hero -->
+    <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content" data-aos="fade-up">
             <span class="hero-badge"><i class="fas fa-rocket"></i> Launch in Minutes</span>
@@ -446,24 +664,29 @@
             <p>Markoo gives you everything you need to start selling online. Beautiful templates, powerful dashboard, and instant QR code for your shop.</p>
             <div class="btn-group">
                 <button class="btn-primary" id="heroStartBtn"><i class="fas fa-store"></i> Start Your Shop</button>
-                <button class="btn-outline" id="featuresBtn"><i class="fas fa-play"></i> See How It Works</button>
             </div>
         </div>
     </section>
 
-    <!-- Auto Image Slider -->
+    <!-- Auto Image Slider - RECTANGULAR SHAPE with TEXT BELOW -->
     <section id="slider" class="slider-section">
         <h2 class="section-title" data-aos="fade-up">Platform Overview</h2>
         <div class="slider-container" data-aos="zoom-in">
-            <div class="slider" id="slider"> <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2003_55_17%20PM.png');"><div class="slide-overlay"><h3>QR Code Posters</h3><p>Share with custom posters</p></div></div>
-               
-                <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2003_36_02%20PM.png');"><div class="slide-overlay"><h3>Analytics Dashboard</h3><p>Track revenue & orders</p></div></div>
-                <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2003_17_40%20PM.png');"><div class="slide-overlay"><h3>Order Track & Cart</h3><p></p></div></div>
-                <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2001_33_00%20PM.png');"><div class="slide-overlay"><h3></h3><p></p></div></div>
+            <div class="slider" id="slider">
+                <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2003_55_17%20PM.png');"></div>
+                <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2003_36_02%20PM.png');"></div>
+                <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2003_17_40%20PM.png');"></div>
+                <div class="slide" style="background-image: url('https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev/shop%20preview/ChatGPT%20Image%20Mar%2025%2C%202026%2C%2001_33_00%20PM.png');"></div>
             </div>
             <button class="slider-btn prev-btn" id="prevSlide"><i class="fas fa-chevron-left"></i></button>
             <button class="slider-btn next-btn" id="nextSlide"><i class="fas fa-chevron-right"></i></button>
             <div class="slider-dots" id="sliderDots"></div>
+        </div>
+        <div class="slide-caption-wrapper" id="slideCaptionWrapper">
+            <div class="slide-caption">
+                <h3 id="captionTitle">QR Code Posters</h3>
+                <p id="captionDesc">Share with custom posters & instant scan</p>
+            </div>
         </div>
     </section>
 
@@ -480,9 +703,9 @@
         </div>
     </section>
 
-    <!-- Pricing - 3 IN SAME ROW -->
+    <!-- Pricing - FIXED: MOST POPULAR BADGE FULLY VISIBLE OUTSIDE CARD -->
     <section id="pricing" class="pricing">
-        <h2 class="section-title" data-aos="fade-up">Simple, Transparent Pricing</h2>
+        <h2 class="section-title" data-aos="fade-up">Pricing</h2>
         <div class="pricing-grid">
             <div class="pricing-card" data-aos="fade-up">
                 <h3>Basic</h3>
@@ -497,7 +720,7 @@
                 <button class="btn-price create-shop-redirect">Start Basic</button>
             </div>
             <div class="pricing-card popular" data-aos="fade-up" data-aos-delay="100">
-                <div class="popular-badge">Most Popular</div>
+                <div class="popular-badge"><i class="fas fa-star"></i> MOST POPULAR</div>
                 <h3>Pro</h3>
                 <div class="price">$11.99 <span>/month</span></div>
                 <ul class="pricing-features">
@@ -527,7 +750,7 @@
     <!-- About -->
     <section id="about" class="about">
         <div class="about-container">
-            <div class="about-image" data-aos="fade-right"><img src="https://picsum.photos/id/106/600/400" alt="About"></div>
+            <div class="about-image" data-aos="fade-right"><img src="https://picsum.photos/id/106/600/400" alt="About Markoo"></div>
             <div class="about-content" data-aos="fade-left">
                 <h2>About Markoo</h2>
                 <p>Founded in 2026, we empower entrepreneurs to launch online stores instantly. From inventory to QR marketing, we provide everything you need to grow.</p>
@@ -553,19 +776,38 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({ duration: 600, once: true });
+        AOS.init({ duration: 500, once: true });
 
         // Mobile Menu Toggle
         const mobileBtn = document.getElementById('mobileMenuBtn');
         const navLinks = document.getElementById('navLinks');
-        mobileBtn.addEventListener('click', () => navLinks.classList.toggle('active'));
-        document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('active')));
+        if (mobileBtn && navLinks) {
+            mobileBtn.addEventListener('click', () => navLinks.classList.toggle('active'));
+            document.querySelectorAll('.nav-links a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('active')));
+        }
 
-        // Auto Slider Logic
+        // Slider Logic
         const slides = document.querySelectorAll('.slide');
         const dotsContainer = document.getElementById('sliderDots');
         let currentSlide = 0;
         let slideInterval;
+        
+        const captions = [
+            { title: "QR Code Posters", description: "Share with custom posters & instant scan" },
+            { title: "Analytics Dashboard", description: "Track revenue, orders & insights" },
+            { title: "Order Track & Cart", description: "Real-time order management" },
+            { title: "Beautiful Storefront", description: "Professional design templates" }
+        ];
+        
+        const captionTitleEl = document.getElementById('captionTitle');
+        const captionDescEl = document.getElementById('captionDesc');
+        
+        function updateCaption(index) {
+            if (captionTitleEl && captionDescEl && captions[index]) {
+                captionTitleEl.textContent = captions[index].title;
+                captionDescEl.textContent = captions[index].description;
+            }
+        }
         
         if (slides.length > 0 && dotsContainer) {
             slides.forEach((_, i) => {
@@ -580,39 +822,69 @@
         
         function updateSlides() { 
             slides.forEach((s, i) => s.classList.toggle('active', i === currentSlide)); 
-            dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide)); 
+            dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+            updateCaption(currentSlide);
         }
-        function nextSlide() { currentSlide = (currentSlide + 1) % slides.length; updateSlides(); }
-        function prevSlide() { currentSlide = (currentSlide - 1 + slides.length) % slides.length; updateSlides(); }
-        function goToSlide(index) { currentSlide = index; updateSlides(); resetInterval(); }
-        function startAutoSlide() { slideInterval = setInterval(nextSlide, 3000); }
-        function resetInterval() { clearInterval(slideInterval); startAutoSlide(); }
         
-        document.getElementById('nextSlide')?.addEventListener('click', () => { nextSlide(); resetInterval(); });
-        document.getElementById('prevSlide')?.addEventListener('click', () => { prevSlide(); resetInterval(); });
+        function nextSlide() { 
+            currentSlide = (currentSlide + 1) % slides.length; 
+            updateSlides(); 
+        }
+        
+        function prevSlide() { 
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length; 
+            updateSlides(); 
+        }
+        
+        function goToSlide(index) { 
+            currentSlide = index; 
+            updateSlides(); 
+            resetInterval(); 
+        }
+        
+        function startAutoSlide() { 
+            if (slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(nextSlide, 4000); 
+        }
+        
+        function resetInterval() { 
+            clearInterval(slideInterval); 
+            startAutoSlide(); 
+        }
+        
+        const nextBtn = document.getElementById('nextSlide');
+        const prevBtn = document.getElementById('prevSlide');
+        if (nextBtn) nextBtn.addEventListener('click', () => { nextSlide(); resetInterval(); });
+        if (prevBtn) prevBtn.addEventListener('click', () => { prevSlide(); resetInterval(); });
         
         if (slides.length > 0) {
+            updateCaption(0);
             startAutoSlide();
-            document.querySelector('.slider-container')?.addEventListener('mouseenter', () => clearInterval(slideInterval));
-            document.querySelector('.slider-container')?.addEventListener('mouseleave', startAutoSlide);
+            const sliderContainer = document.querySelector('.slider-container');
+            if (sliderContainer) {
+                sliderContainer.addEventListener('mouseenter', () => clearInterval(slideInterval));
+                sliderContainer.addEventListener('mouseleave', startAutoSlide);
+            }
         }
 
         // Smooth Scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
         });
-        document.getElementById('featuresBtn')?.addEventListener('click', () => document.getElementById('features').scrollIntoView({ behavior: 'smooth' }));
 
-        // ========== REDIRECT TO SHOPADMIN.HTML ==========
+        // Redirect to shopadmin
         function redirectToShopAdmin() {
             window.location.href = 'shopadmin.html';
         }
         
-        // All "Create Shop" buttons redirect
         const redirectButtons = document.querySelectorAll('.create-shop-redirect');
         redirectButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -622,36 +894,12 @@
         });
         
         const heroStartBtn = document.getElementById('heroStartBtn');
-        if (heroStartBtn) {
-            heroStartBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                redirectToShopAdmin();
-            });
-        }
+        if (heroStartBtn) heroStartBtn.addEventListener('click', (e) => { e.preventDefault(); redirectToShopAdmin(); });
         
         const loginNavBtn = document.getElementById('loginBtnNav');
-        if (loginNavBtn) {
-            loginNavBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                redirectToShopAdmin();
-            });
-        }
+        if (loginNavBtn) loginNavBtn.addEventListener('click', (e) => { e.preventDefault(); redirectToShopAdmin(); });
         
-        // Fallback for any other buttons
-        document.body.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target.tagName === 'BUTTON') {
-                const btnText = target.innerText.toLowerCase();
-                if (btnText.includes('start') || btnText.includes('get') || btnText.includes('go') || 
-                    btnText.includes('basic') || btnText.includes('pro') || btnText.includes('vip') ||
-                    btnText.includes('selling') || btnText.includes('create')) {
-                    if (target.closest('#pricing') || target.closest('#about') || target.id === 'heroStartBtn' || target.id === 'loginBtnNav') {
-                        e.preventDefault();
-                        window.location.href = 'shopadmin.html';
-                    }
-                }
-            }
-        });
+        document.body.style.overflowX = 'hidden';
     </script>
 </body>
 </html>
