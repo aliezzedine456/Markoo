@@ -2719,57 +2719,59 @@
             'cancelled': 'Cancelled'
         };
 
-        // Plan details
-        const planDetails = {
-            'basic': {
-                name: 'Basic',
-                price: 8,
-                maxProducts: 30,
-                maxImagesPerProduct: 5,
-                maxTotalImages: 150,
-                support: 'Email Support',
-                features: [
-                    '30 Products Maximum',
-                    '5 Images per Product',
-                    'Email Support',
-                    '1 Month Subscription',
-                    'Basic Analytics'
-                ]
-            },
-            'pro': {
-                name: 'Pro',
-                price: 14,
-                maxProducts: 50,
-                maxImagesPerProduct: 5,
-                maxTotalImages: 250,
-                support: 'Priority Support',
-                features: [
-                    '50 Products Maximum',
-                    '5 Images per Product',
-                    'Priority Support',
-                    '1 Month Subscription',
-                    'Advanced Analytics',
-                    'Delivery Management'
-                ]
-            },
-            'vip': {
-                name: 'VIP',
-                price: 20,
-                maxProducts: 'Unlimited',
-                maxImagesPerProduct: 7,
-                maxTotalImages: 'Unlimited',
-                support: '24/7 VIP Support',
-                features: [
-                    'Unlimited Products',
-                    '7 Images per Product',
-                    '24/7 VIP Support',
-                    '1 Month Subscription',
-                    'Premium Analytics',
-                    'Delivery Management',
-                    'Custom Branding'
-                ]
-            }
-        };
+     const planDetails = {
+    'basic': {
+        name: 'Basic',
+        price: 8,
+        maxProducts: 30,
+        maxImagesPerProduct: 5,
+        maxTotalImages: 150,
+        support: 'Email Support',
+        features: [
+            '30 Products Maximum',
+            '5 Images per Product',
+            '150 Total Images',
+            'Email Support',
+            '1 Month Subscription',
+            'Basic Analytics'
+        ]
+    },
+    'pro': {
+        name: 'Pro',
+        price: 14,
+        maxProducts: 50,
+        maxImagesPerProduct: 5,
+        maxTotalImages: 250,
+        support: 'Priority Support',
+        features: [
+            '50 Products Maximum',
+            '5 Images per Product',
+            '250 Total Images',
+            'Priority Support',
+            '1 Month Subscription',
+            'Advanced Analytics',
+            'Delivery Management'
+        ]
+    },
+    'vip': {
+        name: 'VIP',
+        price: 20,
+        maxProducts: 'Unlimited',
+        maxImagesPerProduct: 7,
+        maxTotalImages: 'Unlimited',
+        support: '24/7 VIP Support',
+        features: [
+            'Unlimited Products',
+            '7 Images per Product',
+            'Unlimited Images',
+            '24/7 VIP Support',
+            '1 Month Subscription',
+            'Premium Analytics',
+            'Delivery Management',
+            'Custom Branding'
+        ]
+    }
+};
 
 const R2_CONFIG = {
     accessKeyId: '11e16062f2963c227a844e88365313f5',
@@ -4394,14 +4396,16 @@ function loadShopTab() {
                                     <input type="text" id="shopName" value="${currentShopData.name}" placeholder="Shop Name">
                                 </div>
                             </div>
-
-                            <div class="form-group">
-                                <label>Owner Email</label>
-                                <div class="input-wrapper">
-                                    <i class="fas fa-envelope"></i>
-                                    <input type="email" id="shopEmail" value="${currentShopData.ownerEmail || currentUserData?.email || ''}" placeholder="Owner Email">
-                                </div>
-                            </div>
+<div class="form-group">
+    <label>Owner Email</label>
+    <div class="input-wrapper">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="shopEmail" value="${currentUserData?.email || ''}" placeholder="Owner Email" readonly disabled style="background: var(--gray-100); cursor: not-allowed;">
+    </div>
+    <small style="color: var(--gray-500); font-size: 11px; margin-top: 4px; display: block;">
+        <i class="fas fa-info-circle"></i> Email is linked to your account and cannot be changed
+    </small>
+</div>
 
                             <div class="form-group">
                                 <label>Owner Phone</label>
@@ -6224,9 +6228,9 @@ function showQRCodePanel() {
     
     const shopLink = `https://aliezzedine456.github.io/Markoo/?id=${currentShopData.id}`;
     
-    posterCustomization.shopName = currentShopData.name || 'My Shop';
-    posterCustomization.phoneNumber = currentShopData.ownerPhone || currentUserData?.phone || '';
-    posterCustomization.emailAddress = currentShopData.ownerEmail || currentUserData?.email || '';
+   posterCustomization.shopName = currentShopData.name || 'My Shop';
+posterCustomization.phoneNumber = currentShopData.ownerPhone || currentUserData?.phone || '';
+posterCustomization.emailAddress = currentUserData?.email || '';  // Changed to use user's account email
     
     content.innerHTML = `
         <!-- Customization Panel -->
@@ -6806,6 +6810,30 @@ function generateQRCode(shopLink) {
         ordersList.innerHTML = `<p class="text-danger text-center p-4">Error: ${error.message}</p>`;
     }
 }
+async function calculateTotalImagesUsed() {
+    if (!currentShopData || !currentShopData.id) return 0;
+    
+    try {
+        const products = await db.collection('products')
+            .where('shopId', '==', currentShopData.id)
+            .get();
+        
+        let totalImages = 0;
+        products.forEach(doc => {
+            const product = doc.data();
+            if (product.imageUrls && Array.isArray(product.imageUrls)) {
+                totalImages += product.imageUrls.length;
+            } else if (product.imageUrl) {
+                totalImages += 1;
+            }
+        });
+        
+        return totalImages;
+    } catch (error) {
+        console.error('Error calculating total images:', error);
+        return 0;
+    }
+}
 
         async function updateOrderStatus(orderId, newStatus) {
             if (event) {
@@ -7076,105 +7104,175 @@ function generateQRCode(shopLink) {
         content.innerHTML = '<p class="text-danger text-center p-4">Error loading order details</p>';
     });
 }
-        function loadSettingsTab() {
-            const content = document.getElementById('contentArea');
-            
-            if (!currentShopData) {
-                content.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-store"></i>
-                        <h3>No Shop Found</h3>
-                        <p>Create a shop first to access settings</p>
-                        <button class="btn btn-primary" onclick="switchTab(1)">Go to Shop Tab</button>
-                    </div>
-                `;
-                return;
-            }
-            
-            const plan = currentShopData.plan || 'basic';
-            const planInfo = planDetails[plan];
-            const expiryDate = currentShopData.expiryDate ? new Date(currentShopData.expiryDate.seconds * 1000) : new Date();
+   async function loadSettingsTab() {
+    const content = document.getElementById('contentArea');
+    
+    if (!currentShopData) {
+        content.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-store"></i>
+                <h3>No Shop Found</h3>
+                <p>Create a shop first to access settings</p>
+                <button class="btn btn-primary" onclick="switchTab(1)">Go to Shop Tab</button>
+            </div>
+        `;
+        return;
+    }
+    
+    // Safely get plan info with fallback
+    const plan = currentShopData.plan || 'basic';
+    const planInfo = planDetails && planDetails[plan] ? planDetails[plan] : planDetails['basic'];
+    
+    // Calculate expiry date and days remaining
+    let expiryDate = null;
+    let daysRemaining = 0;
+    let isExpired = false;
+    let formattedExpiryDate = 'Not set';
+    
+    if (currentShopData.expiryDate) {
+        try {
+            expiryDate = currentShopData.expiryDate.seconds 
+                ? new Date(currentShopData.expiryDate.seconds * 1000) 
+                : new Date(currentShopData.expiryDate);
             const now = new Date();
-            const daysRemaining = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
-            const isExpired = daysRemaining <= 0;
-            
-            const productCount = currentShopData.productCount || 0;
-            const productLimit = planInfo.maxProducts;
-            const productUsagePercentage = productLimit !== 'Unlimited' ? (productCount / productLimit * 100).toFixed(1) : 0;
-            
-            content.innerHTML = `
-                <div class="card">
-                    <h3 style="font-size: 18px; margin-bottom: 16px;">
-                        <i class="fas fa-crown" style="color: var(--warning);"></i> Current Plan: ${planInfo.name}
-                    </h3>
-                    
-                    <div style="margin-bottom: 20px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span style="color: var(--gray-600);">Status</span>
-                            <span class="badge ${isExpired ? 'badge-danger' : 'badge-success'}">
-                                ${isExpired ? 'Expired' : 'Active'}
-                            </span>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span style="color: var(--gray-600);">Expiry Date</span>
-                            <span style="font-weight: 600;">${expiryDate.toLocaleDateString()}</span>
-                        </div>
-                        
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span style="color: var(--gray-600);">Days Remaining</span>
-                            <span style="font-weight: 600; color: ${daysRemaining < 7 ? 'var(--danger)' : 'var(--success)'}">
-                                ${isExpired ? 'Expired' : daysRemaining + ' days'}
-                            </span>
-                        </div>
-                        
-                        <div style="margin-top: 16px;">
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                <span style="color: var(--gray-600);">Product Usage</span>
-                                <span style="font-weight: 600;">${productCount} / ${productLimit}</span>
-                            </div>
-                            <div style="width: 100%; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
-                                <div style="width: ${productUsagePercentage}%; height: 100%; background: var(--primary);"></div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-success" onclick="showUpgradePlans()">
-                        <i class="fas fa-arrow-up"></i> Upgrade Plan
-                    </button>
-                </div>
-                
-                <div class="card">
-                    <h3 style="font-size: 18px; margin-bottom: 16px;">
-                        <i class="fas fa-headset"></i> Customer Support
-                    </h3>
-                    
-                    <p style="color: var(--gray-600); margin-bottom: 16px;">
-                        Need help? Contact our support team. We typically respond within 24 hours.
-                    </p>
-                    
-                    <button class="btn btn-primary" onclick="showSupportChat()">
-                        <i class="fas fa-comments"></i> Open Support Chat
-                    </button>
-                    
-                    <button class="btn btn-secondary" style="margin-top: 10px;" onclick="openWhatsApp()">
-                        <i class="fab fa-whatsapp"></i> WhatsApp Support
-                    </button>
-                </div>
-                
-                <div class="card">
-                    <h3 style="font-size: 18px; margin-bottom: 16px;">
-                        <i class="fas fa-shield-alt"></i> Account Settings
-                    </h3>
-                    
-                    <button class="btn btn-danger" onclick="deleteShopConfirm()">
-                        <i class="fas fa-trash"></i> Delete Shop
-                    </button>
-                </div>
-            `;
+            daysRemaining = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+            isExpired = daysRemaining <= 0;
+            formattedExpiryDate = expiryDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        } catch (e) {
+            console.error('Error parsing expiry date:', e);
         }
-
-     function showUpgradePlans() {
+    }
+    
+    // Get product count
+    const productCount = currentShopData.productCount || 0;
+    const productLimit = planInfo.maxProducts;
+    const productUsagePercentage = productLimit !== 'Unlimited' && productLimit > 0 
+        ? Math.min((productCount / productLimit * 100), 100).toFixed(1) 
+        : 0;
+    
+    // Calculate total images used
+    const totalImagesUsed = await calculateTotalImagesUsed();
+    const imageLimit = planInfo.maxTotalImages;
+    const imageUsagePercentage = imageLimit !== 'Unlimited' && imageLimit > 0 
+        ? Math.min((totalImagesUsed / imageLimit * 100), 100).toFixed(1) 
+        : 0;
+    
+    // Determine color based on usage
+    const getUsageColor = (percentage, isUnlimited) => {
+        if (isUnlimited) return 'var(--success)';
+        if (percentage >= 90) return 'var(--danger)';
+        if (percentage >= 70) return 'var(--warning)';
+        return 'var(--success)';
+    };
+    
+    const productColor = getUsageColor(productUsagePercentage, productLimit === 'Unlimited');
+    const imageColor = getUsageColor(imageUsagePercentage, imageLimit === 'Unlimited');
+    
+    content.innerHTML = `
+        <div class="card">
+            <h3 style="font-size: 18px; margin-bottom: 16px;">
+                <i class="fas fa-crown" style="color: var(--warning);"></i> Current Plan: ${planInfo.name}
+            </h3>
+            
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--gray-600);">Status</span>
+                    <span class="badge ${isExpired ? 'badge-danger' : 'badge-success'}">
+                        ${isExpired ? 'Expired' : 'Active'}
+                    </span>
+                </div>
+                
+                ${expiryDate ? `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--gray-600);">Expiry Date</span>
+                    <span style="font-weight: 600;">${formattedExpiryDate}</span>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: var(--gray-600);">Days Remaining</span>
+                    <span style="font-weight: 600; color: ${daysRemaining < 7 ? 'var(--danger)' : 'var(--success)'}">
+                        ${isExpired ? 'Expired' : daysRemaining + ' days'}
+                    </span>
+                </div>
+                ` : '<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span style="color: var(--gray-600);">Plan Duration</span><span style="font-weight: 600;">Monthly Subscription</span></div>'}
+                
+                <!-- Products Usage Bar -->
+                <div style="margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: var(--gray-600);">
+                            <i class="fas fa-box"></i> Products Used
+                        </span>
+                        <span style="font-weight: 600; color: ${productColor};">${productCount} / ${productLimit}</span>
+                    </div>
+                    ${productLimit !== 'Unlimited' ? `
+                    <div style="width: 100%; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${productUsagePercentage}%; height: 100%; background: ${productColor}; transition: width 0.3s ease;"></div>
+                    </div>
+                    ` : '<div style="width: 100%; height: 8px; background: var(--gray-200); border-radius: 4px;"><div style="width: 100%; height: 100%; background: var(--success); border-radius: 4px;"></div></div>'}
+                </div>
+                
+                <!-- Images Usage Bar -->
+                <div style="margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span style="color: var(--gray-600);">
+                            <i class="fas fa-images"></i> Images Used
+                        </span>
+                        <span style="font-weight: 600; color: ${imageColor};">${totalImagesUsed} / ${imageLimit}</span>
+                    </div>
+                    ${imageLimit !== 'Unlimited' ? `
+                    <div style="width: 100%; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${imageUsagePercentage}%; height: 100%; background: ${imageColor}; transition: width 0.3s ease;"></div>
+                    </div>
+                    ` : '<div style="width: 100%; height: 8px; background: var(--gray-200); border-radius: 4px;"><div style="width: 100%; height: 100%; background: var(--success); border-radius: 4px;"></div></div>'}
+                    <small style="color: var(--gray-500); font-size: 11px; margin-top: 4px; display: block;">
+                        <i class="fas fa-info-circle"></i> Each product can have up to ${planInfo.maxImagesPerProduct} images
+                    </small>
+                </div>
+            </div>
+            
+            <button class="btn btn-success" onclick="showUpgradePlans()">
+                <i class="fas fa-arrow-up"></i> Upgrade Plan
+            </button>
+        </div>
+        
+        <div class="card">
+            <h3 style="font-size: 18px; margin-bottom: 16px;">
+                <i class="fas fa-headset"></i> Customer Support
+            </h3>
+            
+            <p style="color: var(--gray-600); margin-bottom: 16px;">
+                Need help? Contact our support team. We typically respond within 24 hours.
+            </p>
+            
+            <button class="btn btn-primary" onclick="showSupportChat()">
+                <i class="fas fa-comments"></i> Open Support Chat
+            </button>
+            
+            <button class="btn btn-secondary" style="margin-top: 10px;" onclick="openWhatsApp()">
+                <i class="fab fa-whatsapp"></i> WhatsApp Support
+            </button>
+        </div>
+        
+        <div class="card">
+            <h3 style="font-size: 18px; margin-bottom: 16px;">
+                <i class="fas fa-undo-alt"></i> Shop Management
+            </h3>
+            
+            <p style="color: var(--gray-600); margin-bottom: 16px;">
+                Reset your shop to start fresh. All products, categories, and orders will be cleared, but your shop settings will be preserved.
+            </p>
+            
+            <button class="btn btn-warning" onclick="deleteShopConfirm()">
+                <i class="fas fa-undo-alt"></i> Reset Shop
+            </button>
+        </div>
+    `;
+}
+   function showUpgradePlans() {
     // Create a slide panel for plans instead of modal
     const panelId = 'upgradePlansPanel';
     
@@ -7200,7 +7298,14 @@ function generateQRCode(shopLink) {
     
     const content = document.getElementById('upgradePlansContent');
     
-    const plan = currentShopData.plan || 'basic';
+    const plan = (currentShopData && currentShopData.plan) || 'basic';
+    
+    // Ensure planDetails exists
+    if (!planDetails) {
+        content.innerHTML = '<p class="text-center p-4">Error loading plans. Please refresh the page.</p>';
+        openPanel(panelId);
+        return;
+    }
     
     content.innerHTML = `
         <div style="padding: 4px;">
@@ -7239,7 +7344,6 @@ function generateQRCode(shopLink) {
                     <li><i class="fas fa-check"></i> 7 Images per Product</li>
                     <li><i class="fas fa-check"></i> 24/7 VIP Support</li>
                     <li><i class="fas fa-check"></i> Analytics</li>
-                    
                 </ul>
                 ${plan === 'vip' ? 
                     '<button class="btn btn-secondary" disabled><i class="fas fa-check-circle"></i> Current Plan</button>' : 
@@ -7259,7 +7363,6 @@ function generateQRCode(shopLink) {
     
     openPanel(panelId);
 }
-
 // Add this function to check if shop is expired
 function isShopExpired() {
     if (!currentShopData || !currentShopData.expiryDate) return false;
@@ -7504,22 +7607,264 @@ function updateCharCount(inputId, maxLength, counterId) {
             }
         }
 
-        function deleteShopConfirm() {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.innerHTML = `
-                <div class="modal">
-                    <h3>Delete Shop</h3>
-                    <p style="margin-bottom: 20px;">Are you sure you want to delete your shop? This action cannot be undone and will delete all products and orders.</p>
-                    <div class="modal-actions">
-                        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                        <button class="btn-danger" onclick="deleteShop()">Delete Shop</button>
-                    </div>
+ function deleteShopConfirm() {
+    // Create a modal within the settings tab content
+    const content = document.getElementById('contentArea');
+    
+    // Show confirmation panel inside settings tab
+    content.innerHTML = `
+        <div class="card" style="margin-top: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 24px; color: var(--danger);"></i>
+                <h3 style="margin: 0; color: var(--danger);">Reset Shop - Confirmation Required</h3>
+            </div>
+            
+            <div style="background: #ffebee; border-left: 4px solid var(--danger); padding: 16px; border-radius: var(--border-radius-md); margin-bottom: 24px;">
+                <p style="margin: 0; color: var(--gray-700);">
+                    <strong>⚠️ WARNING:</strong> This action will COMPLETELY RESET your shop. The following will be permanently removed:
+                </p>
+                <ul style="margin: 12px 0 12px 20px; color: var(--gray-600);">
+                    <li><strong>Shop Name</strong> - will be cleared</li>
+                    <li><strong>Shop Phone</strong> - will be cleared</li>
+                    <li><strong>Shop Banner</strong> - will be deleted</li>
+                    <li><strong>Instagram & TikTok Links</strong> - will be removed</li>
+                    <li><strong>All Products</strong> and their images</li>
+                    <li><strong>All Categories</strong></li>
+                    <li><strong>All Orders</strong> and order history</li>
+                    <li><strong>Delivery Settings</strong> - will be disabled</li>
+                    <li><strong>All Revenue Data</strong></li>
+                </ul>
+                <p style="margin: 12px 0 0 0; color: var(--success); font-weight: 500;">
+                    <i class="fas fa-check-circle"></i> Only the following will be preserved: Owner email (linked to your account), Subscription plan, and Expiry date.
+                </p>
+                <p style="margin: 8px 0 0 0; color: var(--warning); font-size: 13px; font-weight: 500;">
+                    <i class="fas fa-exclamation-triangle"></i> After reset, you will need to re-enter your shop name, phone, and all other information.
+                </p>
+            </div>
+            
+            <div class="form-group">
+                <label>Type <strong style="color: var(--danger);">"confirm"</strong> to completely reset your shop:</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-keyboard"></i>
+                    <input type="text" id="deleteConfirmInput" placeholder="Type 'confirm' here" autocomplete="off">
                 </div>
-            `;
-            document.body.appendChild(modal);
-        }
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="cancelDeleteShop()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="btn btn-danger" id="confirmDeleteBtn" onclick="confirmDeleteShop()" disabled>
+                    <i class="fas fa-undo-alt"></i> Reset Everything
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Add input event listener to enable/disable reset button
+    const input = document.getElementById('deleteConfirmInput');
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+    
+    if (input && deleteBtn) {
+        input.addEventListener('input', function(e) {
+            if (e.target.value.toLowerCase() === 'confirm') {
+                deleteBtn.disabled = false;
+                deleteBtn.style.opacity = '1';
+                deleteBtn.style.cursor = 'pointer';
+            } else {
+                deleteBtn.disabled = true;
+                deleteBtn.style.opacity = '0.6';
+                deleteBtn.style.cursor = 'not-allowed';
+            }
+        });
+        
+        // Focus the input
+        input.focus();
+    }
+}
 
+function cancelDeleteShop() {
+    // Reload the settings tab to show original content
+    loadSettingsTab();
+    showToast('Shop reset cancelled', 'info');
+}
+async function confirmDeleteShop() {
+    const input = document.getElementById('deleteConfirmInput');
+    if (!input || input.value.toLowerCase() !== 'confirm') {
+        showToast('Please type "confirm" to reset your shop', 'warning');
+        return;
+    }
+    
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+    
+    try {
+        showToast('Resetting shop...', 'info');
+        
+        const shopIdToReset = currentShopData.id;
+        
+        // Get all products to delete them
+        const products = await db.collection('products')
+            .where('shopId', '==', shopIdToReset)
+            .get();
+        
+        // Get all categories to delete them
+        const categories = await db.collection('categories')
+            .where('shopId', '==', shopIdToReset)
+            .get();
+        
+        // Get all orders to delete them
+        const orders = await db.collection('orders')
+            .where('shopId', '==', shopIdToReset)
+            .get();
+        
+        // Delete images from R2 for all products
+        for (const doc of products.docs) {
+            const product = doc.data();
+            if (product.imageUrls && product.imageUrls.length > 0) {
+                for (const url of product.imageUrls) {
+                    try {
+                        await deleteFromR2(url);
+                    } catch (err) {
+                        console.error('Error deleting image:', err);
+                    }
+                }
+            }
+        }
+        
+        // Delete banner from R2 if exists
+        if (currentShopData.bannerUrl) {
+            try {
+                await deleteFromR2(currentShopData.bannerUrl);
+            } catch (err) {
+                console.error('Error deleting banner:', err);
+            }
+        }
+        
+        // Use multiple batches if needed (Firestore batch limit is 500)
+        // Products batch
+        if (products.size > 0) {
+            let batch = db.batch();
+            let count = 0;
+            for (const doc of products.docs) {
+                batch.delete(doc.ref);
+                count++;
+                if (count >= 500) {
+                    await batch.commit();
+                    batch = db.batch();
+                    count = 0;
+                }
+            }
+            if (count > 0) await batch.commit();
+        }
+        
+        // Categories batch
+        if (categories.size > 0) {
+            let batch = db.batch();
+            let count = 0;
+            for (const doc of categories.docs) {
+                batch.delete(doc.ref);
+                count++;
+                if (count >= 500) {
+                    await batch.commit();
+                    batch = db.batch();
+                    count = 0;
+                }
+            }
+            if (count > 0) await batch.commit();
+        }
+        
+        // Orders batch
+        if (orders.size > 0) {
+            let batch = db.batch();
+            let count = 0;
+            for (const doc of orders.docs) {
+                batch.delete(doc.ref);
+                count++;
+                if (count >= 500) {
+                    await batch.commit();
+                    batch = db.batch();
+                    count = 0;
+                }
+            }
+            if (count > 0) await batch.commit();
+        }
+        
+        // Reset the shop document - UPDATE instead of DELETE
+        const shopRef = db.collection('shops').doc(shopIdToReset);
+        
+        await shopRef.update({
+            // Reset ALL shop fields
+            name: '',  // Empty shop name
+            ownerPhone: '',  // Clear phone number
+            bannerUrl: firebase.firestore.FieldValue.delete(),  // Remove banner
+            instagram: firebase.firestore.FieldValue.delete(),  // Clear Instagram
+            tiktok: firebase.firestore.FieldValue.delete(),  // Clear TikTok
+            
+            // Reset content-related fields
+            productCount: 0,
+            totalRevenue: 0,
+            
+            // Reset delivery settings to default
+            delivery: {
+                enabled: false,
+                charge: 0,
+                freeThreshold: null
+            },
+            
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            
+            // Keep these essential fields ONLY:
+            // ownerEmail (preserved from user account)
+            // plan (preserved)
+            // expiryDate (preserved)
+            // createdAt (preserved)
+        });
+        
+        // Update currentShopData in memory
+        currentShopData.name = '';
+        currentShopData.ownerPhone = '';
+        currentShopData.bannerUrl = null;
+        currentShopData.instagram = null;
+        currentShopData.tiktok = null;
+        currentShopData.productCount = 0;
+        currentShopData.totalRevenue = 0;
+        currentShopData.delivery = {
+            enabled: false,
+            charge: 0,
+            freeThreshold: null
+        };
+        
+        showToast('Shop has been reset successfully! All data has been cleared.', 'success');
+        
+        // Reload the current tab to show empty state
+        if (currentTab === 0) {
+            await loadDashboardData();
+            await loadHomeTab();
+        } else if (currentTab === 1) {
+            loadShopTab();
+        } else if (currentTab === 2) {
+            loadProductsTab();
+        } else if (currentTab === 3) {
+            loadCategoriesTab();
+        } else if (currentTab === 4) {
+            loadOrdersTab();
+        } else if (currentTab === 5) {
+            loadSettingsTab();
+        }
+        
+    } catch (error) {
+        console.error('Error resetting shop:', error);
+        showToast('Error resetting shop: ' + error.message, 'error');
+        
+        // Reload settings tab to show the original content
+        loadSettingsTab();
+    } finally {
+        deleteBtn.disabled = false;
+        deleteBtn.innerHTML = '<i class="fas fa-undo-alt"></i> Reset Shop';
+    }
+}
         async function deleteShop() {
             closeModal();
             
@@ -7810,8 +8155,11 @@ function dataURLtoFile(dataurl, filename) {
         window.showSupportChat = showSupportChat;
         window.sendSupportMessage = sendSupportMessage;
         window.deleteShopConfirm = deleteShopConfirm;
+        window.cancelDeleteShop = cancelDeleteShop;
+    window.confirmDeleteShop = confirmDeleteShop;
         window.deleteShop = deleteShop;
         window.updateCharCount = updateCharCount;
+        
     </script>
 </body>
 </html>
