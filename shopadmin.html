@@ -30,13 +30,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <!-- AWS SDK for JavaScript (required for R2) -->
-<script src="https://cdn.jsdelivr.net/npm/@aws-sdk/client-s3@3.525.0/dist/index.min.js"></script>
-<script src="https://unpkg.com/@aws-sdk/client-s3@3.525.0/dist/index.js"></script>
-<!-- AWS SDK v2 (more stable) -->
-<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1591.0.min.js"></script>
-<!-- AWS SDK v2 -->
-<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1591.0.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
    <style>
      * {
@@ -2668,6 +2662,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
+        const storage = firebase.storage();
 
         // Cloud Functions URL
         const FUNCTIONS_URL = 'https://us-central1-shop-management-1.cloudfunctions.net';
@@ -2709,7 +2704,6 @@
         let productsChart = null;
         
         // Constants
-        const imgbbApiKey = "522870512c188ddca7e0bcd4d64618e0";
         const orderStatuses = ['accepted', 'prepared', 'ontheway', 'delivered', 'cancelled'];
         const statusLabels = {
             'accepted': 'Accepted',
@@ -2773,39 +2767,6 @@
     }
 };
 
-const R2_CONFIG = {
-    accessKeyId: '11e16062f2963c227a844e88365313f5',
-    secretAccessKey: '50770f267a9a9bc495d8301ebfa123664edc9bcc9bf403f5738a1677c9283cba',
-    endpoint: 'https://3732813e81859bdecafdd5726576dd1e.r2.cloudflarestorage.com',
-    bucketName: 'shop-managment',
-    publicUrl: 'https://pub-5092bb90f5824ea2adeca40e59893c67.r2.dev'
-};
-
-let r2Client = null;
-
-function initR2Client() {
-    if (!r2Client) {
-        // Check if AWS SDK is loaded
-        if (typeof AWS === 'undefined') {
-            console.error('AWS SDK not loaded');
-            throw new Error('AWS SDK not loaded. Please check your internet connection and try again.');
-        }
-        
-        // Configure AWS SDK for R2
-        AWS.config.update({
-            accessKeyId: R2_CONFIG.accessKeyId,
-            secretAccessKey: R2_CONFIG.secretAccessKey,
-            region: 'auto',
-            endpoint: R2_CONFIG.endpoint,
-            s3ForcePathStyle: true, // Required for R2
-            signatureVersion: 'v4'
-        });
-        
-        r2Client = new AWS.S3();
-    }
-    return r2Client;
-}
-
 // Generate unique filename
 function generateUniqueFilename(originalName) {
     const timestamp = Date.now();
@@ -2814,62 +2775,47 @@ function generateUniqueFilename(originalName) {
     return `${timestamp}-${random}.${extension}`;
 }
 
-// Upload image to Cloudflare R2
+// Upload image to Firebase Storage
+// (kept the name uploadToR2 so every existing call site keeps working unchanged)
 async function uploadToR2(file, folder = 'products') {
     try {
-        const client = initR2Client();
+        if (!file) throw new Error('No file provided for upload.');
+
         const fileName = generateUniqueFilename(file.name);
-        const key = `${folder}/${fileName}`;
-        
-        // Convert file to buffer/array buffer
-        const buffer = await file.arrayBuffer();
-        
-        const params = {
-            Bucket: R2_CONFIG.bucketName,
-            Key: key,
-            Body: buffer,
-            ContentType: file.type,
-            ACL: 'public-read' // Make file publicly accessible
-        };
-        
-        const result = await client.upload(params).promise();
-        
-        // Return the public URL
-        const publicUrl = `${R2_CONFIG.publicUrl}/${key}`;
+        const path = `${folder}/${fileName}`;
+        const storageRef = storage.ref().child(path);
+
+        const metadata = { contentType: file.type };
+        const snapshot = await storageRef.put(file, metadata);
+        const publicUrl = await snapshot.ref.getDownloadURL();
+
         return publicUrl;
-        
+
     } catch (error) {
-        console.error('Error uploading to R2:', error);
+        console.error('Error uploading to Firebase Storage:', error);
         throw new Error('Failed to upload image: ' + error.message);
     }
 }
 
-// Upload multiple images to R2
+// Upload multiple images to Firebase Storage
 async function uploadMultipleToR2(files, folder = 'products') {
     const uploadPromises = files.map(file => uploadToR2(file, folder));
     const urls = await Promise.all(uploadPromises);
     return urls;
 }
 
-// Delete image from R2
+// Delete image from Firebase Storage
 async function deleteFromR2(imageUrl) {
     try {
-        // Extract key from URL
-        const urlParts = imageUrl.split('/');
-        const key = urlParts.slice(3).join('/');
-        
-        const client = initR2Client();
-        
-        const params = {
-            Bucket: R2_CONFIG.bucketName,
-            Key: key
-        };
-        
-        await client.deleteObject(params).promise();
-        console.log('Image deleted from R2:', key);
-        
+        if (!imageUrl) return;
+
+        // Firebase download URLs work directly with refFromURL
+        const fileRef = storage.refFromURL(imageUrl);
+        await fileRef.delete();
+        console.log('Image deleted from Firebase Storage:', imageUrl);
+
     } catch (error) {
-        console.error('Error deleting from R2:', error);
+        console.error('Error deleting from Firebase Storage:', error);
         // Don't throw - we don't want to block the main operation if deletion fails
     }
 }
@@ -4594,7 +4540,7 @@ function loadShopTab() {
             try {
                 showToast('Uploading image...', 'info');
                 
-                // Upload to R2
+                // Upload to Firebase Storage
                 const imageUrl = await uploadToR2(file, 'banners');
                 
                 await db.collection('shops').doc(currentShopData.id).update({
@@ -5098,7 +5044,7 @@ function loadShopTab() {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
     try {
-        // Upload all images to R2
+        // Upload all images to Firebase Storage
         const imageUrls = await uploadMultipleToR2(productImages, 'products');
 
         const productData = {
@@ -5163,7 +5109,7 @@ function loadShopTab() {
         if (doc.exists) {
             const product = doc.data();
             
-            // Delete images from R2 (optional - can be done later)
+            // Delete images from Firebase Storage (optional - can be done later)
             if (product.imageUrls && product.imageUrls.length > 0) {
                 for (const url of product.imageUrls) {
                     try {
@@ -5670,7 +5616,7 @@ async function handleEditProduct(e, productId) {
             }
         }
         
-        // Upload new images to R2
+        // Upload new images to Firebase Storage
         if (newImages.length > 0) {
             const newUrls = await uploadMultipleToR2(newImages, 'products');
             imageUrls.push(...newUrls);
@@ -6053,7 +5999,7 @@ function addEditCategoryImage() {
         
         const order = maxOrder + 1;
 
-        // Upload to R2
+        // Upload to Firebase Storage
         const imageUrl = await uploadToR2(categoryImage, 'categories');
 
         const categoryData = {
@@ -6198,7 +6144,7 @@ function addEditCategoryImage() {
         };
 
         if (window.editCategoryImage) {
-            // Upload new image to R2
+            // Upload new image to Firebase Storage
             const imageUrl = await uploadToR2(window.editCategoryImage, 'categories');
             categoryData.imageUrl = imageUrl;
         }
@@ -7719,7 +7665,7 @@ async function confirmDeleteShop() {
             .where('shopId', '==', shopIdToReset)
             .get();
         
-        // Delete images from R2 for all products
+        // Delete images from Firebase Storage for all products
         for (const doc of products.docs) {
             const product = doc.data();
             if (product.imageUrls && product.imageUrls.length > 0) {
@@ -7733,7 +7679,7 @@ async function confirmDeleteShop() {
             }
         }
         
-        // Delete banner from R2 if exists
+        // Delete banner from Firebase Storage if exists
         if (currentShopData.bannerUrl) {
             try {
                 await deleteFromR2(currentShopData.bannerUrl);
