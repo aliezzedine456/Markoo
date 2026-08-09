@@ -2988,10 +2988,33 @@ body.panel-open .detail-gallery-container {
                 flex-shrink: 0;
             }
 
+            .sidebar-filter-cat-thumb {
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                overflow: hidden;
+                flex-shrink: 0;
+                background: var(--gray-100, #eee);
+                border: 1px solid var(--gray-200);
+            }
+
+            .sidebar-filter-cat-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
             .sidebar-filter-cat span {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+
+            /* The circular category rail under the search bar is replaced by
+               the sidebar category list on desktop, so hide it here. */
+            .categories-wrapper {
+                display: none !important;
             }
 
             .sidebar-price-row {
@@ -4953,6 +4976,7 @@ function updateShopHeaderDisplay(shopData) {
         list.innerHTML = categories.map(cat => `
             <label class="sidebar-filter-cat">
                 <input type="checkbox" class="sidebar-cat-checkbox" value="${cat.id}">
+                <span class="sidebar-filter-cat-thumb"><img src="${cat.imageUrl || 'https://via.placeholder.com/62'}" onerror="this.src='https://via.placeholder.com/62'" alt=""></span>
                 <span>${escapeHtml(cat.name || '')}</span>
             </label>
         `).join('');
