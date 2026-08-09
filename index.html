@@ -3522,7 +3522,7 @@
     <div class="detail-panel-header"><i class="fas fa-arrow-left" id="closeDetailPanel"></i> Product details</div>
     <div class="detail-content" id="detailContent">
         <div id="detailLoadingPlaceholder" style="display: none;" class="loader-wrap">
-            <div class="circular-loader lg"></div>
+            <div class="circular-loader md"></div>
         </div>
         <div id="detailActualContent" style="display: none;">
             <div class="detail-gallery-container" id="detailGalleryContainer">
@@ -3569,7 +3569,7 @@
     </div>
     <div id="categoryProductsArea">
         <div id="categoryLoadingPlaceholder" style="display: none;" class="loader-wrap">
-            <div class="circular-loader lg"></div>
+            <div class="circular-loader md"></div>
         </div>
         <div class="cat-products-grid" id="categoryProductsGrid"></div>
         <div class="text-center py-4" id="catNoProducts" style="display:none;">No products</div>
@@ -5809,10 +5809,19 @@ async function showProductDetail(p) {
     if (galleryTrack) {
         galleryTrack.style.transition = 'none';
         galleryTrack.style.transform = 'translateX(0%)';
+        // NOTE: <img> must come BEFORE .g-skeleton in the markup. The CSS
+        // rule that hides the skeleton once loaded is
+        // ".gallery-slide img.g-loaded ~ .g-skeleton" - the "~" sibling
+        // combinator only matches a .g-skeleton that appears AFTER the
+        // loaded img in the DOM. With the skeleton listed first (as it
+        // was), that rule could never match, so the shimmer stayed on
+        // screen forever even after the real photo had loaded. Swapping
+        // the order fixes this; .g-skeleton is position:absolute so it
+        // still overlays the image visually until that rule hides it.
         galleryTrack.innerHTML = detailImages.map((imgUrl, idx) => `
             <div class="gallery-slide" data-index="${idx}">
-                <div class="g-skeleton"></div>
                 <img data-src="${optimizeImageUrl(imgUrl)}" alt="${(p.name || 'Product image').replace(/"/g, '&quot;')}" draggable="false">
+                <div class="g-skeleton"></div>
             </div>
         `).join('');
         
