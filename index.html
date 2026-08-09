@@ -1035,6 +1035,10 @@
             width: 100%;
             max-width: 480px;
         }
+
+        .sidebar-brand {
+            display: none;
+        }
         
         .bottom-nav-item { 
             display: flex; 
@@ -2793,7 +2797,7 @@ body.panel-open .detail-gallery-container {
         @media (min-width: 1180px) {
             body {
                 padding-bottom: 24px;
-                padding-left: 92px;
+                padding-left: 232px;
                 box-sizing: border-box;
             }
 
@@ -2802,14 +2806,14 @@ body.panel-open .detail-gallery-container {
                 bottom: 0;
                 left: 0;
                 right: auto;
-                width: 92px;
+                width: 232px;
                 height: 100vh;
                 border-radius: 0;
                 border-top: none;
                 border-right: 1px solid var(--gray-200);
                 box-shadow: 4px 0 28px -14px rgba(20,20,30,0.1);
-                padding: 28px 10px;
-                align-items: flex-start;
+                padding: 28px 16px;
+                align-items: stretch;
                 justify-content: flex-start;
             }
 
@@ -2817,14 +2821,96 @@ body.panel-open .detail-gallery-container {
                 flex-direction: column;
                 width: 100%;
                 max-width: none;
-                gap: 6px;
+                gap: 4px;
                 justify-content: flex-start;
             }
 
             .bottom-nav-item {
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 14px;
                 width: 100%;
                 max-width: none;
-                padding: 12px 4px;
+                padding: 13px 16px;
+                border-radius: 14px;
+            }
+
+            .bottom-nav-item:hover {
+                background: var(--gray-100);
+            }
+
+            .bottom-nav-item.active:hover {
+                background: rgba(79,109,122,0.14);
+            }
+
+            .bottom-nav-item i,
+            .bottom-nav-item .nav-icon-svg {
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+
+            .bottom-nav-item i {
+                font-size: 20px;
+            }
+
+            .bottom-nav-item .nav-icon-svg {
+                width: 21px;
+                height: 21px;
+            }
+
+            .bottom-nav-item span {
+                font-size: 14.5px;
+                font-weight: 500;
+            }
+
+            .bottom-nav-item.active span {
+                font-weight: 600;
+            }
+
+            .sidebar-brand {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 6px 10px 22px;
+                margin-bottom: 10px;
+                border-bottom: 1px solid var(--gray-200);
+            }
+
+            #sidebarBrandInitial {
+                width: 34px;
+                height: 34px;
+                border-radius: 10px;
+                background: var(--brand-gradient, var(--accent));
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 15px;
+                flex-shrink: 0;
+                text-transform: uppercase;
+            }
+
+            #sidebarBrandName {
+                font-weight: 700;
+                font-size: 15px;
+                color: var(--dark);
+                letter-spacing: -0.01em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .bottom-nav-item .cart-badge {
+                position: static;
+                margin-left: auto;
+                border: none;
+            }
+
+            .bottom-nav-item .connect-badge {
+                position: static;
+                margin-left: auto;
             }
         }
 
@@ -2927,6 +3013,7 @@ body.panel-open .detail-gallery-container {
 
 <!-- bottom navigation -->
 <div class="bottom-nav">
+  <div class="sidebar-brand" id="sidebarBrand"><span id="sidebarBrandInitial">S</span><span id="sidebarBrandName">Shop</span></div>
   <div class="bottom-nav-inner">
     <a href="#" class="bottom-nav-item active" id="navHome">
         <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -3709,6 +3796,13 @@ function updateShopHeaderDisplay(shopData) {
     const bannerSkeleton = document.getElementById('bannerSkeleton');
     const bannerContent = document.getElementById('bannerContent');
     const shopTopBar = document.getElementById('shopTopBar');
+
+    // Desktop sidebar brand header (name + initial letter)
+    const sidebarBrandName = document.getElementById('sidebarBrandName');
+    const sidebarBrandInitial = document.getElementById('sidebarBrandInitial');
+    const shopName = shopData.name || 'Shop';
+    if (sidebarBrandName) sidebarBrandName.innerText = shopName;
+    if (sidebarBrandInitial) sidebarBrandInitial.innerText = shopName.trim().charAt(0) || 'S';
 
     const bannerImg = (shopData.bannerEnabled !== false) ? (shopData.bannerUrl || shopData.bannerImage) : '';
     const showCompactBar = shopData.bannerEnabled === false && shopData.compactBarEnabled !== false;
@@ -5785,11 +5879,12 @@ async function showProductDetail(p) {
     document.getElementById('backFromTerms').addEventListener('click', ()=> { closePanel(termsPanel); openPanel(accountPanel); });
     document.getElementById('backFromManualAddress').addEventListener('click', ()=> { closePanel(manualAddressPanel); openPanel(addressPanel); });
 
-    // Navigation
-    document.getElementById('navAccount').addEventListener('click', (e) => { e.preventDefault(); if(userProfile) openPanel(accountPanel); else showAuthPanel(); });
-    document.getElementById('navCart').addEventListener('click', (e) => { e.preventDefault(); openCart(); });
+    // Navigation - closing whatever's open first means any nav item can be
+    // pressed directly to switch sections, with no need to hit Back first.
+    document.getElementById('navAccount').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); if(userProfile) openPanel(accountPanel); else showAuthPanel(); });
+    document.getElementById('navCart').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); openCart(); });
     document.getElementById('navHome').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); });
-    document.getElementById('navSearch').addEventListener('click', (e) => { e.preventDefault(); searchInput.focus(); });
+    document.getElementById('navSearch').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); searchInput.focus(); });
 
     // Account items
     document.getElementById('accountInfoItem').addEventListener('click',()=>{ closePanel(accountPanel); openPanel(accountInfoPanel); });
