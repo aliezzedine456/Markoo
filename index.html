@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Shop Creator – Order Tracking Enabled</title>
     <meta name="description" content="Browse and shop the latest products, track your orders, and manage favorites — all in one place.">
-    <meta name="theme-color" content="#0071e3">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230071e3'/%3E%3Cstop offset='.55' stop-color='%237c5cff'/%3E%3Cstop offset='1' stop-color='%23ff5da2'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M18 26h28l-2.6 20.2a4 4 0 0 1-4 3.4H24.6a4 4 0 0 1-4-3.4L18 26z' fill='white' fill-opacity='.95'/%3E%3Cpath d='M24 26v-4a8 8 0 0 1 16 0v4' stroke='white' stroke-width='3.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#4F6D7A">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236b8794'/%3E%3Cstop offset='1' stop-color='%234F6D7A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M18 26h28l-2.6 20.2a4 4 0 0 1-4 3.4H24.6a4 4 0 0 1-4-3.4L18 26z' fill='white' fill-opacity='.95'/%3E%3Cpath d='M24 26v-4a8 8 0 0 1 16 0v4' stroke='white' stroke-width='3.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
     <!-- Bootstrap 5 + Font Awesome -->
      <!-- Preload critical resources -->
 <link rel="preload" as="image" href="https://via.placeholder.com/400" fetchpriority="high">
@@ -46,21 +46,21 @@
     </script>
     <style>
         :root { 
-            --bs-primary: #0071e3;
-            --bs-primary-rgb: 0,113,227;
+            --bs-primary: #4F6D7A;
+            --bs-primary-rgb: 79,109,122;
             --primary-color: #1d1d1f;
             --primary-light:  #48484a;   
             --primary-dark: #000000;
-            --accent: #0071e3;
-            --accent-dark: #0059b3;
-            --secondary: #0071e3;
-            --accent-color: #0071e3; 
+            --accent: #4F6D7A;
+            --accent-dark: #3d5560;
+            --secondary: #4F6D7A;
+            --accent-color: #4F6D7A; 
             --light-color: #f5f5f7; 
             --dark-color: #1d1d1f; 
             --success: #1d8a3e; 
             --danger: #e0393e;
             --warning: #c77700;
-            --info: #0071e3;
+            --info: #4F6D7A;
             --bg-color: #ffffff; 
             --text-color: #1d1d1f;           
             --text-secondary: #6e6e73;
@@ -74,7 +74,7 @@
             --gray-600: #6e6e73;
             --gray-700: #424245;
             --gray-800: #1d1d1f;
-            --toast-success: #1d8a3e;
+            --toast-success: #1d8a3e; 
             --toast-error: #e0393e;
             --toast-info: #1d1d1f;
             --toast-warning: #c77700;
@@ -89,19 +89,19 @@
             --transition-smooth: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
             --max-content-width: 1180px;
 
-            /* Signature brand gradient - used sparingly for the hero banner,
-               floating CTAs and a handful of accent moments so it stays
-               a genuine "signature", not decoration everywhere. */
-            --brand-1: #0071e3;
-            --brand-2: #7c5cff;
-            --brand-3: #ff5da2;
-            --brand-gradient: linear-gradient(120deg, var(--brand-1) 0%, var(--brand-2) 55%, var(--brand-3) 100%);
-            --brand-gradient-soft: linear-gradient(135deg, rgba(0,113,227,0.16) 0%, rgba(124,92,255,0.14) 55%, rgba(255,93,162,0.12) 100%);
-            --glow-shadow: 0 8px 30px -6px rgba(124,92,255,0.35);
+            /* Signature brand palette - matched to the shop admin dashboard's
+               own slate + signature-green scheme, so the storefront and
+               admin feel like one product. */
+            --brand-1: #6b8794;
+            --brand-2: #4F6D7A;
+            --brand-3: #33474F;
+            --brand-gradient: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-2) 100%);
+            --brand-gradient-soft: linear-gradient(135deg, rgba(79,109,122,0.16) 0%, rgba(79,109,122,0.14) 100%);
+            --glow-shadow: 0 8px 30px -6px rgba(79,109,122,0.35);
         }
         
         html, body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: #ffffff;
             color: var(--text-color); 
             transition: background-color 0.3s, color 0.3s; 
@@ -329,9 +329,9 @@
     inset: -10%;
     z-index: 0;
     background:
-        radial-gradient(circle at 12% 18%, rgba(0,113,227,0.65) 0%, transparent 40%),
-        radial-gradient(circle at 88% 12%, rgba(124,92,255,0.55) 0%, transparent 42%),
-        radial-gradient(circle at 60% 100%, rgba(255,93,162,0.35) 0%, transparent 46%);
+        radial-gradient(circle at 12% 18%, rgba(107,135,148,0.6) 0%, transparent 40%),
+        radial-gradient(circle at 88% 12%, rgba(79,109,122,0.6) 0%, transparent 42%),
+        radial-gradient(circle at 60% 100%, rgba(51,71,79,0.45) 0%, transparent 46%);
     animation: bannerDrift 16s ease-in-out infinite alternate;
     pointer-events: none;
 }
@@ -416,7 +416,7 @@
             height:200px; 
             border-radius: 0 0 28px 28px;
             background:
-                linear-gradient(120deg, rgba(0,113,227,0.35) 0%, rgba(124,92,255,0.35) 50%, rgba(255,93,162,0.3) 100%),
+                linear-gradient(120deg, rgba(107,135,148,0.35) 0%, rgba(79,109,122,0.35) 50%, rgba(51,71,79,0.3) 100%),
                 linear-gradient(90deg, rgba(255,255,255,0.12) 25%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.12) 75%);
             background-blend-mode: overlay;
             background-size: 100% 100%, 200% 100%;
@@ -522,7 +522,7 @@
             border-width: 2px;
             transform: scale(1.03); 
             background: var(--brand-gradient) padding-box, var(--brand-gradient) border-box;
-            box-shadow: 0 4px 14px -4px rgba(124,92,255,0.45);
+            box-shadow: 0 4px 14px -4px rgba(79,109,122,0.45);
         }
         
         .category-circle img { 
@@ -711,6 +711,15 @@
             font-size: 0.92rem; 
         }
 
+        /* Smaller quick-add "+" button variant for the compact horizontal cards */
+        .product-card-h .add-to-cart-btn {
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
+            top: 8px;
+            right: 8px;
+        }
+
         /* product grid - 2 columns */
         .product-grid {
             display: grid;
@@ -798,38 +807,45 @@
         .heart-icon.far { color: var(--gray-500); }
         .heart-icon.fas { color: var(--danger); }
         
+        /* "+" quick-add button — sits top-right of the product image
+           instead of a full-width text button below it */
         .add-to-cart-btn { 
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            margin: 0;
             background: var(--brand-gradient);
             background-size: 160% 160%;
             background-position: 0% 50%;
             color: white; 
             border: none; 
-            border-radius: 980px; 
-            padding: 9px 10px; 
-            font-size: 0.85rem; 
-            width: 100%; 
+            border-radius: 50%; 
+            font-size: 0.95rem; 
             transition: var(--transition), background-position 0.4s ease; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            gap: 6px; 
-            margin-top: 8px; 
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 4px 14px -4px rgba(124,92,255,0.4);
+            z-index: 3;
+            box-shadow: 0 4px 12px -2px rgba(79,109,122,0.5);
         }
         
         .add-to-cart-btn:hover {
             background-position: 100% 50%;
-            box-shadow: 0 6px 18px -4px rgba(124,92,255,0.55);
+            box-shadow: 0 6px 16px -2px rgba(79,109,122,0.6);
+            transform: scale(1.08);
         }
         
         .add-to-cart-btn:active {
-            transform: scale(0.97);
+            transform: scale(0.92);
         }
         
         .add-to-cart-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
@@ -936,7 +952,7 @@
         .search-wrapper:focus-within {
             background: white;
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+            box-shadow: 0 0 0 4px rgba(79,109,122,0.1);
         }
         
         .search-wrapper i { 
@@ -990,11 +1006,14 @@
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
             border-top: 1px solid var(--gray-200);
+            border-radius: 22px 22px 0 0;
+            box-shadow: 0 -10px 30px -8px rgba(20,20,30,0.1);
             flex-shrink: 0;
             z-index: 1000;
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
         }
 
         .bottom-nav-inner {
@@ -1008,10 +1027,10 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 6px 12px;
+            padding: 7px 14px;
             cursor: pointer;
             color: var(--gray-500);
-            transition: var(--transition);
+            transition: color 0.25s ease, background 0.25s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             border-radius: var(--border-radius-md);
             flex: 1;
             max-width: 80px;
@@ -1020,17 +1039,33 @@
         }
         
         .bottom-nav-item:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
         
         .bottom-nav-item.active { 
             color: var(--accent); 
-            background: transparent;
+            background: rgba(79,109,122,0.1);
+        }
+        
+        .bottom-nav-item i,
+        .bottom-nav-item .nav-icon-svg {
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .bottom-nav-item.active i,
+        .bottom-nav-item.active .nav-icon-svg {
+            transform: translateY(-1px) scale(1.06);
         }
         
         .bottom-nav-item i { 
             font-size: 21px; 
             margin-bottom: 4px; 
+        }
+        
+        .bottom-nav-item .nav-icon-svg {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 4px;
         }
         
         .bottom-nav-item span { 
@@ -1070,46 +1105,66 @@
 
         /* marine blue top bar for account */
         .account-top-bar { 
-            background: #1d1d1f;
-            padding:24px 16px 24px; 
+            background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-3) 100%);
+            padding:32px 20px 44px; 
             color:white; 
+            position: relative;
+            overflow: hidden;
+        }
+
+        .account-top-bar::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.14) 1px, transparent 1px);
+            background-size: 16px 16px;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .account-top-bar > * {
+            position: relative;
+            z-index: 1;
         }
         
         .user-circle { 
-            width:56px; 
-            height:56px; 
-            background: var(--accent); 
+            width:64px; 
+            height:64px; 
+            background: rgba(255,255,255,0.16); 
             border-radius:50%; 
             display:flex; 
             align-items:center; 
             justify-content:center; 
-            font-size:1.6rem; 
-            font-weight:500; 
+            font-size:1.7rem; 
+            font-weight:600; 
             color: white; 
-            margin-right:15px; 
-            border: 2px solid rgba(255,255,255,0.3);
-            box-shadow: none;
+            margin-right:16px; 
+            border: 2px solid rgba(255,255,255,0.4);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+            backdrop-filter: blur(6px);
         }
         
         .stats-card { 
             background:white; 
-            border-radius:12px; 
-            padding:16px; 
-            margin-top:8px; 
-            box-shadow:var(--shadow-lg); 
-            position:relative; 
+            border-radius: var(--border-radius-lg); 
+            padding:18px 20px; 
+            margin-top:-28px; 
+            box-shadow: var(--shadow-xl); 
+            position:relative;
+            z-index: 2;
+            border: 1px solid var(--gray-100);
         }
         
         .qr-placeholder { 
-            width:60px; 
-            height:60px; 
-            background:var(--gray-100); 
-            border-radius:12px; 
+            width:56px; 
+            height:56px; 
+            background: var(--brand-gradient-soft); 
+            border-radius: var(--border-radius-md); 
             display:flex; 
             align-items:center; 
             justify-content:center; 
-            font-size:1.8rem; 
-            color: var(--primary-color);
+            font-size:1.6rem; 
+            color: var(--accent);
 
         }
         /* Faster image transitions */
@@ -1213,9 +1268,9 @@
         }
         
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0,113,227,0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(0,113,227,0); }
-            100% { box-shadow: 0 0 0 0 rgba(0,113,227,0); }
+            0% { box-shadow: 0 0 0 0 rgba(79,109,122,0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(79,109,122,0); }
+            100% { box-shadow: 0 0 0 0 rgba(79,109,122,0); }
         }
 
         /* OTP Verification */
@@ -1240,7 +1295,7 @@
         .otp-digit:focus {
             border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(0,113,227,0.1);
+            box-shadow: 0 0 0 4px rgba(79,109,122,0.1);
         }
         /* Improved Gallery Styling */
 .detail-gallery-container {
@@ -1395,7 +1450,11 @@
             overflow-y:auto; 
             transform:translateX(100%); 
             transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-            box-shadow: var(--shadow-xl);
+            /* No shadow while off-canvas — a blurred box-shadow on a
+               fixed, fully off-screen element still bleeds back onto
+               the visible viewport from its left edge. Only the
+               visible (.show) panel gets a shadow, see below. */
+            box-shadow: none;
             scrollbar-width: none;
             will-change: transform;
         }
@@ -1409,37 +1468,44 @@
         
         .slide-panel.show, .product-detail-panel.show, .category-products-panel.show, .order-track-panel.show { 
             transform:translateX(0); 
+            box-shadow: var(--shadow-xl);
         }
         
         .panel-header { 
-            background:white; 
-            padding:16px 20px; 
-            border-bottom:1px solid var(--gray-200); 
+            background: rgba(255,255,255,0.9); 
+            padding:14px 18px; 
+            border-bottom:1px solid var(--gray-100); 
             display:flex; 
             align-items:center; 
-            gap:20px; 
-            font-weight:600; 
-            font-size:1.2rem; 
+            gap:16px; 
+            font-weight:700; 
+            font-size:1.15rem; 
+            letter-spacing: -0.01em;
             position:sticky; 
             top:0; 
-            background:white; 
             z-index:10; 
             color: var(--primary-color);
-            backdrop-filter: blur(10px);
-            background: rgba(255,255,255,0.95);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
         }
         
         .panel-header i { 
-            font-size:1.4rem; 
+            font-size:1.05rem; 
             cursor:pointer; 
             color: var(--primary-color);
-            padding: 8px;
-            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%; 
+            background: var(--gray-100);
             transition: var(--transition);
         }
         
         .panel-header i:active {
             transform: scale(0.9);
+            background: var(--gray-200);
         }
         
         /* Category panel */
@@ -1500,14 +1566,26 @@
             padding: 8px 16px 20px;
         }
         
+        .settings-group {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--gray-100);
+            overflow: hidden;
+        }
+
         .list-item { 
             display:flex; 
             justify-content:space-between; 
             align-items:center; 
-            padding:16px 20px; 
-            border-bottom:1px solid var(--gray-200); 
+            padding:14px 18px; 
+            border-bottom:1px solid var(--gray-100); 
             cursor:pointer; 
-            transition: background-color 0.2s;
+            transition: background-color 0.2s ease;
+        }
+
+        .settings-group .list-item:last-child {
+            border-bottom: none;
         }
         
         .list-item:active {
@@ -1517,7 +1595,35 @@
         .list-item .left { 
             display:flex; 
             align-items:center; 
-            gap:15px; 
+            gap:13px; 
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .list-item > i.fa-chevron-right {
+            color: var(--gray-400);
+            font-size: 0.85rem;
+        }
+
+        .list-icon-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .list-item.text-danger {
+            justify-content: center;
+            font-weight: 600;
+            color: var(--danger) !important;
+        }
+
+        .list-item.text-danger .left {
+            color: var(--danger);
         }
 
         .product-detail-panel { 
@@ -1651,15 +1757,16 @@ body.panel-open .detail-gallery-container {
         }
         
         .btn-green { 
-            background: var(--accent); 
+            background: var(--brand-gradient); 
             color:white; 
             border-radius:980px; 
-            padding:12px; 
+            padding:13px; 
             width:100%; 
             border:none; 
             font-weight:600; 
             transition: var(--transition);
             cursor: pointer;
+            box-shadow: 0 4px 14px -4px rgba(79,109,122,0.45);
         }
         
         .btn-green:active {
@@ -1711,135 +1818,350 @@ body.panel-open .detail-gallery-container {
             transform: scale(0.98);
         }
         
-        /* Address Panel Styles */
-        .address-action-btn {
+        /* ================================================
+           Delivery Address panel — rebuilt from scratch
+           ================================================ */
+
+        /* Hero: a map/location visual is the first thing you see,
+           since this whole screen is fundamentally about "where" */
+        .addr-hero {
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            margin-bottom: 18px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .addr-hero-empty {
+            height: 168px;
+            background: linear-gradient(135deg, #6b8794 0%, #33474F 100%);
+            background-image: linear-gradient(135deg, #6b8794 0%, #33474F 100%), radial-gradient(rgba(255,255,255,0.14) 1px, transparent 1px);
+            background-size: 100% 100%, 16px 16px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 16px;
-            border-radius: var(--border-radius-md);
-            background: white;
-            border: 2px solid var(--gray-200);
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-            width: 100%;
-        }
-        
-        .address-action-btn:active {
-            transform: scale(0.98);
-            border-color: var(--primary-color);
-            background: var(--gray-100);
-        }
-        
-        .address-action-btn.primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            border-color: var(--primary-color);
+            gap: 6px;
             color: white;
+            text-align: center;
+            padding: 0 24px;
         }
-        
-        .address-action-btn .icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(0,113,227,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
+
+        .addr-hero-empty i {
+            font-size: 2rem;
+            margin-bottom: 4px;
+            opacity: 0.95;
         }
-        
-        .address-action-btn.primary .icon {
-            background: rgba(255,255,255,0.2);
-            color: white;
+
+        .addr-hero-empty .title {
+            font-weight: 700;
+            font-size: 1.02rem;
+            letter-spacing: -0.01em;
         }
-        
-        .address-action-btn .content {
-            flex: 1;
-            text-align: left;
+
+        .addr-hero-empty .sub {
+            font-size: 0.8rem;
+            opacity: 0.82;
         }
-        
-        .address-action-btn .content h6 {
+
+        #mapPreviewContainer {
             margin: 0;
-            font-weight: 600;
         }
-        
-        .address-action-btn .content small {
-            color: var(--gray-600);
-            display: block;
-            margin-top: 2px;
-        }
-        
-        .address-action-btn.primary .content small {
-            color: rgba(255,255,255,0.8);
-        }
-        
-        .current-address-card {
-            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
-            border-radius: var(--border-radius-md);
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid var(--gray-300);
-        }
-        
-        .current-address-card .label {
-            font-size: 0.85rem;
-            color: var(--primary-color);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-        
-        .current-address-card .address {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
-        
-        .current-address-card .hint {
-            font-size: 0.85rem;
-            color: var(--gray-600);
-        }
-        
+
         .map-preview {
             width: 100%;
-            height: 150px;
-            background: var(--gray-300);
-            border-radius: var(--border-radius-md);
-            margin-top: 10px;
+            height: 168px;
+            background: var(--gray-200);
             background-size: cover;
             background-position: center;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
         }
-        
-        .map-preview::after {
-            content: '\f3c5';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.5);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+
+        /* Rotating 3D-style globe used inside the address hero once a
+           location is set: a shaded sphere with a slowly spinning
+           "landmass" texture and a fixed pin marking the address, so
+           it reads as "your location on the world" rather than a
+           flat map card */
+        .map-sim {
+            position: relative;
+            width: 100%;
+            height: 168px;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 30% 20%, #1c2b33 0%, #0d1518 70%),
+                linear-gradient(160deg, #16232a 0%, #0a1114 100%);
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            opacity: 0;
-            transition: opacity 0.2s;
         }
-        
-        .map-preview:hover::after {
-            opacity: 1;
+
+        /* faint starfield behind the globe */
+        .map-sim::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px),
+                radial-gradient(rgba(255,255,255,0.16) 1px, transparent 1px);
+            background-size: 60px 60px, 34px 34px;
+            background-position: 0 0, 17px 17px;
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .globe-wrap {
+            position: relative;
+            width: 132px;
+            height: 132px;
+        }
+
+        .globe-atmosphere {
+            position: absolute;
+            inset: -7px;
+            border-radius: 50%;
+            box-shadow: 0 0 18px 4px rgba(107,196,222,0.35);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .globe-sphere {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #14202a;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.1),
+                0 10px 30px -6px rgba(0,0,0,0.55);
+            z-index: 2;
+        }
+
+        /* real Earth photo texture, tiled twice and scrolled
+           horizontally so the sphere actually looks like it's
+           rotating on its axis */
+        .globe-sphere-map {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://cdn.jsdelivr.net/gh/mrdoob/three.js@dev/examples/textures/planets/earth_atmos_2048.jpg');
+            background-repeat: repeat-x;
+            background-size: 264px 132px;
+            background-position: 0 0;
+            animation: globeRotate 20s linear infinite;
+            will-change: background-position;
+        }
+
+        /* spherical shading laid over the flat photo texture so it
+           reads as a curved 3D ball: darker toward the rim, a touch
+           of rim-light on the terminator edge */
+        .globe-sphere-shading {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 38% 42%, transparent 0%, transparent 40%, rgba(4,10,14,0.18) 66%, rgba(4,10,14,0.6) 92%, rgba(4,10,14,0.82) 100%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        @keyframes globeRotate {
+            from { background-position: 0 0; }
+            to   { background-position: -264px 0; }
+        }
+
+        .globe-highlight {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 24%, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.08) 18%, transparent 38%);
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        .globe-pin-wrap {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .globe-pin-pulse {
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translate(-50%, 50%);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.6);
+            animation: globePulse 2.2s ease-out infinite;
+        }
+
+        @keyframes globePulse {
+            0%   { transform: translate(-50%, 50%) scale(0.6); opacity: 0.9; }
+            100% { transform: translate(-50%, 50%) scale(3.2); opacity: 0; }
+        }
+
+        .globe-pin-wrap i {
+            font-size: 1.6rem;
+            color: white;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.45));
+        }
+
+        .globe-label {
+            position: absolute;
+            left: 50%;
+            bottom: 14px;
+            transform: translateX(-50%);
+            z-index: 4;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,0.32);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: white;
+            padding: 7px 16px;
+            border-radius: 980px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Current address: a single clean row — icon, label + value,
+           and a lightweight "open in maps" link, no redundant cards */
+        .addr-current-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 4px 2px 18px;
+        }
+
+        .addr-current-row .addr-current-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(79,109,122,0.1);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .addr-current-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .addr-current-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--gray-500);
+            margin-bottom: 3px;
+        }
+
+        .addr-current-value {
+            font-size: 1.02rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text-color);
+            word-break: break-word;
+            line-height: 1.35;
+        }
+
+        .addr-current-value.is-empty {
+            color: var(--gray-400);
+            font-weight: 500;
+        }
+
+        .addr-map-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-top: 6px;
+            text-decoration: none;
+        }
+
+        .addr-map-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Method list reuses the same settings-group / list-item
+           language as the Account panel for visual consistency */
+        .addr-method-row .left {
+            gap: 14px;
+        }
+
+        .addr-method-row .list-icon-badge {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            font-size: 1.05rem;
+        }
+
+        .addr-method-row .method-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .addr-method-row .method-sub {
+            font-weight: 400;
+            font-size: 0.78rem;
+            color: var(--gray-500);
+            margin-top: 1px;
+        }
+
+        /* Sticky action bar pinned to the bottom of the panel, always
+           reachable without hunting for it after scrolling. Panels
+           that end in one become flex columns so the bar hugs the
+           true bottom of the screen even when content above is short */
+        .slide-panel.has-bottom-bar {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-panel.has-bottom-bar > .p-4 {
+            flex: 1;
+        }
+
+        .panel-bottom-bar {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 10px;
+            padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-top: 1px solid var(--gray-100);
+        }
+
+        .panel-bottom-bar .btn-outline-red,
+        .panel-bottom-bar .btn-dark {
+            width: auto;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         /* similar products */
@@ -1934,13 +2256,16 @@ body.panel-open .detail-gallery-container {
 
         /* address manual panel */
         .address-field { 
-            margin-bottom: 12px; 
+            margin-bottom: 16px; 
         }
         
         .address-field label { 
-            font-size:0.9rem; 
-            font-weight:500; 
-            margin-bottom:3px; 
+            font-size:0.82rem; 
+            font-weight:600; 
+            color: var(--gray-600);
+            margin-bottom:5px; 
+            display: block;
+            width: 100%;
         }
         
         .container, .container-fluid { 
@@ -1985,7 +2310,7 @@ body.panel-open .detail-gallery-container {
         
         .address-option.selected {
             border-color: var(--accent);
-            background: rgba(0,113,227,0.05);
+            background: rgba(79,109,122,0.05);
         }
         
         .address-option i {
@@ -2266,6 +2591,9 @@ body.panel-open .detail-gallery-container {
 
         /* Form inputs - clean, Apple-like */
         .form-control, .form-select {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
             border: 1px solid var(--gray-300);
             border-radius: var(--border-radius-sm);
             padding: 11px 14px;
@@ -2277,7 +2605,7 @@ body.panel-open .detail-gallery-container {
 
         .form-control:focus, .form-select:focus {
             border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(0,113,227,0.12);
+            box-shadow: 0 0 0 4px rgba(79,109,122,0.12);
         }
 
         label {
@@ -2345,12 +2673,13 @@ body.panel-open .detail-gallery-container {
                 left: auto;
                 right: 0;
                 transform: translateX(100%);
-                box-shadow: var(--shadow-xl);
+                box-shadow: none;
                 border-left: 1px solid var(--gray-200);
             }
 
             .slide-panel.show, .product-detail-panel.show, .category-products-panel.show, .order-track-panel.show {
                 transform: translateX(0);
+                box-shadow: var(--shadow-xl);
             }
 
             .cat-panel-header .cat-title,
@@ -2475,11 +2804,16 @@ body.panel-open .detail-gallery-container {
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
     <a href="#" class="bottom-nav-item active" id="navHome">
-        <i class="fas fa-home"></i>
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M2 12.2039C2 9.91549 2 8.77128 2.5192 7.82274C3.0384 6.87421 3.98695 6.28551 5.88403 5.10813L7.88403 3.86687C9.88939 2.62229 10.8921 2 12 2C13.1079 2 14.1106 2.62229 16.116 3.86687L18.116 5.10812C20.0131 6.28551 20.9616 6.87421 21.4808 7.82274C22 8.77128 22 9.91549 22 12.2039V13.725C22 17.6258 22 19.5763 20.8284 20.7881C19.6569 22 17.7712 22 14 22H10C6.22876 22 4.34315 22 3.17157 20.7881C2 19.5763 2 17.6258 2 13.725V12.2039Z" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M9 16C9.85038 16.6303 10.8846 17 12 17C13.1154 17 14.1496 16.6303 15 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
         <span>Home</span>
     </a>
     <a href="#" class="bottom-nav-item" id="navSearch">
-        <i class="fas fa-search"></i>
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M17.0392 15.6244C18.2714 14.084 19.0082 12.1301 19.0082 10.0041C19.0082 5.03127 14.9769 1 10.0041 1C5.03127 1 1 5.03127 1 10.0041C1 14.9769 5.03127 19.0082 10.0041 19.0082C12.1301 19.0082 14.084 18.2714 15.6244 17.0392L21.2921 22.707C21.6828 23.0977 22.3163 23.0977 22.707 22.707C23.0977 22.3163 23.0977 21.6828 22.707 21.2921L17.0392 15.6244ZM10.0041 17.0173C6.1308 17.0173 2.99087 13.8774 2.99087 10.0041C2.99087 6.1308 6.1308 2.99087 10.0041 2.99087C13.8774 2.99087 17.0173 6.1308 17.0173 10.0041C17.0173 13.8774 13.8774 17.0173 10.0041 17.0173Z" fill="currentColor"/>
+        </svg>
         <span>Search</span>
     </a>
     <a href="#" class="bottom-nav-item" id="navConnect" style="display: none;">
@@ -2488,12 +2822,19 @@ body.panel-open .detail-gallery-container {
         <span class="connect-badge" id="connectIndicator"></span>
     </a>
     <a href="#" class="bottom-nav-item" id="navCart">
-        <i class="fas fa-shopping-cart"></i>
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M7.5 18C8.32843 18 9 18.6716 9 19.5C9 20.3284 8.32843 21 7.5 21C6.67157 21 6 20.3284 6 19.5C6 18.6716 6.67157 18 7.5 18Z" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M16.5 18.0001C17.3284 18.0001 18 18.6716 18 19.5001C18 20.3285 17.3284 21.0001 16.5 21.0001C15.6716 21.0001 15 20.3285 15 19.5001C15 18.6716 15.6716 18.0001 16.5 18.0001Z" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M2 3L2.26121 3.09184C3.5628 3.54945 4.2136 3.77826 4.58584 4.32298C4.95808 4.86771 4.95808 5.59126 4.95808 7.03836V9.76C4.95808 12.7016 5.02132 13.6723 5.88772 14.5862C6.75412 15.5 8.14857 15.5 10.9375 15.5H12M16.2404 15.5C17.8014 15.5 18.5819 15.5 19.1336 15.0504C19.6853 14.6008 19.8429 13.8364 20.158 12.3075L20.6578 9.88275C21.0049 8.14369 21.1784 7.27417 20.7345 6.69708C20.2906 6.12 18.7738 6.12 17.0888 6.12H11.0235M4.95808 6.12H7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
         <span>Cart</span>
         <span class="cart-badge" id="cartCount">0</span>
     </a>
     <a href="#" class="bottom-nav-item" id="navAccount">
-        <i class="fas fa-user"></i>
+        <svg class="nav-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M3 9.11011V14.8801C3 17.0001 3 17.0001 5 18.3501L10.5 21.5301C11.33 22.0101 12.68 22.0101 13.5 21.5301L19 18.3501C21 17.0001 21 17.0001 21 14.8901V9.11011C21 7.00011 21 7.00011 19 5.65011L13.5 2.47011C12.68 1.99011 11.33 1.99011 10.5 2.47011L5 5.65011C3 7.00011 3 7.00011 3 9.11011Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <span>Account</span>
     </a>
   </div>
@@ -2568,14 +2909,18 @@ body.panel-open .detail-gallery-container {
         <div><span class="fw-bold fs-4" id="purchaseCount">0</span><br><small>orders</small></div>
         <div class="qr-placeholder"><i class="fas fa-qrcode"></i></div>
     </div>
-    <div class="mt-2 mx-3">
-        <div class="list-item" id="accountInfoItem"><div class="left"><i class="fas fa-user-circle"></i> Account info</div><i class="fas fa-chevron-right"></i></div>
-        <div class="list-item" id="addressItem"><div class="left"><i class="fas fa-map-marker-alt"></i> Selected address</div><i class="fas fa-chevron-right"></i></div>
-        <div class="list-item" id="favoritesItem"><div class="left"><i class="fas fa-heart"></i> Favorite products</div><i class="fas fa-chevron-right"></i></div>
-        <div class="list-item" id="myOrdersItem"><div class="left"><i class="fas fa-truck"></i> My Orders</div><i class="fas fa-chevron-right"></i></div>
-        <div class="list-item" id="privacyItem"><div class="left"><i class="fas fa-shield-alt"></i> Privacy policy</div><i class="fas fa-chevron-right"></i></div>
-        <div class="list-item" id="termsItem"><div class="left"><i class="fas fa-file-contract"></i> Terms & conditions</div><i class="fas fa-chevron-right"></i></div>
-        <div class="list-item text-danger" id="logoutItem"><div class="left"><i class="fas fa-sign-out-alt"></i> Logout</div></div>
+    <div class="mt-3 mx-3">
+        <div class="settings-group">
+            <div class="list-item" id="accountInfoItem"><div class="left"><span class="list-icon-badge" style="background:rgba(79,109,122,0.12); color:var(--accent);"><i class="fas fa-user-circle"></i></span> Account info</div><i class="fas fa-chevron-right"></i></div>
+            <div class="list-item" id="addressItem"><div class="left"><span class="list-icon-badge" style="background:rgba(255,149,0,0.12); color:#ff9500;"><i class="fas fa-map-marker-alt"></i></span> Selected address</div><i class="fas fa-chevron-right"></i></div>
+            <div class="list-item" id="favoritesItem"><div class="left"><span class="list-icon-badge" style="background:rgba(255,59,48,0.1); color:#ff3b30;"><i class="fas fa-heart"></i></span> Favorite products</div><i class="fas fa-chevron-right"></i></div>
+            <div class="list-item" id="myOrdersItem"><div class="left"><span class="list-icon-badge" style="background:rgba(52,199,89,0.12); color:#2ea84a;"><i class="fas fa-truck"></i></span> My Orders</div><i class="fas fa-chevron-right"></i></div>
+            <div class="list-item" id="privacyItem"><div class="left"><span class="list-icon-badge" style="background:rgba(175,82,222,0.12); color:#af52de;"><i class="fas fa-shield-alt"></i></span> Privacy policy</div><i class="fas fa-chevron-right"></i></div>
+            <div class="list-item" id="termsItem"><div class="left"><span class="list-icon-badge" style="background:rgba(142,142,147,0.12); color:#6e6e73;"><i class="fas fa-file-contract"></i></span> Terms & conditions</div><i class="fas fa-chevron-right"></i></div>
+        </div>
+        <div class="settings-group mt-3">
+            <div class="list-item text-danger" id="logoutItem"><div class="left"><i class="fas fa-sign-out-alt"></i> Logout</div></div>
+        </div>
     </div>
 </div>
 
@@ -2591,70 +2936,78 @@ body.panel-open .detail-gallery-container {
 </div>
 
 <!-- ADDRESS PANEL -->
-<div class="slide-panel" id="addressPanel">
+<div class="slide-panel has-bottom-bar" id="addressPanel">
     <div class="panel-header"><i class="fas fa-arrow-left" id="backFromAddress"></i> Delivery Address</div>
     <div class="p-4">
-        <div class="current-address-card">
-            <div class="label">
-                <i class="fas fa-map-pin me-1"></i> Current Address
+
+        <div class="addr-hero" id="addressHeroWrap">
+            <div class="addr-hero-empty" id="addressHeroEmpty">
+                <i class="fas fa-map-location-dot"></i>
+                <div class="title">No address yet</div>
+                <div class="sub">Add one below to enable delivery</div>
             </div>
-            <div class="address" id="currentAddressDisplay">Not set</div>
-            <div class="hint">
-                <i class="fas fa-info-circle me-1"></i> This address will be used for delivery
+            <div id="mapPreviewContainer" style="display: none;">
+                <div class="map-preview" id="mapPreview"></div>
             </div>
-          <a href="#" id="openGoogleMapsLink" class="view-map-btn" style="display: none; text-decoration: none;" target="_blank">
-    <i class="fas fa-map-marker-alt"></i> View on Map
-    <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
-</a>
         </div>
-        
-        <div class="address-action-btn" id="getLocationBtn">
-            <div class="icon">
-                <i class="fas fa-location-arrow"></i>
+
+        <div class="addr-current-row">
+            <div class="addr-current-icon"><i class="fas fa-location-dot"></i></div>
+            <div class="addr-current-text">
+                <div class="addr-current-label">Delivery address</div>
+                <div class="addr-current-value is-empty" id="currentAddressDisplay">Not set</div>
+                <a href="#" id="openGoogleMapsLink" class="addr-map-link" style="display: none;" target="_blank">
+                    <i class="fas fa-arrow-up-right-from-square"></i> Open in Google Maps
+                </a>
             </div>
-            <div class="content">
-                <h6>Get Current Location</h6>
-                <small>Use your GPS to set address automatically</small>
+        </div>
+
+        <div class="settings-group">
+            <div class="list-item addr-method-row" id="getLocationBtn">
+                <div class="left">
+                    <span class="list-icon-badge" style="background:rgba(79,109,122,0.12); color:var(--accent);"><i class="fas fa-location-arrow"></i></span>
+                    <div>
+                        <div class="method-title">Use current location</div>
+                        <div class="method-sub">Auto-detect with GPS</div>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right"></i>
             </div>
-            <i class="fas fa-chevron-right" style="color: var(--primary-color);"></i>
-        </div>
-        
-        <div class="address-action-btn primary" id="manualAddressBtn">
-            <div class="icon">
-                <i class="fas fa-pen"></i>
+            <div class="list-item addr-method-row" id="manualAddressBtn">
+                <div class="left">
+                    <span class="list-icon-badge" style="background:rgba(79,109,122,0.12); color:var(--accent);"><i class="fas fa-pen"></i></span>
+                    <div>
+                        <div class="method-title">Enter manually</div>
+                        <div class="method-sub">Type your full address</div>
+                    </div>
+                </div>
+                <i class="fas fa-chevron-right"></i>
             </div>
-            <div class="content">
-                <h6>Enter Address Manually</h6>
-                <small>Type your complete address details</small>
-            </div>
-            <i class="fas fa-chevron-right" style="color: white;"></i>
         </div>
-        
-        <div id="mapPreviewContainer" style="display: none;" class="mt-3">
-            <div class="map-preview" id="mapPreview"></div>
-            <small class="text-muted mt-1 d-block text-center">Click to open in Google Maps</small>
-        </div>
-        
-        <div class="d-flex gap-2 mt-4">
-            <button class="btn-outline-red flex-grow-1" id="deleteLocationBtn">
-                <i class="fas fa-trash me-2"></i> Clear
-            </button>
-            <button class="btn-dark flex-grow-1" id="saveAddressBtn">
-                <i class="fas fa-check me-2"></i> Save Address
-            </button>
-        </div>
+    </div>
+
+    <div class="panel-bottom-bar">
+        <button class="btn-outline-red" id="deleteLocationBtn">
+            <i class="fas fa-trash"></i> Clear
+        </button>
+        <button class="btn-dark" id="saveAddressBtn">
+            <i class="fas fa-check"></i> Save Address
+        </button>
     </div>
 </div>
 
+
 <!-- MANUAL ADDRESS SUB PANEL -->
-<div class="slide-panel" id="manualAddressPanel">
+<div class="slide-panel has-bottom-bar" id="manualAddressPanel">
     <div class="panel-header"><i class="fas fa-arrow-left" id="backFromManualAddress"></i> Enter address</div>
     <div class="p-4">
         <div class="address-field"><label>Full street address</label><input class="form-control" id="manualStreet" placeholder="Street, building, floor"></div>
         <div class="address-field"><label>City</label><input class="form-control" id="manualCity" placeholder="Beirut"></div>
         <div class="address-field"><label>Area / District</label><input class="form-control" id="manualArea" placeholder="Hamra"></div>
         <div class="address-field"><label>Additional details (optional)</label><input class="form-control" id="manualDetails" placeholder="Near pharmacy, etc"></div>
-        <button class="btn-dark w-100 mt-3" id="confirmManualAddress">Use this address</button>
+    </div>
+    <div class="panel-bottom-bar">
+        <button class="btn-dark" id="confirmManualAddress"><i class="fas fa-check"></i> Use this address</button>
     </div>
 </div>
 
@@ -3075,13 +3428,24 @@ body.panel-open .detail-gallery-container {
         return phone;
     }
 
+       function setAddressDisplay(text) {
+        const el = document.getElementById('currentAddressDisplay');
+        if (!el) return;
+        const isEmpty = !text || text === 'Not set';
+        el.innerText = isEmpty ? 'Not set' : text;
+        el.classList.toggle('is-empty', isEmpty);
+        updateMapPreview(isEmpty ? '' : text);
+    }
+
        function updateMapPreview(address) {
         const mapPreviewContainer = document.getElementById('mapPreviewContainer');
         const mapPreview = document.getElementById('mapPreview');
         const openGoogleMapsLink = document.getElementById('openGoogleMapsLink');
+        const heroEmpty = document.getElementById('addressHeroEmpty');
         
         if (address && address !== 'Not set' && address !== '') {
             mapPreviewContainer.style.display = 'block';
+            if (heroEmpty) heroEmpty.style.display = 'none';
             
             // Create a Google Maps static map image preview
             let mapImageUrl = '';
@@ -3103,29 +3467,25 @@ body.panel-open .detail-gallery-container {
                 mapLinkUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
             }
             
-            // Create a green-themed custom map simulation with clickable link
+            // Rotating globe card: a shaded 3D sphere with a slowly
+            // spinning landmass texture and a fixed pin, clickable
+            // through to Google Maps
             mapPreview.innerHTML = `
                 <a href="${mapLinkUrl}" target="_blank" style="text-decoration: none; display: block; width: 100%; height: 100%;">
-                    <div style="
-                        width: 100%;
-                        height: 150px;
-                        background: linear-gradient(135deg, #2e7d32, #1b5e20);
-                        border-radius: 12px;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                        gap: 10px;
-                        color: white;
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                        transition: transform 0.2s ease, box-shadow 0.2s ease;
-                        cursor: pointer;
-                    " 
-                    onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.15)';"
-                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                        <i class="fas fa-map-marker-alt" style="font-size: 2.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></i>
-                        <div style="font-weight: 600; font-size: 1rem;">View on Map</div>
-                        <div style="font-size: 0.7rem; opacity: 0.9;"><i class="fas fa-external-link-alt"></i> Google Maps</div>
+                    <div class="map-sim">
+                        <div class="globe-wrap">
+                            <div class="globe-atmosphere"></div>
+                            <div class="globe-sphere">
+                                <div class="globe-sphere-map"></div>
+                                <div class="globe-sphere-shading"></div>
+                                <div class="globe-highlight"></div>
+                            </div>
+                        </div>
+                        <div class="globe-pin-wrap">
+                            <div class="globe-pin-pulse"></div>
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="globe-label"><i class="fas fa-external-link-alt"></i> Open in Google Maps</div>
                     </div>
                 </a>
             `;
@@ -3138,6 +3498,7 @@ body.panel-open .detail-gallery-container {
             
         } else {
             mapPreviewContainer.style.display = 'none';
+            if (heroEmpty) heroEmpty.style.display = 'flex';
             if (openGoogleMapsLink) {
                 openGoogleMapsLink.style.display = 'none';
             }
@@ -3200,7 +3561,7 @@ body.panel-open .detail-gallery-container {
                 }
             };
             
-            const bannerImg = shopData.bannerUrl || shopData.bannerImage;
+            const bannerImg = (shopData.bannerEnabled !== false) ? (shopData.bannerUrl || shopData.bannerImage) : '';
             const bannerContainer = document.getElementById('bannerContainer');
             const bannerSkeleton = document.getElementById('bannerSkeleton');
             const bannerContent = document.getElementById('bannerContent');
@@ -3249,7 +3610,7 @@ body.panel-open .detail-gallery-container {
             if (shopData.ownerPhone) shopOwnerPhone = shopData.ownerPhone;
             if (shopData.ownerEmail) shopOwnerEmail = shopData.ownerEmail;
             
-            const bannerImg = shopData.bannerUrl || shopData.bannerImage;
+            const bannerImg = (shopData.bannerEnabled !== false) ? (shopData.bannerUrl || shopData.bannerImage) : '';
             const bannerContainer = document.getElementById('bannerContainer');
             const bannerSkeleton = document.getElementById('bannerSkeleton');
             const bannerContent = document.getElementById('bannerContent');
@@ -3723,8 +4084,7 @@ body.panel-open .detail-gallery-container {
             
             setTimeout(() => {
                 openPanel(addressPanel);
-                document.getElementById('currentAddressDisplay').innerText = 'Not set';
-                updateMapPreview('');
+                setAddressDisplay('Not set');
             }, 300);
             
             return;
@@ -4126,9 +4486,7 @@ body.panel-open .detail-gallery-container {
             document.getElementById('editName').value = u.name || '';
             document.getElementById('editEmail').value = u.email || '';
             document.getElementById('editPhone').value = u.phone || '';
-            document.getElementById('currentAddressDisplay').innerText = u.address || 'Not set';
-            
-            updateMapPreview(u.address);
+            setAddressDisplay(u.address || 'Not set');
             
             if (checkoutName) checkoutName.innerText = u.name || '-';
             if (checkoutPhone) checkoutPhone.innerText = u.phone || '-';
@@ -4142,7 +4500,7 @@ body.panel-open .detail-gallery-container {
             document.getElementById('editName').value = ''; 
             document.getElementById('editEmail').value = ''; 
             document.getElementById('editPhone').value = '';
-            document.getElementById('currentAddressDisplay').innerText = 'Not set';
+            setAddressDisplay('Not set');
             mapPreviewContainer.style.display = 'none';
         }
         
@@ -4286,8 +4644,8 @@ body.panel-open .detail-gallery-container {
                         <i class="heart-icon ${heartIcon}" data-id="${p.id}"></i>
                     </div>
                     ${lowStockBadge}
-                    <button class="add-to-cart-btn mt-2" data-id="${p.id}" ${!hasStock ? 'disabled' : ''}>
-                        <i class="fas fa-cart-plus"></i> ${!hasStock ? 'Out of Stock' : 'Add to Cart'}
+                    <button class="add-to-cart-btn" data-id="${p.id}" ${!hasStock ? 'disabled' : ''} aria-label="${!hasStock ? 'Out of stock' : 'Add to cart'}" title="${!hasStock ? 'Out of stock' : 'Add to cart'}">
+                        <i class="fas fa-plus"></i>
                     </button>
                 </div>
             </div>
@@ -4366,8 +4724,8 @@ body.panel-open .detail-gallery-container {
                 ${p.stock !== undefined && p.stock !== null && p.stock < 5 && p.stock > 0 ? 
                     `<div class="small text-warning mt-1" style="font-size: 0.65rem;"><i class="fas fa-exclamation-triangle"></i> Only ${p.stock} left</div>` : ''
                 }
-                <button class="add-to-cart-btn" style="margin-top:5px; font-size:0.7rem; padding:4px 0;" data-id="${p.id}" ${!hasStock ? 'disabled' : ''}>
-                    ${!hasStock ? 'Out of Stock' : 'Add'}
+                <button class="add-to-cart-btn" data-id="${p.id}" ${!hasStock ? 'disabled' : ''} aria-label="${!hasStock ? 'Out of stock' : 'Add to cart'}" title="${!hasStock ? 'Out of stock' : 'Add to cart'}">
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>`; 
@@ -4441,8 +4799,8 @@ body.panel-open .detail-gallery-container {
                         <span class="stock-badge ${stockClass}"><i class="fas fa-boxes me-1"></i>${stockText}</span>
                     </div>
                 ` : ''}
-                <button class="add-to-cart-btn" data-id="${p.id}" ${!hasStock ? 'disabled' : ''}>
-                    <i class="fas fa-cart-plus"></i> ${!hasStock ? 'Out of Stock' : 'Add'}
+                <button class="add-to-cart-btn" data-id="${p.id}" ${!hasStock ? 'disabled' : ''} aria-label="${!hasStock ? 'Out of stock' : 'Add to cart'}" title="${!hasStock ? 'Out of stock' : 'Add to cart'}">
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         `;
@@ -5336,8 +5694,7 @@ async function showProductDetail(p) {
             navigator.geolocation.getCurrentPosition(pos => { 
                 const lat = pos.coords.latitude; const lng = pos.coords.longitude;
                 const addr = `lat:${lat.toFixed(6)}, lng:${lng.toFixed(6)}`;
-                document.getElementById('currentAddressDisplay').innerText = addr;
-                updateMapPreview(addr);
+                setAddressDisplay(addr);
                 window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
                 showToast('Location captured successfully', 'success', 'Location Found');
             }, error => {
@@ -5360,16 +5717,14 @@ async function showProductDetail(p) {
         }
         
         const full = `${street}, ${area}, ${city} ${details ? '('+details+')' : ''}`.trim();
-        document.getElementById('currentAddressDisplay').innerText = full;
-        updateMapPreview(full);
+        setAddressDisplay(full);
         closePanel(manualAddressPanel); 
         openPanel(addressPanel);
         showToast('Address entered successfully', 'success', 'Address Added');
     });
     
     document.getElementById('deleteLocationBtn').addEventListener('click', () => { 
-        document.getElementById('currentAddressDisplay').innerText = 'Not set';
-        updateMapPreview('');
+        setAddressDisplay('Not set');
         showToast('Address cleared', 'info', 'Address Removed');
     });
     
