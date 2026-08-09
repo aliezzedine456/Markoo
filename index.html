@@ -1039,6 +1039,10 @@
         .sidebar-brand {
             display: none;
         }
+
+        .sidebar-filters {
+            display: none;
+        }
         
         .bottom-nav-item { 
             display: flex; 
@@ -2797,7 +2801,7 @@ body.panel-open .detail-gallery-container {
         @media (min-width: 1180px) {
             body {
                 padding-bottom: 24px;
-                padding-left: 232px;
+                padding-left: 208px;
                 box-sizing: border-box;
             }
 
@@ -2806,95 +2810,95 @@ body.panel-open .detail-gallery-container {
                 bottom: 0;
                 left: 0;
                 right: auto;
-                width: 232px;
+                width: 208px;
                 height: 100vh;
                 border-radius: 0;
                 border-top: none;
                 border-right: 1px solid var(--gray-200);
                 box-shadow: 4px 0 28px -14px rgba(20,20,30,0.1);
-                padding: 28px 16px;
+                padding: 20px 14px;
+                flex-direction: column;
                 align-items: stretch;
                 justify-content: flex-start;
+                overflow-y: auto;
             }
 
             .bottom-nav-inner {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
                 width: 100%;
                 max-width: none;
-                gap: 4px;
+                gap: 2px;
                 justify-content: flex-start;
+                padding-bottom: 14px;
+                margin-bottom: 14px;
+                border-bottom: 1px solid var(--gray-200);
             }
 
+            /* Compact - icon on top, small label below, same as mobile - just
+               laid out in a row of small tabs rather than one big list, so
+               the nav itself stays small and most of the rail is free for
+               filters below. */
             .bottom-nav-item {
-                flex-direction: row;
-                align-items: center;
-                justify-content: flex-start;
-                gap: 14px;
-                width: 100%;
+                flex: 1 1 auto;
                 max-width: none;
-                padding: 13px 16px;
-                border-radius: 14px;
+                padding: 8px 4px 9px;
+                border-radius: 0;
+                border-bottom: 2px solid transparent;
             }
 
             .bottom-nav-item:hover {
-                background: var(--gray-100);
+                background: none;
+                border-bottom-color: var(--gray-300);
+            }
+
+            .bottom-nav-item.active {
+                background: none;
+                border-bottom-color: var(--accent);
             }
 
             .bottom-nav-item.active:hover {
-                background: rgba(79,109,122,0.14);
-            }
-
-            .bottom-nav-item i,
-            .bottom-nav-item .nav-icon-svg {
-                margin-bottom: 0;
-                flex-shrink: 0;
+                background: none;
             }
 
             .bottom-nav-item i {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .bottom-nav-item .nav-icon-svg {
-                width: 21px;
-                height: 21px;
+                width: 19px;
+                height: 19px;
             }
 
             .bottom-nav-item span {
-                font-size: 14.5px;
-                font-weight: 500;
-            }
-
-            .bottom-nav-item.active span {
-                font-weight: 600;
+                font-size: 10.5px;
             }
 
             .sidebar-brand {
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                padding: 6px 10px 22px;
-                margin-bottom: 10px;
-                border-bottom: 1px solid var(--gray-200);
+                gap: 9px;
+                padding: 2px 4px 16px;
             }
 
             #sidebarBrandInitial {
-                width: 34px;
-                height: 34px;
-                border-radius: 10px;
+                width: 30px;
+                height: 30px;
+                border-radius: 9px;
                 background: var(--brand-gradient, var(--accent));
                 color: white;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-weight: 700;
-                font-size: 15px;
+                font-size: 13px;
                 flex-shrink: 0;
                 text-transform: uppercase;
             }
 
             #sidebarBrandName {
                 font-weight: 700;
-                font-size: 15px;
+                font-size: 14px;
                 color: var(--dark);
                 letter-spacing: -0.01em;
                 overflow: hidden;
@@ -2902,15 +2906,129 @@ body.panel-open .detail-gallery-container {
                 white-space: nowrap;
             }
 
-            .bottom-nav-item .cart-badge {
-                position: static;
-                margin-left: auto;
+            /* Sidebar filters - fills the rest of the rail, AliExpress-style:
+               a category list and a price range, right under the nav. */
+            .sidebar-filters {
+                display: block;
+            }
+
+            .sidebar-filters-title {
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--dark);
+                margin: 0 0 10px;
+                padding: 0 2px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .sidebar-filters-clear {
+                font-size: 11.5px;
+                font-weight: 500;
+                color: var(--gray-500);
+                cursor: pointer;
+                text-decoration: none;
+            }
+
+            .sidebar-filters-clear:hover {
+                color: var(--accent);
+            }
+
+            .sidebar-filter-group {
+                margin-bottom: 20px;
+            }
+
+            .sidebar-filter-group-label {
+                font-size: 11.5px;
+                font-weight: 600;
+                color: var(--gray-500);
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                margin-bottom: 8px;
+                padding: 0 2px;
+            }
+
+            .sidebar-filter-cat {
+                display: flex;
+                align-items: center;
+                gap: 9px;
+                padding: 6px 2px;
+                font-size: 13px;
+                color: var(--gray-700);
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .sidebar-filter-cat input[type="checkbox"] {
+                width: 15px;
+                height: 15px;
+                accent-color: var(--accent);
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            .sidebar-filter-cat span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .sidebar-price-row {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .sidebar-price-row input {
+                width: 100%;
+                min-width: 0;
+                padding: 7px 8px;
+                border: 1px solid var(--gray-300);
+                border-radius: 8px;
+                font-size: 12.5px;
+                box-sizing: border-box;
+            }
+
+            .sidebar-price-row input:focus {
+                outline: none;
+                border-color: var(--accent);
+            }
+
+            .sidebar-price-row span {
+                color: var(--gray-400);
+                font-size: 12px;
+                flex-shrink: 0;
+            }
+
+            .sidebar-filters-apply {
+                width: 100%;
+                padding: 9px;
+                margin-top: 4px;
                 border: none;
+                border-radius: 9px;
+                background: var(--accent);
+                color: white;
+                font-size: 12.5px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+
+            .sidebar-filters-apply:hover {
+                filter: brightness(1.08);
+            }
+
+            .bottom-nav-item .cart-badge {
+                position: absolute;
+                top: 2px;
+                right: 8px;
             }
 
             .bottom-nav-item .connect-badge {
-                position: static;
-                margin-left: auto;
+                position: absolute;
+                top: 2px;
+                right: 8px;
             }
         }
 
@@ -3050,9 +3168,26 @@ body.panel-open .detail-gallery-container {
         <span>Account</span>
     </a>
   </div>
+  <div class="sidebar-filters" id="sidebarFilters">
+    <div class="sidebar-filters-title">Filters <a class="sidebar-filters-clear" id="sidebarFiltersClear">Clear</a></div>
+    <div class="sidebar-filter-group" id="sidebarCategoryGroup" style="display:none;">
+        <div class="sidebar-filter-group-label">Category</div>
+        <div id="sidebarCategoryList"></div>
+    </div>
+    <div class="sidebar-filter-group">
+        <div class="sidebar-filter-group-label">Price</div>
+        <div class="sidebar-price-row">
+            <input type="number" id="sidebarPriceMin" placeholder="Min" min="0">
+            <span>-</span>
+            <input type="number" id="sidebarPriceMax" placeholder="Max" min="0">
+        </div>
+    </div>
+    <button type="button" class="sidebar-filters-apply" id="sidebarFiltersApply">Apply Filters</button>
+  </div>
 </div>
 
 <!-- PRODUCT DETAIL PANEL -->
+
 <div class="product-detail-panel" id="productDetailPanel">
     <div class="detail-panel-header"><i class="fas fa-arrow-left" id="closeDetailPanel"></i> Product details</div>
     <div class="detail-content" id="detailContent">
@@ -4754,6 +4889,7 @@ function updateShopHeaderDisplay(shopData) {
             const snap = await getDocs(q); 
             categories = []; 
             snap.forEach(d=>categories.push({id:d.id, ...d.data()}));
+            renderSidebarFilterCategories();
             if(categories.length>0) { 
                 renderCategories(); 
                 await loadProductsByCategory(); 
@@ -4769,6 +4905,66 @@ function updateShopHeaderDisplay(shopData) {
             loadAllProducts(); 
         }
     }
+
+    // ---------- Desktop sidebar filters (category + price) ----------
+    function renderSidebarFilterCategories() {
+        const group = document.getElementById('sidebarCategoryGroup');
+        const list = document.getElementById('sidebarCategoryList');
+        if (!list || !group) return;
+        if (!categories || categories.length === 0) {
+            group.style.display = 'none';
+            list.innerHTML = '';
+            return;
+        }
+        group.style.display = 'block';
+        list.innerHTML = categories.map(cat => `
+            <label class="sidebar-filter-cat">
+                <input type="checkbox" class="sidebar-cat-checkbox" value="${cat.id}">
+                <span>${escapeHtml(cat.name || '')}</span>
+            </label>
+        `).join('');
+    }
+
+    function applySidebarFilters() {
+        const selectedCats = Array.from(document.querySelectorAll('.sidebar-cat-checkbox:checked')).map(cb => cb.value);
+        const minVal = parseFloat(document.getElementById('sidebarPriceMin')?.value);
+        const maxVal = parseFloat(document.getElementById('sidebarPriceMax')?.value);
+
+        let filtered = products.slice();
+        if (selectedCats.length > 0) filtered = filtered.filter(p => selectedCats.includes(p.categoryId));
+        if (!isNaN(minVal)) filtered = filtered.filter(p => (p.price || 0) >= minVal);
+        if (!isNaN(maxVal)) filtered = filtered.filter(p => (p.price || 0) <= maxVal);
+
+        categorySections.style.display = 'none';
+        if (filtered.length === 0) {
+            productsGrid.style.display = 'none';
+            noProducts.style.display = 'block';
+        } else {
+            noProducts.style.display = 'none';
+            productsGrid.style.display = 'grid';
+            renderProducts(filtered);
+        }
+    }
+
+    function clearSidebarFilters() {
+        document.querySelectorAll('.sidebar-cat-checkbox').forEach(cb => cb.checked = false);
+        const minEl = document.getElementById('sidebarPriceMin');
+        const maxEl = document.getElementById('sidebarPriceMax');
+        if (minEl) minEl.value = '';
+        if (maxEl) maxEl.value = '';
+        noProducts.style.display = 'none';
+        if (categories.length > 0) {
+            categorySections.style.display = 'block';
+            productsGrid.style.display = 'none';
+        } else {
+            categorySections.style.display = 'none';
+            productsGrid.style.display = 'grid';
+            renderProducts(products);
+        }
+    }
+
+    document.getElementById('sidebarFiltersApply')?.addEventListener('click', applySidebarFilters);
+    document.getElementById('sidebarFiltersClear')?.addEventListener('click', (e) => { e.preventDefault(); clearSidebarFilters(); });
 
     function renderCategories() {
         let html = ''; 
