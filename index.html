@@ -3095,6 +3095,24 @@ body.panel-open .detail-gallery-container {
             body.panel-open::before {
                 left: 236px;
             }
+
+            /* The category products panel holds the same 4-column product
+               grid as Home, but as a narrow 640px drawer (like Cart/Account)
+               its cards end up much smaller than the ones on Home. Opening
+               it up to fill the space beside the sidebar - instead of
+               staying a slim drawer - lets its grid use the same content
+               width as Home, so cards come out the same size in both. */
+            .category-products-panel {
+                left: 236px;
+                right: 0;
+                max-width: none;
+                width: auto;
+            }
+
+            .cat-products-grid {
+                max-width: var(--max-content-width);
+                margin: 0 auto;
+            }
         }
 
         /* Small phones: tighten spacing slightly */
