@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts (Inter & Poppins) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Animate.css for toast animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <!-- Firebase SDK (modular) -->
@@ -3544,6 +3545,30 @@ body.panel-open .detail-gallery-container {
     };
 }
 
+// Applies the shop owner's compact-title-bar design (set in the shop admin's
+// "Compact Title Bar Design" section) to the #shopTopBar element shown when
+// the banner is turned off. Falls back to the original default look
+// (transparent background so the signature gradient shows through, white
+// bold centered text) when the shop has no custom topBarStyle saved yet.
+function applyCompactBarStyle(el, shopData) {
+    const style = shopData.topBarStyle || {};
+    const align = style.align || 'center';
+
+    el.innerText = shopData.name || 'Shop';
+    el.style.height = '70px';
+    el.style.padding = '0 20px';
+    el.style.background = style.bgColor || 'transparent';
+    el.style.color = style.textColor || '#ffffff';
+    el.style.fontFamily = style.fontFamily || "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    el.style.fontSize = (style.fontSize || 19) + 'px';
+    el.style.fontWeight = style.fontWeight || '700';
+    el.style.justifyContent = align === 'left' ? 'flex-start' : align === 'right' ? 'flex-end' : 'center';
+    el.style.textAlign = align;
+    // The heavy shadow is tuned for the default dark gradient background;
+    // drop it once the owner picks a solid custom color so text stays crisp.
+    el.style.textShadow = style.bgColor ? 'none' : '0 2px 14px rgba(0,0,0,0.4)';
+}
+
    async function loadShopData() {
     try {
         if (shopId === 'demoShop') {
@@ -3587,10 +3612,7 @@ body.panel-open .detail-gallery-container {
                 if (bannerSkeleton) bannerSkeleton.style.display = 'none';
                 if (shopTopBar) {
                     shopTopBar.style.display = 'flex';
-                    shopTopBar.innerText = shopData.name || 'Shop';
-                    shopTopBar.style.height = '70px';
-                    shopTopBar.style.fontSize = '1.2rem';
-                    shopTopBar.style.padding = '0 15px';
+                    applyCompactBarStyle(shopTopBar, shopData);
                 }
             }
             
@@ -3636,10 +3658,7 @@ body.panel-open .detail-gallery-container {
                 if (bannerSkeleton) bannerSkeleton.style.display = 'none';
                 if (shopTopBar) {
                     shopTopBar.style.display = 'flex';
-                    shopTopBar.innerText = shopData.name || 'Shop';
-                    shopTopBar.style.height = '70px';
-                    shopTopBar.style.fontSize = '1.2rem';
-                    shopTopBar.style.padding = '0 15px';
+                    applyCompactBarStyle(shopTopBar, shopData);
                 }
             }
             
