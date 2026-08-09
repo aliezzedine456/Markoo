@@ -4992,6 +4992,12 @@ function updateShopHeaderDisplay(shopData) {
     }
 
     function applySidebarFilters() {
+        // Applying filters shows results on the Home view, so close
+        // whatever panel is open (Cart, Account, etc.) and land back on
+        // Home with the active-tab underline following along.
+        closeAllPanels();
+        setActiveNavItem('navHome');
+
         const selectedCats = Array.from(document.querySelectorAll('.sidebar-cat-checkbox:checked')).map(cb => cb.value);
         const minVal = parseFloat(document.getElementById('sidebarPriceMin')?.value);
         const maxVal = parseFloat(document.getElementById('sidebarPriceMax')?.value);
@@ -5013,6 +5019,9 @@ function updateShopHeaderDisplay(shopData) {
     }
 
     function clearSidebarFilters() {
+        closeAllPanels();
+        setActiveNavItem('navHome');
+
         document.querySelectorAll('.sidebar-cat-checkbox').forEach(cb => cb.checked = false);
         const minEl = document.getElementById('sidebarPriceMin');
         const maxEl = document.getElementById('sidebarPriceMax');
@@ -6143,10 +6152,17 @@ async function showProductDetail(p) {
 
     // Navigation - closing whatever's open first means any nav item can be
     // pressed directly to switch sections, with no need to hit Back first.
-    document.getElementById('navAccount').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); if(userProfile) openPanel(accountPanel); else showAuthPanel(); });
-    document.getElementById('navCart').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); openCart(); });
-    document.getElementById('navHome').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); });
-    document.getElementById('navSearch').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); searchInput.focus(); });
+    // setActiveNavItem keeps the active-tab underline (Home/Search/Cart/
+    // Account) in sync with whichever section is actually on screen.
+    function setActiveNavItem(id) {
+        document.querySelectorAll('.bottom-nav-item').forEach(item => item.classList.remove('active'));
+        document.getElementById(id)?.classList.add('active');
+    }
+
+    document.getElementById('navAccount').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); setActiveNavItem('navAccount'); if(userProfile) openPanel(accountPanel); else showAuthPanel(); });
+    document.getElementById('navCart').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); setActiveNavItem('navCart'); openCart(); });
+    document.getElementById('navHome').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); setActiveNavItem('navHome'); });
+    document.getElementById('navSearch').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); setActiveNavItem('navSearch'); searchInput.focus(); });
 
     // Account items
     document.getElementById('accountInfoItem').addEventListener('click',()=>{ closePanel(accountPanel); openPanel(accountInfoPanel); });
