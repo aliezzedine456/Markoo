@@ -150,33 +150,97 @@
             visibility: visible;
         }
         
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255,255,255,0.3);
+        /* ======================================================
+           CIRCULAR LOADER — a single, reusable animated loading
+           indicator used everywhere in the app instead of plain
+           spinners or "Loading X..." text blocks. Built from a
+           rotating conic-gradient ring (soft trailing tail) plus
+           a gently pulsing core dot, masked into a clean ring so
+           it never looks like a flat CSS border-spinner.
+           ====================================================== */
+        .circular-loader {
+            --loader-size: 46px;
+            --loader-thickness: 4px;
+            width: var(--loader-size);
+            height: var(--loader-size);
             border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.8s linear infinite;
+            position: relative;
+            display: inline-block;
+            flex-shrink: 0;
         }
-        
+
+        .circular-loader::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            padding: var(--loader-thickness);
+            background: conic-gradient(from 0deg, var(--accent) 0deg, rgba(79,109,122,0.55) 130deg, rgba(79,109,122,0.06) 210deg, rgba(79,109,122,0.06) 360deg);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+            animation: circularSpin 0.9s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+        }
+
+        .circular-loader::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: calc(var(--loader-thickness) * 1.6);
+            height: calc(var(--loader-thickness) * 1.6);
+            margin: calc(var(--loader-thickness) * -0.8) 0 0 calc(var(--loader-thickness) * -0.8);
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.9;
+            animation: circularPulse 0.9s ease-in-out infinite;
+        }
+
+        .circular-loader.sm { --loader-size: 22px; --loader-thickness: 2.5px; }
+        .circular-loader.md { --loader-size: 34px; --loader-thickness: 3px; }
+        .circular-loader.lg { --loader-size: 62px; --loader-thickness: 5px; }
+
+        .circular-loader.on-dark::before {
+            background: conic-gradient(from 0deg, #fff 0deg, rgba(255,255,255,0.6) 130deg, rgba(255,255,255,0.12) 210deg, rgba(255,255,255,0.12) 360deg);
+        }
+        .circular-loader.on-dark::after { background: #fff; }
+
+        @keyframes circularSpin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes circularPulse {
+            0%, 100% { transform: scale(0.85); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+        }
+
+        /* Generic centered wrapper for a loader dropped into any panel/section */
+        .loader-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 0;
+            animation: fadeIn 0.25s ease;
+        }
+
         .loading-content {
             background: white;
             border-radius: var(--border-radius-lg);
-            padding: 24px;
+            padding: 28px;
             text-align: center;
-            min-width: 200px;
+            min-width: 160px;
             box-shadow: var(--shadow-xl);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
         }
-        
-        .loading-content .loading-spinner {
-            border-top-color: var(--primary-color);
-            margin: 0 auto 16px;
-        }
-        
+
         .loading-content p {
             margin: 0;
             color: var(--gray-700);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         /* Inline Loading */
@@ -187,15 +251,6 @@
             padding: 40px;
             flex-direction: column;
             gap: 12px;
-        }
-        
-        .inline-loading .spinner {
-            width: 30px;
-            height: 30px;
-            border: 2px solid var(--gray-300);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
         }
         
         /* Custom Toast Notifications */
@@ -283,18 +338,40 @@
     pointer-events: all;
 }
 
-.loading-circle { 
-    width: 44px; 
-    height: 44px; 
-    border: 2px solid rgba(0,0,0,0.1);
-    border-radius: 50%; 
-    border-top-color: black; 
-    animation: spin 0.7s linear infinite; 
+.loading-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    position: relative;
+}
+
+.loading-circle::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    padding: 4px;
+    background: conic-gradient(from 0deg, var(--accent, #4F6D7A) 0deg, rgba(79,109,122,0.5) 130deg, rgba(79,109,122,0.06) 210deg, rgba(79,109,122,0.06) 360deg);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation: spin 0.9s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
 }
         
         .loading-screen.hidden { 
             opacity:0; 
             pointer-events:none; 
+        }
+
+        /* Gentle reveal for the app shell once the splash clears */
+        #mainContent, #categorySections, #productsView {
+            animation: contentReveal 0.5s ease both;
+        }
+
+        @keyframes contentReveal {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
        
@@ -695,6 +772,12 @@
         .product-card-h:active {
             transform: scale(0.98);
         }
+
+        .product-card-h:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--gray-300);
+            transform: translateY(-3px);
+        }
         
         .product-img-h { 
             width: 100%; 
@@ -702,6 +785,11 @@
             object-fit: cover; 
             will-change: transform;
             background: var(--gray-100);
+            transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .product-card-h:hover .product-img-h {
+            transform: scale(1.06);
         }
         
         .product-info-h { 
@@ -819,6 +907,28 @@
         
         .heart-icon.far { color: var(--gray-500); }
         .heart-icon.fas { color: var(--danger); }
+
+        @keyframes heartBounce {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.35); }
+            60% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        .heart-icon.bounce {
+            animation: heartBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes addToCartPop {
+            0% { transform: scale(1); }
+            40% { transform: scale(0.85); }
+            70% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .add-to-cart-btn.pop {
+            animation: addToCartPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
         
         /* "+" quick-add button — sits top-right of the product image
            instead of a full-width text button below it */
@@ -1210,10 +1320,158 @@
     background-color: #f5f5f5;
 }
 
-/* Optimize for mobile touch */
+/* ======================================================
+   PRODUCT IMAGE GALLERY — a real sliding track (not a
+   crossfade), supporting touch, mouse-drag, and keyboard,
+   with a direction-lock so a swipe that turns out to be a
+   vertical scroll doesn't get hijacked by the carousel.
+   ====================================================== */
 .detail-gallery-container {
-    touch-action: pan-y pinch-zoom;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin-bottom: 16px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: var(--gray-100);
+    box-shadow: 0 1px 0 rgba(20,20,30,0.04);
+    touch-action: pan-y;
+    cursor: grab;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.detail-gallery-container.multi { cursor: grab; }
+.detail-gallery-container.dragging { cursor: grabbing; }
+
+.gallery-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    will-change: transform;
+}
+
+.gallery-track.animating {
+    transition: transform 0.38s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.gallery-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: var(--gray-100);
+}
+
+.gallery-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+}
+
+.gallery-slide img.g-loaded {
+    opacity: 1;
+}
+
+.gallery-slide .g-skeleton {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, var(--gray-100) 30%, var(--gray-200) 50%, var(--gray-100) 70%);
+    background-size: 200% 100%;
+    animation: shimmer 1.3s ease-in-out infinite;
+}
+
+.gallery-slide img.g-loaded ~ .g-skeleton { display: none; }
+
+@keyframes shimmer {
+    0% { background-position: 150% 0; }
+    100% { background-position: -50% 0; }
+}
+
+/* Desktop hover-reveal prev/next arrows */
+.gallery-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.9);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
     cursor: pointer;
+    z-index: 6;
+    opacity: 0;
+    box-shadow: 0 4px 14px -4px rgba(20,20,30,0.35);
+    transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.detail-gallery-container:hover .gallery-nav-btn {
+    opacity: 1;
+}
+
+.gallery-nav-btn:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.08);
+}
+
+.gallery-nav-btn:active {
+    transform: translateY(-50%) scale(0.94);
+}
+
+.gallery-nav-prev { left: 12px; }
+.gallery-nav-next { right: 12px; }
+
+.image-counter {
+    position: absolute;
+    bottom: 14px;
+    right: 14px;
+    background: rgba(0, 0, 0, 0.55);
+    color: white;
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10;
+    pointer-events: none;
+    letter-spacing: 0.01em;
+    transition: opacity 0.2s ease;
+}
+
+.image-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 14px;
+}
+
+.dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--gray-300);
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    cursor: pointer;
+}
+
+.dot:hover {
+    background: var(--gray-400);
+}
+
+.dot.active {
+    background: var(--accent, var(--primary-color));
+    width: 22px;
+    border-radius: 10px;
 }
 
 /* Faster animations */
@@ -1318,68 +1576,6 @@
             outline: none;
             box-shadow: 0 0 0 4px rgba(79,109,122,0.1);
         }
-        /* Improved Gallery Styling */
-.detail-gallery-container {
-    position: relative;
-    width: 100%;
-    margin-bottom: 16px;
-    overflow: hidden;
-    border-radius: 20px;
-    touch-action: pan-y pinch-zoom;
-    cursor: pointer;
-    background: var(--gray-100);
-    box-shadow: 0 1px 0 rgba(20,20,30,0.04);
-}
-
-.main-image {
-    width: 100%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    border-radius: 20px;
-    background: var(--gray-100);
-    transition: opacity 0.25s ease-out;
-    display: block;
-}
-
-.image-counter {
-    position: absolute;
-    bottom: 14px;
-    right: 14px;
-    background: rgba(0, 0, 0, 0.55);
-    color: white;
-    padding: 4px 11px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 10;
-    pointer-events: none;
-    letter-spacing: 0.01em;
-}
-
-.image-dots {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 14px;
-}
-
-.dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--gray-300);
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    cursor: pointer;
-}
-
-.dot.active {
-    background: var(--accent, var(--primary-color));
-    width: 22px;
-    border-radius: 10px;
-}
-
 /* Product description card */
 .desc-label {
     display: flex;
@@ -1684,23 +1880,6 @@
         .product-detail-panel { 
             z-index:3000; 
         }
-        /* Add to the existing CSS, near the bottom */
-.detail-gallery-container {
-    touch-action: pan-y pinch-zoom;
-    cursor: pointer;
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.detail-gallery-container:active {
-    cursor: grabbing;
-}
-
-/* Prevent body scroll while swiping on gallery */
-body.panel-open .detail-gallery-container {
-    touch-action: none;
-}
-        
         .detail-panel-header { 
             background:white; 
             padding:16px 20px; 
@@ -1734,21 +1913,6 @@ body.panel-open .detail-gallery-container {
         
         .detail-content { 
             padding: 20px; 
-        }
-        
-        .detail-gallery-container { 
-            position:relative; 
-            width:100%; 
-            margin-bottom:15px; 
-        }
-        
-        .main-image { 
-            width:100%; 
-            aspect-ratio:1/1; 
-            object-fit:cover; 
-            border-radius:24px; 
-            background: var(--gray-100);
-            will-change: transform;
         }
         
         .price-container {
@@ -1787,28 +1951,6 @@ body.panel-open .detail-gallery-container {
         .adjustment-badge.negative {
             background: #ffebee;
             color: #c62828;
-        }
-        
-        .image-dots { 
-            display:flex; 
-            justify-content:center; 
-            gap:8px; 
-            margin-top:8px; 
-        }
-        
-        .dot { 
-            width:8px; 
-            height:8px; 
-            border-radius:50%; 
-            background: var(--gray-400); 
-            transition:0.2s; 
-            cursor:pointer; 
-        }
-        
-        .dot.active { 
-            background: var(--accent); 
-            width:20px; 
-            border-radius:10px; 
         }
         
         .btn-green { 
@@ -2667,6 +2809,41 @@ body.panel-open .detail-gallery-container {
             contain: content;
         }
 
+        /* ======================================================
+           GRID ENTRANCE ANIMATION — cards cascade in with a soft
+           fade + rise whenever a grid/scroller is (re)populated,
+           instead of just snapping into place. Pure CSS so it
+           replays automatically every time innerHTML is rebuilt,
+           no JS wiring needed in each render function.
+           ====================================================== */
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(14px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .product-card, .product-card-h {
+            animation: cardEnter 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+        }
+
+        .product-grid .product-card:nth-child(1), .cat-products-grid .product-card:nth-child(1), .products-horizontal .product-card-h:nth-child(1) { animation-delay: 0.02s; }
+        .product-grid .product-card:nth-child(2), .cat-products-grid .product-card:nth-child(2), .products-horizontal .product-card-h:nth-child(2) { animation-delay: 0.06s; }
+        .product-grid .product-card:nth-child(3), .cat-products-grid .product-card:nth-child(3), .products-horizontal .product-card-h:nth-child(3) { animation-delay: 0.10s; }
+        .product-grid .product-card:nth-child(4), .cat-products-grid .product-card:nth-child(4), .products-horizontal .product-card-h:nth-child(4) { animation-delay: 0.14s; }
+        .product-grid .product-card:nth-child(5), .cat-products-grid .product-card:nth-child(5), .products-horizontal .product-card-h:nth-child(5) { animation-delay: 0.18s; }
+        .product-grid .product-card:nth-child(6), .cat-products-grid .product-card:nth-child(6), .products-horizontal .product-card-h:nth-child(6) { animation-delay: 0.22s; }
+        .product-grid .product-card:nth-child(7), .cat-products-grid .product-card:nth-child(7), .products-horizontal .product-card-h:nth-child(7) { animation-delay: 0.26s; }
+        .product-grid .product-card:nth-child(8), .cat-products-grid .product-card:nth-child(8), .products-horizontal .product-card-h:nth-child(8) { animation-delay: 0.30s; }
+        .product-grid .product-card:nth-child(n+9), .cat-products-grid .product-card:nth-child(n+9), .products-horizontal .product-card-h:nth-child(n+9) { animation-delay: 0.32s; }
+
+        .similar-card {
+            animation: cardEnter 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+        }
+
+        /* Section headers / banner settle in on load too */
+        .section-header, .image-banner {
+            animation: contentReveal 0.5s ease both;
+        }
+
         /* Form inputs - clean, Apple-like */
         .form-control, .form-select {
             display: block;
@@ -2750,6 +2927,66 @@ body.panel-open .detail-gallery-container {
                 grid-template-columns: repeat(4, 1fr);
                 gap: 20px;
                 padding: 8px 24px 20px;
+            }
+
+            /* Home's "you might like" style horizontal scrollers used tiny
+               148px cards while the category filter grid used full-size
+               cards, so the same products looked noticeably smaller on
+               Home than in Category on desktop. Past this breakpoint the
+               scroller becomes a real grid using the exact same column
+               formula as .product-grid / .cat-products-grid, so cards on
+               Home render at the identical size to Category - the
+               horizontal-swipe interaction stays for mobile only. */
+            .products-horizontal {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+                overflow-x: visible;
+                white-space: normal;
+                padding: 4px 0 15px;
+            }
+
+            .product-card-h {
+                display: flex;
+                flex-direction: column;
+                width: auto;
+                margin-right: 0;
+                height: 100%;
+            }
+
+            .product-img-h {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 1 / 1;
+            }
+
+            .product-info-h {
+                padding: 12px 14px 14px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .product-info-h h6 {
+                font-size: 0.95rem;
+                white-space: normal;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .product-price-h {
+                font-size: 1rem;
+            }
+
+            .product-card-h .add-to-cart-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 0.95rem;
+                top: 10px;
+                right: 10px;
             }
 
             .search-wrapper {
@@ -3138,8 +3375,8 @@ body.panel-open .detail-gallery-container {
 <!-- Global Loading Overlay -->
 <div class="loading-overlay" id="globalLoadingOverlay">
     <div class="loading-content">
-        <div class="loading-spinner"></div>
-        <p id="loadingMessage">Loading...</p>
+        <div class="circular-loader lg"></div>
+        <p id="loadingMessage" style="display:none;">Loading...</p>
     </div>
 </div>
 
@@ -3208,7 +3445,7 @@ body.panel-open .detail-gallery-container {
     <!-- category sections will be dynamically added here -->
     <div id="categorySections"></div>
     
-    <div class="products-loading text-center py-4" id="productsLoading" style="display:none"><div class="spinner-border text-dark"></div></div>
+    <div class="products-loading loader-wrap" id="productsLoading" style="display:none"><div class="circular-loader"></div></div>
     <div class="no-products text-center py-5" id="noProducts" style="display:none"><i class="fas fa-box-open fa-3x"></i><h5>No products</h5></div>
 </div>
 
@@ -3274,15 +3511,17 @@ body.panel-open .detail-gallery-container {
 <div class="product-detail-panel" id="productDetailPanel">
     <div class="detail-panel-header"><i class="fas fa-arrow-left" id="closeDetailPanel"></i> Product details</div>
     <div class="detail-content" id="detailContent">
-        <div id="detailLoadingPlaceholder" style="display: none;" class="text-center py-5">
-            <div class="loading-spinner" style="margin: 0 auto;"></div>
-            <p class="mt-3 text-muted">Loading product details...</p>
+        <div id="detailLoadingPlaceholder" style="display: none;" class="loader-wrap">
+            <div class="circular-loader lg"></div>
         </div>
         <div id="detailActualContent" style="display: none;">
-            <div class="detail-gallery-container">
-                <img id="mainDetailImage" class="main-image" src="" alt="">
-                <div class="image-dots" id="imageDots"></div>
+            <div class="detail-gallery-container" id="detailGalleryContainer">
+                <div class="gallery-track" id="galleryTrack"></div>
+                <div class="image-counter" id="imageCounter" style="display:none;"></div>
+                <button type="button" class="gallery-nav-btn gallery-nav-prev" id="galleryPrevBtn" style="display:none;" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>
+                <button type="button" class="gallery-nav-btn gallery-nav-next" id="galleryNextBtn" style="display:none;" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>
             </div>
+            <div class="image-dots" id="imageDots"></div>
             <div class="d-flex align-items-center justify-content-between mt-2">
                 <div><span class="product-price" id="detailPrice"></span><span class="old-price ms-2 text-decoration-line-through text-muted" id="detailOldPrice"></span><span class="discount-badge ms-2 text-danger fw-bold" id="detailDiscount"></span></div>
                 <i class="heart-icon fas fa-heart" id="detailHeart" style="font-size:1.6rem; color:#ff6b6b; cursor:pointer;"></i>
@@ -3319,9 +3558,8 @@ body.panel-open .detail-gallery-container {
         <input type="text" id="categorySearchInput" placeholder="Search in this category...">
     </div>
     <div id="categoryProductsArea">
-        <div id="categoryLoadingPlaceholder" style="display: none;" class="text-center py-5">
-            <div class="loading-spinner" style="margin: 0 auto;"></div>
-            <p class="mt-3 text-muted">Loading products...</p>
+        <div id="categoryLoadingPlaceholder" style="display: none;" class="loader-wrap">
+            <div class="circular-loader lg"></div>
         </div>
         <div class="cat-products-grid" id="categoryProductsGrid"></div>
         <div class="text-center py-4" id="catNoProducts" style="display:none;">No products</div>
@@ -3444,7 +3682,7 @@ body.panel-open .detail-gallery-container {
 <!-- FAVORITES PANEL -->
 <div class="slide-panel" id="favoritesPanel">
     <div class="panel-header"><i class="fas fa-arrow-left" id="backFromFavorites"></i> Favorites</div>
-    <div class="p-3" id="favoritesList">Loading favorites...</div>
+    <div class="p-3" id="favoritesList"><div class="loader-wrap"><div class="circular-loader"></div></div></div>
 </div>
 
 <!-- MY ORDERS PANEL -->
@@ -3769,7 +4007,11 @@ body.panel-open .detail-gallery-container {
     const detailOldPrice = document.getElementById('detailOldPrice');
     const detailDiscount = document.getElementById('detailDiscount');
     const detailDesc = document.getElementById('detailDesc');
-    const mainDetailImage = document.getElementById('mainDetailImage');
+    const detailGalleryContainer = document.getElementById('detailGalleryContainer');
+    const galleryTrack = document.getElementById('galleryTrack');
+    const imageCounterEl = document.getElementById('imageCounter');
+    const galleryPrevBtn = document.getElementById('galleryPrevBtn');
+    const galleryNextBtn = document.getElementById('galleryNextBtn');
     const imageDots = document.getElementById('imageDots');
     const detailHeart = document.getElementById('detailHeart');
     const similarContainer = document.getElementById('similarProductsContainer');
@@ -4716,7 +4958,7 @@ function updateShopHeaderDisplay(shopData) {
         }
         
         try {
-            container.innerHTML = '<div class="text-center py-4"><div class="spinner-border"></div></div>';
+            container.innerHTML = '<div class="loader-wrap"><div class="circular-loader"></div></div>';
             
             const ordersRef = collection(db, 'orders');
             let q;
@@ -5357,6 +5599,9 @@ function updateShopHeaderDisplay(shopData) {
     async function toggleFavorite(prodId, heartEl) {
         if(!userProfile) { showAuthPanel(); return; }
         let favs = userProfile.favorites || [];
+        heartEl.classList.remove('bounce');
+        void heartEl.offsetWidth; // restart animation if clicked rapidly
+        heartEl.classList.add('bounce');
         if (favs.includes(prodId)) {
             favs = favs.filter(id => id !== prodId);
             heartEl.classList.remove('fas'); heartEl.classList.add('far');
@@ -5371,6 +5616,18 @@ function updateShopHeaderDisplay(shopData) {
         localStorage.setItem('userProfile', JSON.stringify(userProfile));
     }
     
+    // Purely cosmetic: a quick "pop" animation on any quick-add button when
+    // pressed, regardless of which render function created it. Delegated at
+    // the document level so it works for every grid/scroller/detail button
+    // without having to wire it into each individual click handler above.
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.add-to-cart-btn, .add-to-cart-detail');
+        if (!btn) return;
+        btn.classList.remove('pop');
+        void btn.offsetWidth;
+        btn.classList.add('pop');
+    });
+
     function addToCart(prod, qty=1) {
         if(!userProfile) { showAuthPanel(); return; }
         
@@ -5496,7 +5753,7 @@ async function showProductDetail(p) {
     // Create a unique session ID for this product load
     const sessionId = ++currentDetailSession;
     
-    // 🔥 CLEAR ALL old timeouts
+    // Clear old timeouts from any previous product load
     activeImageTimeouts.forEach(t => clearTimeout(t));
     activeImageTimeouts = [];
     
@@ -5506,26 +5763,17 @@ async function showProductDetail(p) {
     
     currentProduct = p;
     
-    // 🚨 FULL reset of image element (but don't replace it!)
-    if (mainDetailImage) {
-        mainDetailImage.src = '';
-        mainDetailImage.removeAttribute('src');
-        // Don't remove all classes - just reset critical ones
-        mainDetailImage.style.opacity = '1';
-        mainDetailImage.style.transition = 'none';
-        mainDetailImage.classList.remove('loading');
-        mainDetailImage.classList.add('loaded');
-        // FORCE reflow
-        void mainDetailImage.offsetHeight;
+    // Tear down any drag/keyboard listeners left over from the previous
+    // product before rebuilding the gallery, so handlers never pile up.
+    if (detailGalleryContainer && detailGalleryContainer._galleryCleanup) {
+        detailGalleryContainer._galleryCleanup();
     }
     
-    // Clear preloaded images object
-    let preloadedImages = {};
     let currentImageIndex = 0;
-    let isAnimating = false;
     
     // Prepare images array with fallback
     const detailImages = (p.imageUrls && p.imageUrls.length) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : ['https://via.placeholder.com/400x400?text=No+Image']);
+    const multiImage = detailImages.length > 1;
     
     // COMPRESS IMAGES for better performance
     function optimizeImageUrl(url) {
@@ -5537,246 +5785,205 @@ async function showProductDetail(p) {
         return baseUrl;
     }
     
-    // Clear and reset dots container completely
+    // ---- Build the slide track: one real <img> per photo, laid out in a
+    // row. Sliding between images is a genuine transform on the track
+    // rather than a src swap + opacity crossfade, so motion stays smooth
+    // and the browser can decode/cache each image independently. ----
+    if (galleryTrack) {
+        galleryTrack.style.transition = 'none';
+        galleryTrack.style.transform = 'translateX(0%)';
+        galleryTrack.innerHTML = detailImages.map((imgUrl, idx) => `
+            <div class="gallery-slide" data-index="${idx}">
+                <div class="g-skeleton"></div>
+                <img data-src="${optimizeImageUrl(imgUrl)}" alt="${(p.name || 'Product image').replace(/"/g, '&quot;')}" draggable="false">
+            </div>
+        `).join('');
+        
+        // Load the first slide eagerly; the rest lazily as they're needed.
+        const loadSlideImage = (idx) => {
+            const slide = galleryTrack.children[idx];
+            if (!slide) return;
+            const img = slide.querySelector('img');
+            if (!img || img.src) return;
+            const finish = () => { if (sessionId === currentDetailSession) img.classList.add('g-loaded'); };
+            img.onload = finish;
+            img.onerror = () => { img.src = 'https://via.placeholder.com/400x400?text=Image+Error'; finish(); };
+            img.src = img.dataset.src;
+        };
+        loadSlideImage(0);
+        if (multiImage) loadSlideImage(1);
+    }
+    
+    detailGalleryContainer && detailGalleryContainer.classList.toggle('multi', multiImage);
+    
+    // ---- Dots ----
     if (imageDots) {
-        imageDots.innerHTML = '';
-    }
-    
-    // Clear any existing counter from gallery container
-    const galleryContainer = document.querySelector('.detail-gallery-container');
-    if (galleryContainer) {
-        let existingCounter = galleryContainer.querySelector('.image-counter');
-        if (existingCounter) existingCounter.remove();
-        
-        // Remove old touch listeners by removing and re-adding the container's children
-        // But keep the container itself to preserve references
-        const oldMainImage = galleryContainer.querySelector('#mainDetailImage');
-        const oldImageDots = galleryContainer.querySelector('#imageDots');
-        
-        // Don't replace the container, just clean it
-        // The mainDetailImage and imageDots references are still valid
-    }
-    
-    // Preload images with optimization and session check
-    detailImages.forEach((imgUrl, idx) => {
-        if (imgUrl && imgUrl !== '') {
-            const optimizedUrl = optimizeImageUrl(imgUrl);
-            const img = new Image();
-            img.fetchPriority = idx === 0 ? 'high' : 'auto';
-            img.decoding = 'async';
-            img.onload = () => {
-                // Ignore old product loads
-                if (sessionId !== currentDetailSession) return;
-                
-                preloadedImages[idx] = optimizedUrl;
-                // If this is the first image and detail panel is open, update it
-                if (idx === currentImageIndex && mainDetailImage && detailPanel.classList.contains('show')) {
-                    mainDetailImage.src = optimizedUrl;
-                    mainDetailImage.classList.add('loaded');
-                }
-            };
-            img.onerror = () => {
-                // Ignore old product loads
-                if (sessionId !== currentDetailSession) return;
-                
-                preloadedImages[idx] = 'https://via.placeholder.com/400x400?text=Image+Error';
-                if (idx === currentImageIndex && mainDetailImage && detailPanel.classList.contains('show')) {
-                    mainDetailImage.src = preloadedImages[idx];
-                }
-            };
-            img.src = optimizedUrl;
-        } else {
-            preloadedImages[idx] = 'https://via.placeholder.com/400x400?text=No+Image';
-        }
-    });
-    
-    function updateMainImage(index, direction = 'next') {
-        if (isAnimating) return;
-        if (index < 0) index = detailImages.length - 1;
-        if (index >= detailImages.length) index = 0;
-        
-        if (currentImageIndex === index) return;
-        
-        isAnimating = true;
-        currentImageIndex = index;
-        
-        const imgUrl = detailImages[currentImageIndex];
-        const optimizedUrl = preloadedImages[currentImageIndex] || optimizeImageUrl(imgUrl);
-        
-        // Safe animation with timeout tracking
-        if (mainDetailImage) {
-            mainDetailImage.style.transition = 'opacity 0.15s ease-out';
-            mainDetailImage.style.opacity = '0.5';
-            
-            const t1 = setTimeout(() => {
-                if (sessionId !== currentDetailSession) return;
-                
-                mainDetailImage.src = optimizedUrl;
-                
-                const t2 = setTimeout(() => {
-                    if (sessionId !== currentDetailSession) return;
-                    
-                    mainDetailImage.style.opacity = '1';
-                    
-                    const t3 = setTimeout(() => {
-                        if (sessionId !== currentDetailSession) return;
-                        
-                        isAnimating = false;
-                        mainDetailImage.style.transition = '';
-                    }, 150);
-                    
-                    activeImageTimeouts.push(t3);
-                }, 50);
-                
-                activeImageTimeouts.push(t2);
-            }, 50);
-            
-            activeImageTimeouts.push(t1);
-        } else {
-            isAnimating = false;
-        }
-        
-        // Update dots
-        const dots = imageDots?.querySelectorAll('.dot');
-        if (dots) {
-            dots.forEach((d, i) => d.classList.toggle('active', i === currentImageIndex));
-        }
-        
-        // Update counter if exists
-        const counter = galleryContainer?.querySelector('.image-counter');
-        if (counter && detailImages.length > 1) {
-            counter.textContent = `${currentImageIndex + 1}/${detailImages.length}`;
-        }
-        
-        // Preload adjacent images with session check
-        if (currentImageIndex + 1 < detailImages.length && !preloadedImages[currentImageIndex + 1]) {
-            const nextImg = new Image();
-            const nextUrl = optimizeImageUrl(detailImages[currentImageIndex + 1]);
-            nextImg.onload = () => {
-                if (sessionId !== currentDetailSession) return;
-                preloadedImages[currentImageIndex + 1] = nextUrl;
-            };
-            nextImg.src = nextUrl;
-        }
-        if (currentImageIndex - 1 >= 0 && !preloadedImages[currentImageIndex - 1]) {
-            const prevImg = new Image();
-            const prevUrl = optimizeImageUrl(detailImages[currentImageIndex - 1]);
-            prevImg.onload = () => {
-                if (sessionId !== currentDetailSession) return;
-                preloadedImages[currentImageIndex - 1] = prevUrl;
-            };
-            prevImg.src = prevUrl;
-        }
-    }
-    
-    // Create dots
-    if (imageDots && detailImages.length > 1) {
-        let dotsHtml = '';
-        for (let i = 0; i < detailImages.length; i++) {
-            dotsHtml += `<span class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`;
-        }
-        imageDots.innerHTML = dotsHtml;
-        
-        // Add dot click handlers
-        imageDots.querySelectorAll('.dot').forEach(dot => {
-            dot.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const idx = parseInt(dot.dataset.index);
-                updateMainImage(idx);
+        imageDots.innerHTML = multiImage
+            ? detailImages.map((_, i) => `<span class="dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('')
+            : '';
+        if (multiImage) {
+            imageDots.querySelectorAll('.dot').forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    goToSlide(parseInt(dot.dataset.index, 10));
+                });
             });
-        });
-    } else if (imageDots) {
-        imageDots.innerHTML = '';
+        }
     }
     
-    // Add counter for multiple images
-    if (detailImages.length > 1 && galleryContainer) {
-        const counterHtml = `<div class="image-counter" style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 20px; font-size: 12px; z-index: 5;">1/${detailImages.length}</div>`;
-        galleryContainer.insertAdjacentHTML('beforeend', counterHtml);
+    // ---- Counter + desktop arrows ----
+    if (imageCounterEl) {
+        imageCounterEl.style.display = multiImage ? 'block' : 'none';
+        imageCounterEl.textContent = `1/${detailImages.length}`;
+    }
+    if (galleryPrevBtn) galleryPrevBtn.style.display = multiImage ? 'flex' : 'none';
+    if (galleryNextBtn) galleryNextBtn.style.display = multiImage ? 'flex' : 'none';
+    
+    // ---- Core navigation: moves the track to a given slide index ----
+    function goToSlide(index, { animate = true } = {}) {
+        if (!galleryTrack) return;
+        const clamped = Math.max(0, Math.min(detailImages.length - 1, index));
+        currentImageIndex = clamped;
+        
+        galleryTrack.style.transition = animate ? '' : 'none';
+        galleryTrack.classList.toggle('animating', animate);
+        galleryTrack.style.transform = `translateX(-${clamped * 100}%)`;
+        
+        loadSlideImageSafe(clamped);
+        loadSlideImageSafe(clamped + 1);
+        loadSlideImageSafe(clamped - 1);
+        
+        const dots = imageDots ? imageDots.querySelectorAll('.dot') : null;
+        if (dots) dots.forEach((d, i) => d.classList.toggle('active', i === clamped));
+        
+        if (imageCounterEl && multiImage) imageCounterEl.textContent = `${clamped + 1}/${detailImages.length}`;
     }
     
-    // Set up touch/swipe support - remove old listeners by creating new ones
-    // We'll use a flag to track if the touch handlers are still valid
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let isSwiping = false;
-    let touchSessionValid = true;
+    function loadSlideImageSafe(idx) {
+        if (!galleryTrack || idx < 0 || idx >= detailImages.length) return;
+        const slide = galleryTrack.children[idx];
+        if (!slide) return;
+        const img = slide.querySelector('img');
+        if (!img || img.src) return;
+        const finish = () => { if (sessionId === currentDetailSession) img.classList.add('g-loaded'); };
+        img.onload = finish;
+        img.onerror = () => { img.src = 'https://via.placeholder.com/400x400?text=Image+Error'; finish(); };
+        img.src = img.dataset.src;
+    }
     
-    const handleTouchStart = (e) => {
-        if (!touchSessionValid || sessionId !== currentDetailSession) return;
-        if (detailImages.length <= 1) return;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        isSwiping = true;
-    };
+    if (galleryPrevBtn) galleryPrevBtn.onclick = (e) => { e.stopPropagation(); goToSlide(currentImageIndex - 1); };
+    if (galleryNextBtn) galleryNextBtn.onclick = (e) => { e.stopPropagation(); goToSlide(currentImageIndex + 1); };
     
-    const handleTouchMove = (e) => {
-        if (!touchSessionValid || sessionId !== currentDetailSession) return;
-        if (!isSwiping || detailImages.length <= 1) return;
-        e.preventDefault();
-    };
-    
-    const handleTouchEnd = (e) => {
-        if (!touchSessionValid || sessionId !== currentDetailSession) return;
-        if (!isSwiping || detailImages.length <= 1) {
-            isSwiping = false;
-            return;
-        }
+    // ---- Drag / swipe handling via Pointer Events (covers touch, mouse
+    // and pen with one code path). Direction is only "locked" once the
+    // gesture has moved far enough to be confident it's horizontal, so a
+    // vertical scroll started on top of the image is never hijacked. ----
+    if (detailGalleryContainer && multiImage) {
+        let startX = 0, startY = 0, dragX = 0, pointerId = null;
+        let dragging = false, directionLocked = null; // null | 'x' | 'y'
+        const DIRECTION_THRESHOLD = 8;
+        const SWIPE_COMMIT_RATIO = 0.18;
         
-        const touchEndX = e.changedTouches[0].clientX;
-        const touchEndY = e.changedTouches[0].clientY;
+        const containerWidth = () => detailGalleryContainer.offsetWidth || 1;
         
-        const swipeThreshold = 50;
-        const swipeDistance = touchEndX - touchStartX;
-        const verticalDistance = Math.abs(touchEndY - touchStartY);
-        
-        if (Math.abs(swipeDistance) > verticalDistance && Math.abs(swipeDistance) > swipeThreshold) {
-            if (swipeDistance < 0) {
-                updateMainImage(currentImageIndex + 1, 'next');
-                if (navigator.vibrate) navigator.vibrate(50);
-            } else if (swipeDistance > 0) {
-                updateMainImage(currentImageIndex - 1, 'prev');
-                if (navigator.vibrate) navigator.vibrate(50);
-            }
-        }
-        
-        isSwiping = false;
-    };
-    
-    // Remove old listeners by adding new ones with session check
-    if (galleryContainer) {
-        // Store the handlers to remove them later when session ends
-        if (galleryContainer._touchHandlers) {
-            const oldHandlers = galleryContainer._touchHandlers;
-            galleryContainer.removeEventListener('touchstart', oldHandlers.start);
-            galleryContainer.removeEventListener('touchmove', oldHandlers.move);
-            galleryContainer.removeEventListener('touchend', oldHandlers.end);
-        }
-        
-        // Store new handlers
-        galleryContainer._touchHandlers = {
-            start: handleTouchStart,
-            move: handleTouchMove,
-            end: handleTouchEnd
+        const setTrackX = (percentOffset, animate) => {
+            galleryTrack.classList.toggle('animating', animate);
+            galleryTrack.style.transition = animate ? '' : 'none';
+            galleryTrack.style.transform = `translateX(${percentOffset}%)`;
         };
         
-        galleryContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
-        galleryContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
-        galleryContainer.addEventListener('touchend', handleTouchEnd);
-        galleryContainer.style.touchAction = 'pan-y pinch-zoom';
-    }
-    
-    // Set initial image with preloaded first image or placeholder
-    if (mainDetailImage) {
-        if (preloadedImages[0]) {
-            mainDetailImage.src = preloadedImages[0];
-        } else {
-            const firstUrl = optimizeImageUrl(detailImages[0]);
-            mainDetailImage.src = firstUrl;
-        }
-        mainDetailImage.classList.add('loaded');
-        mainDetailImage.style.opacity = '1';
-        mainDetailImage.style.transition = '';
+        const onPointerDown = (e) => {
+            if (sessionId !== currentDetailSession) return;
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            pointerId = e.pointerId;
+            startX = e.clientX;
+            startY = e.clientY;
+            dragX = 0;
+            dragging = true;
+            directionLocked = null;
+            detailGalleryContainer.setPointerCapture && detailGalleryContainer.setPointerCapture(pointerId);
+        };
+        
+        const onPointerMove = (e) => {
+            if (!dragging || e.pointerId !== pointerId) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            if (!directionLocked) {
+                if (Math.abs(dx) > DIRECTION_THRESHOLD || Math.abs(dy) > DIRECTION_THRESHOLD) {
+                    directionLocked = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+                }
+            }
+            
+            if (directionLocked === 'y') return; // let the page scroll normally
+            if (directionLocked !== 'x') return;
+            
+            e.preventDefault();
+            detailGalleryContainer.classList.add('dragging');
+            
+            // Rubber-band resistance at the first/last image
+            let resisted = dx;
+            const atStart = currentImageIndex === 0 && dx > 0;
+            const atEnd = currentImageIndex === detailImages.length - 1 && dx < 0;
+            if (atStart || atEnd) resisted = dx * 0.35;
+            
+            dragX = resisted;
+            const basePercent = -currentImageIndex * 100;
+            const dragPercent = (resisted / containerWidth()) * 100;
+            setTrackX(basePercent + dragPercent, false);
+        };
+        
+        const endDrag = (e) => {
+            if (!dragging || (e && e.pointerId !== pointerId)) return;
+            dragging = false;
+            detailGalleryContainer.classList.remove('dragging');
+            
+            if (directionLocked === 'x') {
+                const ratio = dragX / containerWidth();
+                if (Math.abs(ratio) > SWIPE_COMMIT_RATIO) {
+                    if (ratio < 0) goToSlide(currentImageIndex + 1);
+                    else goToSlide(currentImageIndex - 1);
+                    if (navigator.vibrate) navigator.vibrate(15);
+                } else {
+                    goToSlide(currentImageIndex); // snap back
+                }
+            }
+            directionLocked = null;
+            pointerId = null;
+        };
+        
+        // Tap-to-advance on the left/right edges when no real drag happened
+        const onClick = (e) => {
+            if (Math.abs(dragX) > 5) { dragX = 0; return; }
+            const rect = detailGalleryContainer.getBoundingClientRect();
+            const relativeX = e.clientX - rect.left;
+            if (relativeX < rect.width * 0.28) goToSlide(currentImageIndex - 1);
+            else if (relativeX > rect.width * 0.72) goToSlide(currentImageIndex + 1);
+        };
+        
+        const onKeyDown = (e) => {
+            if (!detailPanel.classList.contains('show')) return;
+            if (e.key === 'ArrowLeft') goToSlide(currentImageIndex - 1);
+            else if (e.key === 'ArrowRight') goToSlide(currentImageIndex + 1);
+        };
+        
+        detailGalleryContainer.addEventListener('pointerdown', onPointerDown);
+        detailGalleryContainer.addEventListener('pointermove', onPointerMove, { passive: false });
+        detailGalleryContainer.addEventListener('pointerup', endDrag);
+        detailGalleryContainer.addEventListener('pointercancel', endDrag);
+        detailGalleryContainer.addEventListener('click', onClick);
+        document.addEventListener('keydown', onKeyDown);
+        
+        detailGalleryContainer._galleryCleanup = () => {
+            detailGalleryContainer.removeEventListener('pointerdown', onPointerDown);
+            detailGalleryContainer.removeEventListener('pointermove', onPointerMove);
+            detailGalleryContainer.removeEventListener('pointerup', endDrag);
+            detailGalleryContainer.removeEventListener('pointercancel', endDrag);
+            detailGalleryContainer.removeEventListener('click', onClick);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    } else if (detailGalleryContainer) {
+        detailGalleryContainer._galleryCleanup = null;
     }
     
     // Rest of product details
@@ -6387,7 +6594,7 @@ async function showProductDetail(p) {
     }
     
     // Show loading state while fetching favorites
-    container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" style="color: var(--primary-color);"></div><p class="mt-2 text-muted">Loading favorites...</p></div>';
+    container.innerHTML = '<div class="loader-wrap"><div class="circular-loader"></div></div>';
     
     try {
         let html = '<div class="favorites-list">';
