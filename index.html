@@ -9,7 +9,7 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236b8794'/%3E%3Cstop offset='1' stop-color='%234F6D7A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M18 26h28l-2.6 20.2a4 4 0 0 1-4 3.4H24.6a4 4 0 0 1-4-3.4L18 26z' fill='white' fill-opacity='.95'/%3E%3Cpath d='M24 26v-4a8 8 0 0 1 16 0v4' stroke='white' stroke-width='3.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
     <!-- Bootstrap 5 + Font Awesome -->
      <!-- Preload critical resources -->
-<link rel="preload" as="image" href="https://via.placeholder.com/400" fetchpriority="high">
+<link rel="preload" as="image" href="https://placehold.co/400" fetchpriority="high">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts (Inter & Poppins) -->
@@ -4220,7 +4220,7 @@
     };
     
     imgElement.onerror = () => {
-        imgElement.src = 'https://via.placeholder.com/400?text=Image+Not+Found';
+        imgElement.src = 'https://placehold.co/400?text=Image+Not+Found';
         imgElement.classList.add('loaded');
         if (onError) onError();
     };
@@ -5255,7 +5255,7 @@ function updateShopHeaderDisplay(shopData) {
         list.innerHTML = categories.map(cat => `
             <label class="sidebar-filter-cat">
                 <input type="checkbox" class="sidebar-cat-checkbox" value="${cat.id}">
-                <span class="sidebar-filter-cat-thumb"><img src="${cat.imageUrl || 'https://via.placeholder.com/62'}" onerror="this.src='https://via.placeholder.com/62'" alt=""></span>
+                <span class="sidebar-filter-cat-thumb"><img src="${cat.imageUrl || 'https://placehold.co/62'}" onerror="this.src='https://placehold.co/62'" alt=""></span>
                 <span>${escapeHtml(cat.name || '')}</span>
             </label>
         `).join('');
@@ -5314,7 +5314,7 @@ function updateShopHeaderDisplay(shopData) {
     function renderCategories() {
         let html = ''; 
         categories.forEach(cat => { 
-            html += `<div class="category-item" data-category-id="${cat.id}"><div class="category-circle"><img src="${cat.imageUrl||'https://via.placeholder.com/62'}" onerror="this.src='https://via.placeholder.com/62'"></div><div class="category-name">${cat.name}</div></div>`; 
+            html += `<div class="category-item" data-category-id="${cat.id}"><div class="category-circle"><img src="${cat.imageUrl||'https://placehold.co/62'}" onerror="this.src='https://placehold.co/62'"></div><div class="category-name">${cat.name}</div></div>`; 
         });
         categoriesContainer.innerHTML = html;
         document.querySelectorAll('.category-item').forEach(item => item.addEventListener('click',()=>{ const catId=item.dataset.categoryId; openCategoryPanel(catId); document.querySelectorAll('.category-circle').forEach(c=>c.classList.remove('active')); item.querySelector('.category-circle').classList.add('active'); }));
@@ -5325,8 +5325,10 @@ function updateShopHeaderDisplay(shopData) {
         if (!category) return;
         categoryPanelTitle.innerText = category.name;
         
-        // Show loading
-        if (categoryLoadingPlaceholder) categoryLoadingPlaceholder.style.display = 'block';
+        // Show loading (must be 'flex', not 'block' - .loader-wrap centers
+        // its spinner with display:flex + justify-content:center; setting
+        // an inline 'block' here overrides that and left-aligns it)
+        if (categoryLoadingPlaceholder) categoryLoadingPlaceholder.style.display = 'flex';
         if (categoryProductsGridElem) categoryProductsGridElem.style.display = 'none';
         if (catNoProductsElem) catNoProductsElem.style.display = 'none';
         
@@ -5408,7 +5410,7 @@ function updateShopHeaderDisplay(shopData) {
             <div class="product-card" data-prod-id="${p.id}" style="position: relative;">
                 <div class="product-img-container" style="position: relative;">
                     ${discountBadge}
-                    <img src="${img}" class="product-img" loading="lazy" decoding="async" onerror="this.src='https://via.placeholder.com/300'">
+                    <img src="${img}" class="product-img" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/300'">
                 </div>
                 <div class="p-3 pt-2">
                     <h6 style="font-size:0.9rem; margin-bottom:2px; white-space: normal; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${escapeHtml(p.name || '')}</h6>
@@ -5487,7 +5489,7 @@ function updateShopHeaderDisplay(shopData) {
         
         productsHtml += `<div class="product-card-h" data-product-id="${p.id}" style="position: relative;">
             ${discountHtml}
-            <img src="${img}" class="product-img-h" onerror="this.src='https://via.placeholder.com/130'">
+            <img src="${img}" class="product-img-h" onerror="this.src='https://placehold.co/130'">
             <div class="product-info-h">
                 <h6>${p.name||''}</h6>
                 <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -5557,7 +5559,7 @@ function updateShopHeaderDisplay(shopData) {
         card.innerHTML = `
             <div class="product-img-container" style="position: relative;">
                 ${discountBadge}
-                <img class="product-img" src="${img || 'https://via.placeholder.com/300?text=No+Image'}" 
+                <img class="product-img" src="${img || 'https://placehold.co/300?text=No+Image'}" 
                      loading="lazy" decoding="async"
                      alt="${escapeHtml(p.name || 'Product')}">
             </div>
@@ -5593,7 +5595,7 @@ function updateShopHeaderDisplay(shopData) {
         const imgElement = card.querySelector('.product-img');
         if (imgElement && img) {
             imgElement.onerror = () => {
-                imgElement.src = 'https://via.placeholder.com/300?text=No+Image';
+                imgElement.src = 'https://placehold.co/300?text=No+Image';
             };
         }
     }
@@ -5767,8 +5769,9 @@ async function showProductDetail(p) {
     activeImageTimeouts.forEach(t => clearTimeout(t));
     activeImageTimeouts = [];
     
-    // Show loading state in detail panel
-    if (detailLoadingPlaceholder) detailLoadingPlaceholder.style.display = 'block';
+    // Show loading state in detail panel (same 'flex' fix as above, so the
+    // spinner stays centered instead of jumping to the left)
+    if (detailLoadingPlaceholder) detailLoadingPlaceholder.style.display = 'flex';
     if (detailActualContent) detailActualContent.style.display = 'none';
     
     currentProduct = p;
@@ -5782,7 +5785,7 @@ async function showProductDetail(p) {
     let currentImageIndex = 0;
     
     // Prepare images array with fallback
-    const detailImages = (p.imageUrls && p.imageUrls.length) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : ['https://via.placeholder.com/400x400?text=No+Image']);
+    const detailImages = (p.imageUrls && p.imageUrls.length) ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : ['https://placehold.co/400x400?text=No+Image']);
     const multiImage = detailImages.length > 1;
     
     // COMPRESS IMAGES for better performance
@@ -5795,7 +5798,7 @@ async function showProductDetail(p) {
     // isn't a real Firebase Storage resizing parameter, so the image
     // request failed. Fix: keep the original URL (with its token) intact.
     function optimizeImageUrl(url) {
-        if (!url) return 'https://via.placeholder.com/400x400?text=No+Image';
+        if (!url) return 'https://placehold.co/400x400?text=No+Image';
         return url;
     }
     
@@ -5821,7 +5824,7 @@ async function showProductDetail(p) {
             if (!img || img.src) return;
             const finish = () => { if (sessionId === currentDetailSession) img.classList.add('g-loaded'); };
             img.onload = finish;
-            img.onerror = () => { img.src = 'https://via.placeholder.com/400x400?text=Image+Error'; finish(); };
+            img.onerror = () => { img.src = 'https://placehold.co/400x400?text=Image+Error'; finish(); };
             img.src = img.dataset.src;
         };
         loadSlideImage(0);
@@ -5881,7 +5884,7 @@ async function showProductDetail(p) {
         if (!img || img.src) return;
         const finish = () => { if (sessionId === currentDetailSession) img.classList.add('g-loaded'); };
         img.onload = finish;
-        img.onerror = () => { img.src = 'https://via.placeholder.com/400x400?text=Image+Error'; finish(); };
+        img.onerror = () => { img.src = 'https://placehold.co/400x400?text=Image+Error'; finish(); };
         img.src = img.dataset.src;
     }
     
@@ -6157,7 +6160,7 @@ async function showProductDetail(p) {
             });
             let similarHtml = '';
             similar.forEach(sp => {
-                const img = (sp.imageUrls && sp.imageUrls[0]) || sp.imageUrl || 'https://via.placeholder.com/120';
+                const img = (sp.imageUrls && sp.imageUrls[0]) || sp.imageUrl || 'https://placehold.co/120';
                 similarHtml += `<div class="similar-card" data-product-id="${sp.id}"><div class="similar-img-wrap"><img src="${img}" class="similar-img" loading="lazy" decoding="async"></div><div class="similar-name">${escapeHtml(sp.name)}</div><div class="similar-price">$${(sp.price||0).toFixed(2)}</div></div>`;
             });
             similarContainer.innerHTML = similarHtml || '<p class="text-muted">No similar products</p>';
@@ -6230,7 +6233,7 @@ async function showProductDetail(p) {
             
             html += `
                 <div class="d-flex align-items-center mb-3 p-2 border-bottom" style="gap: 12px;">
-                    <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://via.placeholder.com/60'">
+                    <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://placehold.co/60'">
                     <div class="flex-grow-1">
                         <h6 class="mb-1" style="font-size: 0.95rem;">
                             ${item.name}
@@ -6640,7 +6643,7 @@ async function showProductDetail(p) {
                 
                 html += `
                     <div class="d-flex align-items-center mb-3 p-2 border-bottom" style="gap: 12px; cursor: pointer;" data-prod-id="${prodId}">
-                        <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://via.placeholder.com/60'">
+                        <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://placehold.co/60'">
                         <div class="flex-grow-1">
                             <h6 class="mb-1" style="font-size: 0.95rem;">
                                 ${escapeHtml(prod.name)}
