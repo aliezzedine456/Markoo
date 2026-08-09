@@ -3030,6 +3030,16 @@
             }
         }
 
+        /* On real desktop widths, each category's row on the Home page
+           (.products-horizontal) shows 6 products across instead of 4, so
+           a full category "shelf" fits in one row without scrolling. */
+        @media (min-width: 1180px) {
+            .products-horizontal {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 16px;
+            }
+        }
+
         /* Desktop app-shell nav: past this width there's enough room for a
            proper left-hand navigation rail like most shopping apps use on
            desktop (AliExpress, Amazon, etc.), so the bottom tab bar rotates
@@ -5776,13 +5786,17 @@ async function showProductDetail(p) {
     const multiImage = detailImages.length > 1;
     
     // COMPRESS IMAGES for better performance
+    // NOTE: Firebase Storage download URLs look like
+    //   https://firebasestorage.googleapis.com/v0/b/<bucket>/o/<path>?alt=media&token=<token>
+    // The "?alt=media&token=..." query string is REQUIRED to fetch the file -
+    // without the token, Storage returns 403/404 and the <img> never loads.
+    // The previous version stripped the whole query string (losing the
+    // token) and replaced it with "?alt=media&width=400&height=400", which
+    // isn't a real Firebase Storage resizing parameter, so the image
+    // request failed. Fix: keep the original URL (with its token) intact.
     function optimizeImageUrl(url) {
         if (!url) return 'https://via.placeholder.com/400x400?text=No+Image';
-        const baseUrl = url.split('?')[0];
-        if (baseUrl.includes('firebasestorage')) {
-            return `${baseUrl}?alt=media&width=400&height=400`;
-        }
-        return baseUrl;
+        return url;
     }
     
     // ---- Build the slide track: one real <img> per photo, laid out in a
