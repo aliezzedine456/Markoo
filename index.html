@@ -2989,8 +2989,8 @@ body.panel-open .detail-gallery-container {
             }
 
             .sidebar-filter-cat-thumb {
-                width: 24px;
-                height: 24px;
+                width: 30px;
+                height: 30px;
                 border-radius: 50%;
                 overflow: hidden;
                 flex-shrink: 0;
@@ -3064,14 +3064,12 @@ body.panel-open .detail-gallery-container {
 
             /* On the desktop rail the icon+label sit stacked, so the count
                reads better centered directly above the cart icon rather
-               than as a corner badge. */
-            #navCart {
-                padding-top: 15px;
-            }
-
+               than as a corner badge. The badge is absolutely positioned,
+               so it can float above the item without pushing the icon/label
+               down or throwing off alignment with the other nav items. */
             .bottom-nav-item .cart-badge {
                 position: absolute;
-                top: -1px;
+                top: -9px;
                 left: 50%;
                 right: auto;
                 transform: translateX(-50%);
@@ -3085,6 +3083,17 @@ body.panel-open .detail-gallery-container {
                 position: absolute;
                 top: 2px;
                 right: 8px;
+            }
+
+            /* The dimmed backdrop behind an open panel otherwise spans the
+               full viewport (inset: 0) and, sitting above the sidebar's
+               z-index, ends up swallowing clicks on the left nav - so on
+               desktop it's pulled in to start after the sidebar. That
+               keeps the sidebar visible and clickable while a panel (Cart,
+               Account, etc.) is open, so pressing another nav item jumps
+               straight to that section with no need to hit Back first. */
+            body.panel-open::before {
+                left: 236px;
             }
         }
 
