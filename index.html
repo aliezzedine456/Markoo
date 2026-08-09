@@ -373,6 +373,18 @@
     z-index: 2;
     mix-blend-mode: normal;
 }
+
+/* #bannerContent wraps the <img>; without an explicit size here, height:100%
+   on .banner-image has nothing to resolve against and the image falls back
+   to its own natural aspect ratio instead of filling the fixed-height
+   banner box - leaving empty space below it. Pinning it to the container's
+   full size fixes that. */
+#bannerContent {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
         
         .banner-overlay { 
             position:absolute; 
@@ -3555,7 +3567,13 @@ function applyCompactBarStyle(el, shopData) {
     const align = style.align || 'center';
 
     el.innerText = shopData.name || 'Shop';
-    el.style.height = '70px';
+    // Fill the full height of .banner-container.no-banner (which itself
+    // changes per breakpoint: 88px / 120px on desktop / 80px on small
+    // phones) rather than a fixed px value, so a custom background color
+    // always covers the entire bar with no gradient visible around it.
+    el.style.height = '100%';
+    el.style.width = '100%';
+    el.style.boxSizing = 'border-box';
     el.style.padding = '0 20px';
     el.style.background = style.bgColor || 'transparent';
     el.style.color = style.textColor || '#ffffff';
@@ -3567,6 +3585,56 @@ function applyCompactBarStyle(el, shopData) {
     // The heavy shadow is tuned for the default dark gradient background;
     // drop it once the owner picks a solid custom color so text stays crisp.
     el.style.textShadow = style.bgColor ? 'none' : '0 2px 14px rgba(0,0,0,0.4)';
+}
+
+// Decides what shows at the top of the shop page and applies it:
+//   1. bannerEnabled + an image set          -> the full banner image
+//   2. bannerEnabled off, compactBarEnabled  -> the customizable compact title bar
+//   3. bannerEnabled off, compactBarEnabled off -> nothing at all (fully hidden)
+function updateShopHeaderDisplay(shopData) {
+    const imageBannerWrap = document.getElementById('imageBanner');
+    const bannerContainer = document.getElementById('bannerContainer');
+    const bannerSkeleton = document.getElementById('bannerSkeleton');
+    const bannerContent = document.getElementById('bannerContent');
+    const shopTopBar = document.getElementById('shopTopBar');
+
+    const bannerImg = (shopData.bannerEnabled !== false) ? (shopData.bannerUrl || shopData.bannerImage) : '';
+    const showCompactBar = shopData.bannerEnabled === false && shopData.compactBarEnabled !== false;
+    const hideEverything = shopData.bannerEnabled === false && shopData.compactBarEnabled === false;
+
+    if (imageBannerWrap) imageBannerWrap.style.display = hideEverything ? 'none' : '';
+
+    if (bannerImg && bannerImg !== '') {
+        // Has banner - show banner image
+        if (bannerContainer) {
+            bannerContainer.classList.add('has-banner');
+            bannerContainer.classList.remove('no-banner');
+        }
+        loadImageWithSkeleton(bannerImage, bannerImg);
+        if (bannerContent) bannerContent.style.display = 'block';
+        if (bannerSkeleton) bannerSkeleton.style.display = 'none';
+        if (shopTopBar) shopTopBar.style.display = 'none';
+    } else if (showCompactBar) {
+        // No banner, but the compact title bar is enabled
+        if (bannerContainer) {
+            bannerContainer.classList.add('no-banner');
+            bannerContainer.classList.remove('has-banner');
+        }
+        if (bannerContent) bannerContent.style.display = 'none';
+        if (bannerSkeleton) bannerSkeleton.style.display = 'none';
+        if (shopTopBar) {
+            shopTopBar.style.display = 'flex';
+            applyCompactBarStyle(shopTopBar, shopData);
+        }
+    } else {
+        // Owner chose to hide the top area completely - no banner, no title bar
+        if (bannerContainer) {
+            bannerContainer.classList.remove('has-banner', 'no-banner');
+        }
+        if (bannerContent) bannerContent.style.display = 'none';
+        if (bannerSkeleton) bannerSkeleton.style.display = 'none';
+        if (shopTopBar) shopTopBar.style.display = 'none';
+    }
 }
 
    async function loadShopData() {
@@ -3586,35 +3654,7 @@ function applyCompactBarStyle(el, shopData) {
                 }
             };
             
-            const bannerImg = (shopData.bannerEnabled !== false) ? (shopData.bannerUrl || shopData.bannerImage) : '';
-            const bannerContainer = document.getElementById('bannerContainer');
-            const bannerSkeleton = document.getElementById('bannerSkeleton');
-            const bannerContent = document.getElementById('bannerContent');
-            const shopTopBar = document.getElementById('shopTopBar');
-            
-            if (bannerImg && bannerImg !== '') {
-                // Has banner - show banner image
-                if (bannerContainer) {
-                    bannerContainer.classList.add('has-banner');
-                    bannerContainer.classList.remove('no-banner');
-                }
-                loadImageWithSkeleton(bannerImage, bannerImg);
-                bannerContent.style.display = 'block';
-                if (bannerSkeleton) bannerSkeleton.style.display = 'none';
-                if (shopTopBar) shopTopBar.style.display = 'none';
-            } else {
-                // No banner - show a compact colored bar
-                if (bannerContainer) {
-                    bannerContainer.classList.add('no-banner');
-                    bannerContainer.classList.remove('has-banner');
-                }
-                if (bannerContent) bannerContent.style.display = 'none';
-                if (bannerSkeleton) bannerSkeleton.style.display = 'none';
-                if (shopTopBar) {
-                    shopTopBar.style.display = 'flex';
-                    applyCompactBarStyle(shopTopBar, shopData);
-                }
-            }
+            updateShopHeaderDisplay(shopData);
             
             bannerTitle.innerText = shopData.name || 'Shop';
             bannerSubtitle.innerText = shopData.subtitle || '';
@@ -3632,35 +3672,7 @@ function applyCompactBarStyle(el, shopData) {
             if (shopData.ownerPhone) shopOwnerPhone = shopData.ownerPhone;
             if (shopData.ownerEmail) shopOwnerEmail = shopData.ownerEmail;
             
-            const bannerImg = (shopData.bannerEnabled !== false) ? (shopData.bannerUrl || shopData.bannerImage) : '';
-            const bannerContainer = document.getElementById('bannerContainer');
-            const bannerSkeleton = document.getElementById('bannerSkeleton');
-            const bannerContent = document.getElementById('bannerContent');
-            const shopTopBar = document.getElementById('shopTopBar');
-            
-            if (bannerImg && bannerImg !== '') {
-                // Has banner - show banner image
-                if (bannerContainer) {
-                    bannerContainer.classList.add('has-banner');
-                    bannerContainer.classList.remove('no-banner');
-                }
-                loadImageWithSkeleton(bannerImage, bannerImg);
-                bannerContent.style.display = 'block';
-                if (bannerSkeleton) bannerSkeleton.style.display = 'none';
-                if (shopTopBar) shopTopBar.style.display = 'none';
-            } else {
-                // No banner - show a compact colored bar
-                if (bannerContainer) {
-                    bannerContainer.classList.add('no-banner');
-                    bannerContainer.classList.remove('has-banner');
-                }
-                if (bannerContent) bannerContent.style.display = 'none';
-                if (bannerSkeleton) bannerSkeleton.style.display = 'none';
-                if (shopTopBar) {
-                    shopTopBar.style.display = 'flex';
-                    applyCompactBarStyle(shopTopBar, shopData);
-                }
-            }
+            updateShopHeaderDisplay(shopData);
             
             bannerTitle.innerText = shopData.name || 'Shop';
             bannerSubtitle.innerText = shopData.subtitle || '';
