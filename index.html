@@ -787,8 +787,9 @@
         
         /* horizontal product scroll */
         .products-horizontal { 
+            display: flex;
+            align-items: stretch;
             overflow-x: auto; 
-            white-space: nowrap; 
             padding: 5px 0 12px; 
             -webkit-overflow-scrolling: touch; 
             scrollbar-width: none; 
@@ -799,7 +800,9 @@
         }
         
         .product-card-h { 
-            display: inline-block; 
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 148px; 
             width: 148px; 
             margin-right: 12px; 
             background: var(--card-bg); 
@@ -807,7 +810,6 @@
             overflow: hidden; 
             box-shadow: none;
             border: 1px solid var(--gray-200);
-            vertical-align: top; 
             white-space: normal; 
             transition: var(--transition-smooth);
             cursor: pointer;
@@ -838,6 +840,9 @@
         
         .product-info-h { 
             padding: 10px 12px 12px; 
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
         
         .product-info-h h6 { 
@@ -5098,6 +5103,12 @@
     // ---------- GLOBAL STATE ----------
     let products = [];
     let categories = [];
+    // Full catalog cache used only for search - kept separate from `products`
+    // because that array is capped (only a handful of items per category are
+    // loaded for the homepage preview rows), which was making the search bar
+    // miss most of the shop's products.
+    let allProductsCache = null;
+    let allProductsPromise = null;
     let currentProduct = null;
     let detailQty = 1;
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -8015,28 +8026,79 @@ async function showProductDetail(p) {
         });
     }
 
-    function filterSearch() {
-        let term = searchInput.value.toLowerCase();
-        if(!term) { 
+    // Fetches every active product for this shop once and caches it, so the
+    // search bar can match against the whole catalog instead of just the
+    // handful of items per category that get preloaded for the homepage rows.
+    async function getAllProductsForSearch() {
+        if (allProductsCache) return allProductsCache;
+        if (!allProductsPromise) {
+            allProductsPromise = (async () => {
+                try {
+                    const q = query(collection(db,'products'), where('shopId','==',shopId), where('active','==',true));
+                    const snap = await getDocs(q);
+                    const list = [];
+                    snap.forEach(d => { const data = d.data(); if (data.price) data.price = parseFloat(data.price); list.push({ id: d.id, ...data }); });
+                    allProductsCache = list;
+                    return list;
+                } catch (e) {
+                    console.error(e);
+                    allProductsPromise = null; // allow retry on next search
+                    return products; // fall back to whatever's already loaded
+                }
+            })();
+        }
+        return allProductsPromise;
+    }
+
+    function showNoProductsMessage(show, isSearch) {
+        if (!noProducts) return;
+        noProducts.style.display = show ? 'block' : 'none';
+        const heading = noProducts.querySelector('h5');
+        if (heading) heading.textContent = isSearch ? 'No matching products' : 'No products';
+    }
+
+    async function filterSearch() {
+        let term = searchInput.value.trim().toLowerCase();
+        if (!term) {
+            showNoProductsMessage(false, false);
             if (categories.length > 0) {
                 categorySections.style.display = 'block';
                 productsGrid.style.display = 'none';
             } else {
-                location.reload();
+                productsGrid.style.display = 'grid';
+                categorySections.style.display = 'none';
+                renderProducts(products);
             }
+            return;
         }
-        else { 
-            let filtered = products.filter(p => (p.name?.toLowerCase().includes(term) || p.description?.toLowerCase().includes(term))); 
-            productsGrid.style.display='grid'; 
-            categorySections.style.display='none'; 
-            renderProducts(filtered); 
-        }
+
+        productsGrid.style.display = 'grid';
+        categorySections.style.display = 'none';
+
+        const searchPool = await getAllProductsForSearch();
+        // If the person kept typing while we were fetching, this result is
+        // stale - the newer keystroke's search (already scheduled) will render.
+        if (searchInput.value.trim().toLowerCase() !== term) return;
+
+        const filtered = searchPool.filter(p =>
+            p.name?.toLowerCase().includes(term) || p.description?.toLowerCase().includes(term)
+        );
+        renderProducts(filtered);
+        showNoProductsMessage(filtered.length === 0, true);
     }
+
+    let searchDebounceTimer = null;
+    function debouncedFilterSearch() {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(filterSearch, 250);
+    }
+
     searchBtn.addEventListener('click', filterSearch);
-    searchInput.addEventListener('input', filterSearch);
+    searchInput.addEventListener('input', debouncedFilterSearch);
     const searchClearBtn = document.getElementById('searchClearBtn');
     if (searchClearBtn) {
         searchClearBtn.addEventListener('click', () => {
+            clearTimeout(searchDebounceTimer);
             searchInput.value = '';
             filterSearch();
             searchInput.focus();
