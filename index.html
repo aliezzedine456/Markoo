@@ -2914,23 +2914,24 @@
             gap: 8px;
         }
         #authStep3 .addr-method-row {
-            padding: 13px 14px;
+            padding: 20px 18px;
             margin: 0 6px;
             border-bottom: none;
-            border-radius: 10px;
+            border-radius: 12px;
             background: var(--gray-100);
         }
         #authStep3 .addr-method-row .list-icon-badge {
-            width: 32px;
-            height: 32px;
-            border-radius: 10px;
-            font-size: 0.9rem;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            font-size: 1.15rem;
+            background: transparent !important;
         }
         #authStep3 .addr-method-row .method-title {
-            font-size: 0.87rem;
+            font-size: 1rem;
         }
         #authStep3 .addr-method-row .method-sub {
-            font-size: 0.72rem;
+            font-size: 0.82rem;
         }
 
         /* Sticky action bar pinned to the bottom of the panel, always
@@ -5344,7 +5345,7 @@
         <div class="settings-group mb-3">
             <div class="list-item addr-method-row address-option" id="useCurrentLocationOption">
                 <div class="left">
-                    <span class="list-icon-badge" style="background:rgba(79,109,122,0.12); color:var(--accent);"><i class="fas fa-location-arrow"></i></span>
+                    <span class="list-icon-badge" style="color:var(--accent);"><i class="fas fa-location-arrow"></i></span>
                     <div>
                         <div class="method-title">Use current location</div>
                         <div class="method-sub">Auto-detect with GPS</div>
@@ -5355,7 +5356,7 @@
             </div>
             <div class="list-item addr-method-row address-option" id="enterManualAddressOption">
                 <div class="left">
-                    <span class="list-icon-badge" style="background:rgba(79,109,122,0.12); color:var(--accent);"><i class="fas fa-pen"></i></span>
+                    <span class="list-icon-badge" style="color:var(--accent);"><i class="fas fa-pen"></i></span>
                     <div>
                         <div class="method-title">Enter manually</div>
                         <div class="method-sub">Type your full address</div>
@@ -5517,32 +5518,6 @@
                 setTimeout(() => toast.remove(), 300);
             }
         }, duration);
-    }
-
-    // ---------- LAZY IMAGE LOADING ----------
-    // Product grid/category/similar-product images used the browser's
-    // native loading="lazy", but its fetch-start distance is small and
-    // inconsistent (especially in mobile webviews), so on a fast scroll
-    // the image row scrolls into view before the fetch has even started -
-    // that's the "half screen empty, then it fills in" gap. Loading these
-    // images ourselves off a data-src attribute, with a large rootMargin,
-    // starts the fetch well before the image is on screen so it's already
-    // decoded by the time it scrolls into view.
-    const lazyImageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) return;
-            const img = entry.target;
-            const src = img.getAttribute('data-src');
-            if (src) {
-                img.src = src;
-                img.removeAttribute('data-src');
-            }
-            observer.unobserve(img);
-        });
-    }, { rootMargin: '1500px 0px', threshold: 0.01 });
-
-    function observeLazyImages(root) {
-        (root || document).querySelectorAll('img[data-src]').forEach(img => lazyImageObserver.observe(img));
     }
 
     // ---------- GLOBAL STATE ----------
@@ -7424,7 +7399,7 @@ function updateShopHeaderDisplay(shopData) {
             <div class="product-card" data-prod-id="${p.id}" style="position: relative;">
                 <div class="product-img-container" style="position: relative;">
                     ${discountBadge}
-                    <img data-src="${img}" class="product-img" decoding="async" onerror="this.src='https://placehold.co/300'">
+                    <img src="${img}" class="product-img" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/300'">
                 </div>
                 <div class="p-3 pt-2">
                     <h6 style="font-size:0.9rem; margin-bottom:2px; white-space: normal; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${escapeHtml(p.name || '')}</h6>
@@ -7447,7 +7422,6 @@ function updateShopHeaderDisplay(shopData) {
     });
     if (categoryProductsGridElem) categoryProductsGridElem.innerHTML = html;
     if (categoryProductsGridElem) {
-        observeLazyImages(categoryProductsGridElem);
         categoryProductsGridElem.querySelectorAll('.product-card').forEach(card => {
             const prodId = card.dataset.prodId;
             const prod = prods.find(p => p.id === prodId);
@@ -7579,8 +7553,8 @@ function updateShopHeaderDisplay(shopData) {
         card.innerHTML = `
             <div class="product-img-container" style="position: relative;">
                 ${discountBadge}
-                <img class="product-img" data-src="${img || 'https://placehold.co/300?text=No+Image'}" 
-                     decoding="async"
+                <img class="product-img" src="${img || 'https://placehold.co/300?text=No+Image'}" 
+                     loading="lazy" decoding="async"
                      alt="${escapeHtml(p.name || 'Product')}">
             </div>
             <div class="p-3 pt-2">
@@ -7620,7 +7594,6 @@ function updateShopHeaderDisplay(shopData) {
         }
     }
     productsGrid.appendChild(fragment);
-    observeLazyImages(productsGrid);
 }
 
     function escapeHtml(text) {
@@ -8236,10 +8209,9 @@ async function showProductDetail(p) {
                 let similarHtml = '';
                 similar.forEach(sp => {
                     const img = (sp.imageUrls && sp.imageUrls[0]) || sp.imageUrl || 'https://placehold.co/120';
-                    similarHtml += `<div class="similar-card" data-product-id="${sp.id}"><div class="similar-img-wrap"><img data-src="${img}" class="similar-img" decoding="async"></div><div class="similar-name">${escapeHtml(sp.name)}</div><div class="similar-price">$${(sp.price||0).toFixed(2)}</div></div>`;
+                    similarHtml += `<div class="similar-card" data-product-id="${sp.id}"><div class="similar-img-wrap"><img src="${img}" class="similar-img" loading="lazy" decoding="async"></div><div class="similar-name">${escapeHtml(sp.name)}</div><div class="similar-price">$${(sp.price||0).toFixed(2)}</div></div>`;
                 });
                 similarContainer.innerHTML = similarHtml || '<p class="text-muted">No similar products</p>';
-                observeLazyImages(similarContainer);
                 similarContainer.querySelectorAll('.similar-card').forEach(card => {
                     card.addEventListener('click', () => {
                         const prodId = card.dataset.productId;
