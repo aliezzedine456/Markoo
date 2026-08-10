@@ -2902,9 +2902,23 @@
 
         /* Sign-up's location/manual buttons only - a touch smaller than
            the account panel's version of the same row, per feedback that
-           they felt a bit large in that context. */
+           they felt a bit large in that context. Also given their own
+           narrower rounded pill (rather than a flush full-width row) so
+           there's a visible gap to the surrounding bg box and to each
+           other, with a touch more height to compensate. */
+        #authStep3 .settings-group {
+            padding: 6px;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
         #authStep3 .addr-method-row {
-            padding: 11px 14px;
+            padding: 13px 14px;
+            margin: 0 6px;
+            border-bottom: none;
+            border-radius: 10px;
+            background: var(--gray-100);
         }
         #authStep3 .addr-method-row .list-icon-badge {
             width: 32px;
