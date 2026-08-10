@@ -975,17 +975,39 @@
 
         /* Variant Selector Styles */
         .variant-section {
-            margin: 16px 0;
-            padding: 12px;
-            background: var(--gray-100);
-            border-radius: var(--border-radius-md);
+            margin: 18px 0;
+            padding: 16px;
+            background: var(--card-bg);
+            border-radius: 18px;
+            border: 1px solid var(--gray-100);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .variant-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--gray-500);
+        }
+
+        /* The very first .variant-title in the card is the overall
+           "Options:" heading (see showProductDetail's variantsHtml) - give
+           it more weight than the per-attribute captions ("Size", "Color"…)
+           that follow, so the card reads as one heading + labelled groups
+           rather than a flat repeated list, closer to Apple's product
+           configurator layout. */
+        .variant-title:first-child {
+            font-size: 0.98rem;
+            text-transform: none;
+            letter-spacing: -0.01em;
+            color: var(--text-color);
+            margin-bottom: 14px;
+        }
+
+        .variant-options {
+            margin-bottom: 6px;
         }
         
         .variant-option {
@@ -993,17 +1015,18 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 16px;
-            border: 1px solid var(--gray-300);
+            padding: 9px 18px;
+            border: 1.5px solid var(--gray-200);
             border-radius: 30px;
             background: white;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
         }
         
         .variant-option:active {
-            transform: scale(0.96);
+            transform: scale(0.95);
         }
         
         .variant-option .price-adjustment {
@@ -1026,6 +1049,8 @@
             background: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
+            font-weight: 600;
+            box-shadow: 0 6px 14px -6px rgba(0,0,0,0.4);
         }
         
         .variant-option.selected .price-adjustment {
@@ -1594,14 +1619,15 @@
 
 .detail-desc-card {
     white-space: pre-line;
-    background: var(--gray-100);
+    background: var(--card-bg);
     border: 1px solid var(--gray-100);
-    padding: 14px 16px;
-    border-radius: 16px;
+    padding: 16px 18px;
+    border-radius: 18px;
     margin-top: 10px;
     font-size: 0.92rem;
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--gray-700);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 /* Swipe hint animation */
@@ -2086,6 +2112,153 @@
         .cart-qty-stepper .qty-value {
             min-width: 22px;
             font-size: 0.85rem;
+        }
+
+        /* ===== Cart panel - iOS-style redesign =====
+           Large-title header, grouped "table view" cards for the order
+           summary and delivery info (à la iOS Settings/Wallet), and a
+           sticky checkout footer with the total sitting just above the
+           button, the way most native checkout screens lay it out. */
+        .cart-hero {
+            padding: 6px 20px 16px;
+        }
+
+        .cart-hero-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .cart-empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: var(--gray-500);
+        }
+
+        .cart-empty-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            margin: 0 auto 16px;
+        }
+
+        .cart-empty-state h5 {
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .cart-empty-state p {
+            font-size: 0.88rem;
+            margin: 0;
+        }
+
+        /* Grouped "table view" card - reused for the order summary and
+           the delivery-info block */
+        .ios-group-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .ios-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.88rem;
+        }
+
+        .ios-row:last-child {
+            border-bottom: none;
+        }
+
+        .ios-row-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+
+        .ios-row-icon.icon-blue { background: #eaf2ff; color: #3478f6; }
+        .ios-row-icon.icon-green { background: #e8faf0; color: #34c759; }
+        .ios-row-icon.icon-orange { background: #fff4e5; color: #ff9500; }
+        .ios-row-icon.icon-red { background: #ffeceb; color: #ff3b30; }
+
+        .ios-row-label {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .cart-summary-card {
+            margin-top: 4px;
+        }
+
+        .cart-summary-row {
+            justify-content: space-between;
+        }
+
+        .cart-summary-row .ios-row-label {
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .cart-summary-row .ios-row-value {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .cart-summary-total .ios-row-label,
+        .cart-summary-total .ios-row-value {
+            color: var(--text-color);
+            font-weight: 700;
+            font-size: 0.98rem;
+        }
+
+        .cart-free-delivery-hint {
+            padding: 0 16px 10px;
+            margin-top: -8px;
+            font-size: 0.78rem;
+            color: var(--gray-500);
+        }
+
+        .cart-checkout-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .cart-checkout-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0 2px;
+        }
+
+        .cart-checkout-total-label {
+            font-size: 0.88rem;
+            color: var(--gray-500);
+            font-weight: 600;
+        }
+
+        .cart-checkout-total-value {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-color);
         }
 
         .detail-panel-header { 
@@ -4035,24 +4208,41 @@
 <!-- CART PANEL -->
 <div class="slide-panel" id="cartPanel">
     <div class="panel-header"><i class="fas fa-arrow-left" id="backFromCart"></i> Cart <span class="ms-auto" id="cartCountPanel">(0)</span></div>
+
+    <div class="cart-hero">
+        <h1 class="cart-hero-title">Your Cart</h1>
+    </div>
+
     <div class="p-3" id="cartItemsContainer">Your cart is empty</div>
     
     <div id="checkoutSection" style="display: none;">
-        <div class="px-3">
-            <hr>
-            <div class="d-flex justify-content-between mb-3">
-                <span class="fw-bold">Total:</span>
-                <span class="fw-bold text-primary" id="checkoutTotal">$0.00</span>
+        <div class="px-3 pb-3">
+            <div class="desc-label mb-2"><i class="fas fa-truck"></i>Delivery information</div>
+            <div class="ios-group-card">
+                <div class="ios-row">
+                    <div class="ios-row-icon icon-blue"><i class="fas fa-user"></i></div>
+                    <span class="ios-row-label" id="checkoutName">-</span>
+                </div>
+                <div class="ios-row">
+                    <div class="ios-row-icon icon-green"><i class="fas fa-phone"></i></div>
+                    <span class="ios-row-label" id="checkoutPhone">-</span>
+                </div>
+                <div class="ios-row">
+                    <div class="ios-row-icon icon-orange"><i class="fas fa-envelope"></i></div>
+                    <span class="ios-row-label" id="checkoutEmail">-</span>
+                </div>
+                <div class="ios-row">
+                    <div class="ios-row-icon icon-red"><i class="fas fa-map-marker-alt"></i></div>
+                    <span class="ios-row-label" id="checkoutAddress">-</span>
+                </div>
             </div>
-            
-            <div class="card bg-light p-3 mb-3">
-                <h6 class="fw-bold">Delivery Information</h6>
-                <p class="mb-1 small"><i class="fas fa-user me-2"></i><span id="checkoutName">-</span></p>
-                <p class="mb-1 small"><i class="fas fa-phone me-2"></i><span id="checkoutPhone">-</span></p>
-                <p class="mb-1 small"><i class="fas fa-envelope me-2"></i><span id="checkoutEmail">-</span></p>
-                <p class="mb-0 small"><i class="fas fa-map-marker-alt me-2"></i><span id="checkoutAddress">-</span></p>
+        </div>
+        
+        <div class="panel-bottom-bar cart-checkout-bar">
+            <div class="cart-checkout-total">
+                <span class="cart-checkout-total-label">Total</span>
+                <span class="cart-checkout-total-value" id="checkoutTotal">$0.00</span>
             </div>
-            
             <button class="btn-dark w-100" id="placeOrderBtn">
                 <i class="fas fa-check-circle me-2"></i> Place Order
             </button>
@@ -4317,6 +4507,20 @@
 
     window.addEventListener('popstate', handleBackNavigation);
     history.replaceState({panel: 'base'}, '');
+
+    // Desktop: clicking the dimmed backdrop behind an open panel (Cart,
+    // Settings/Account, etc.) closes it, the same way pressing Back would.
+    // The backdrop is a ::before pseudo-element on <body> (see the
+    // "body.panel-open::before" CSS rule) - a pseudo-element isn't its own
+    // click target, so a click that visually lands on it is reported with
+    // e.target === document.body. Routing it through history.back() (rather
+    // than calling closePanel directly) keeps the pushState stack used by
+    // the real Back button in sync.
+    document.body.addEventListener('click', (e) => {
+        if (e.target === document.body && panelStack.length > 0) {
+            history.back();
+        }
+    });
     
     // ---------- Helper Functions ----------
     function updateCartBadge() {
@@ -6450,7 +6654,7 @@ async function showProductDetail(p) {
    function renderCartItems() {
     const container = document.getElementById('cartItemsContainer');
     if (!cart.length) {
-        container.innerHTML = '<div class="text-center py-5"><i class="fas fa-shopping-cart fa-3x text-muted"></i><h5 class="mt-3">Your cart is empty</h5></div>';
+        container.innerHTML = '<div class="cart-empty-state"><div class="cart-empty-icon"><i class="fas fa-shopping-bag"></i></div><h5>Your cart is empty</h5><p>Items you add will show up here</p></div>';
         checkoutSection.style.display = 'none';
     } else { 
         let html = '<div class="cart-items-list">';
@@ -6553,31 +6757,25 @@ async function showProductDetail(p) {
         const deliveryFee = calculateDeliveryFee(subtotal);
         const total = subtotal + deliveryFee;
         
-        html += `
-            <div class="mt-3 p-3 bg-light rounded">
-                <div class="d-flex justify-content-between mb-2">
-                    <span>Subtotal:</span>
-                    <span>$${subtotal.toFixed(2)}</span>
-                </div>`;
-        
+        let deliveryRowHtml = '';
         if (shopData && shopData.delivery && shopData.delivery.enabled) {
             if (deliveryFee === 0 && shopData.delivery.freeThreshold && subtotal >= shopData.delivery.freeThreshold) {
-                html += `
-                    <div class="d-flex justify-content-between mb-2 text-success">
-                        <span><i class="fas fa-truck"></i> Delivery:</span>
-                        <span>FREE (Order over $${shopData.delivery.freeThreshold})</span>
+                deliveryRowHtml = `
+                    <div class="ios-row cart-summary-row">
+                        <span class="ios-row-label"><i class="fas fa-truck me-1"></i> Delivery</span>
+                        <span class="ios-row-value text-success">FREE</span>
                     </div>`;
             } else if (deliveryFee > 0) {
-                html += `
-                    <div class="d-flex justify-content-between mb-2">
-                        <span><i class="fas fa-truck"></i> Delivery:</span>
-                        <span>$${deliveryFee.toFixed(2)}</span>
+                deliveryRowHtml = `
+                    <div class="ios-row cart-summary-row">
+                        <span class="ios-row-label"><i class="fas fa-truck me-1"></i> Delivery</span>
+                        <span class="ios-row-value">$${deliveryFee.toFixed(2)}</span>
                     </div>`;
                 if (shopData.delivery.freeThreshold) {
                     const remaining = shopData.delivery.freeThreshold - subtotal;
                     if (remaining > 0) {
-                        html += `
-                            <div class="small text-muted mb-2">
+                        deliveryRowHtml += `
+                            <div class="cart-free-delivery-hint">
                                 Add $${remaining.toFixed(2)} more for free delivery
                             </div>`;
                     }
@@ -6586,10 +6784,15 @@ async function showProductDetail(p) {
         }
         
         html += `
-                <hr class="my-2">
-                <div class="d-flex justify-content-between fw-bold">
-                    <span>Total:</span>
-                    <span>$${total.toFixed(2)}</span>
+            <div class="ios-group-card cart-summary-card">
+                <div class="ios-row cart-summary-row">
+                    <span class="ios-row-label">Subtotal</span>
+                    <span class="ios-row-value">$${subtotal.toFixed(2)}</span>
+                </div>
+                ${deliveryRowHtml}
+                <div class="ios-row cart-summary-row cart-summary-total">
+                    <span class="ios-row-label">Total</span>
+                    <span class="ios-row-value">$${total.toFixed(2)}</span>
                 </div>
             </div>
         </div>`;
