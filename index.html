@@ -1164,11 +1164,13 @@
             padding:11px 0; 
             font-size:0.95rem; 
             width:100%; 
+            min-width: 0;
+            flex: 1 1 auto;
             outline:none; 
             color: var(--text-color);
         }
         
-        .search-wrapper button { 
+        .search-wrapper button:not(.search-clear-btn) { 
             background:var(--accent); 
             border:none; 
             border-radius:980px; 
@@ -1181,11 +1183,11 @@
             cursor: pointer;
         }
         
-        .search-wrapper button:hover {
+        .search-wrapper button:not(.search-clear-btn):hover {
             background: var(--accent-dark);
         }
         
-        .search-wrapper button:active {
+        .search-wrapper button:not(.search-clear-btn):active {
             transform: scale(0.97);
         }
 
@@ -1903,6 +1905,8 @@
             border: none;
             background: transparent;
             width: 100%;
+            min-width: 0;
+            flex: 1 1 auto;
             outline: none;
             font-size: 1rem;
             color: var(--text-color);
@@ -3963,7 +3967,7 @@
            matches the trailing search/"go" control seen in native iOS
            search fields (Maps, Photos, Spotlight). Text is kept in the
            DOM for accessibility/JS but visually replaced by the icon. */
-        .search-wrapper button {
+        .search-wrapper button:not(.search-clear-btn) {
             width: 38px !important;
             height: 38px !important;
             padding: 0 !important;
@@ -3976,14 +3980,14 @@
             justify-content: center;
             box-shadow: 0 2px 8px -2px rgba(79,109,122,0.5) !important;
         }
-        .search-wrapper button::before {
+        .search-wrapper button:not(.search-clear-btn)::before {
             content: "\f002";
             font-family: "Font Awesome 6 Free";
             font-weight: 900;
             font-size: 14px;
             color: #fff;
         }
-        .search-wrapper button:hover { background: var(--accent-dark) !important; }
+        .search-wrapper button:not(.search-clear-btn):hover { background: var(--accent-dark) !important; }
 
         /* ---- Bottom tab bar: authentic iOS translucent tab bar ---- */
         .bottom-nav {
