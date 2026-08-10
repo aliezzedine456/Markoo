@@ -6229,6 +6229,83 @@ function updateShopHeaderDisplay(shopData) {
         }
     }
 
+    // Builds a friendly WhatsApp order message with the customer's exact
+    // items, totals, and delivery location, then opens WhatsApp with it
+    // pre-filled so the shop admin receives everything in one message.
+    function formatWhatsAppLocation(address) {
+        if (!address || address === 'Not set') return { text: 'Not provided', mapUrl: null };
+
+        if (address.startsWith('lat:')) {
+            const coords = address.replace('lat:', '').split(', lng:');
+            if (coords.length === 2) {
+                const lat = parseFloat(coords[0]);
+                const lng = parseFloat(coords[1]);
+                return {
+                    text: 'Shared GPS location (see map link below)',
+                    mapUrl: `https://www.google.com/maps?q=${lat},${lng}`
+                };
+            }
+        }
+
+        return {
+            text: address,
+            mapUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+        };
+    }
+
+    function buildWhatsAppOrderMessage(order) {
+        const shopName = (shopData && shopData.name) || 'the shop';
+        const orderNumber = order.id ? order.id.slice(-6) : '';
+        const location = formatWhatsAppLocation(order.customer?.address);
+
+        const lines = [];
+        lines.push(`Hi ${shopName}! 👋 I'd like to place this order (#${orderNumber}) from your Markoo shop:`);
+        lines.push('');
+        lines.push('🛍️ *Order Items*');
+
+        order.items.forEach(item => {
+            const variantText = item.selectedVariants && item.selectedVariants.length
+                ? ' (' + item.selectedVariants.map(v => `${v.name}: ${v.value}`).join(', ') + ')'
+                : '';
+            lines.push(`• ${item.name}${variantText} x${item.quantity} — $${(item.price * item.quantity).toFixed(2)}`);
+        });
+
+        lines.push('');
+        lines.push(`Subtotal: $${order.subtotal.toFixed(2)}`);
+        if (order.deliveryFee) lines.push(`Delivery: $${order.deliveryFee.toFixed(2)}`);
+        lines.push(`*Total: $${order.total.toFixed(2)}*`);
+        lines.push('');
+        lines.push('👤 *Customer Details*');
+        lines.push(`Name: ${order.customer?.name || ''}`);
+        if (order.customer?.phone) lines.push(`Phone: ${order.customer.phone}`);
+        lines.push('');
+        lines.push('📍 *Delivery Location*');
+        lines.push(location.text);
+        if (location.mapUrl) lines.push(location.mapUrl);
+        lines.push('');
+        lines.push('Please confirm my order, thank you! 🙏');
+
+        return lines.join('\n');
+    }
+
+    // Opens WhatsApp (in a new tab) with a pre-filled order message, sent to
+    // the shop's configured WhatsApp checkout number. Returns true if it
+    // was able to open the chat, false if no number is configured.
+    function sendOrderViaWhatsApp(order) {
+        const rawNumber = (shopData && (shopData.checkoutWhatsapp || shopData.ownerPhone)) || '';
+        const number = rawNumber.replace(/[^0-9+]/g, '').replace(/^\+/, '');
+
+        if (!number) {
+            showToast('This shop has not set up WhatsApp checkout yet.', 'warning', 'WhatsApp Unavailable');
+            return false;
+        }
+
+        const message = buildWhatsAppOrderMessage(order);
+        const waUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+        window.open(waUrl, '_blank');
+        return true;
+    }
+
     placeOrderBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         
@@ -6334,6 +6411,7 @@ function updateShopHeaderDisplay(shopData) {
                 shopId: shopId,
                 shopOwnerEmail: shopOwnerEmail,
                 status: 'accepted',
+                channel: (shopData?.checkoutMethod === 'whatsapp') ? 'whatsapp' : 'app',
                 statusTimeline: [
                     { status: 'accepted', time: new Date().toISOString(), note: 'Order accepted' }
                 ],
@@ -6401,7 +6479,17 @@ function updateShopHeaderDisplay(shopData) {
             updateCartBadge();
             
             closePanel(cartPanel);
-            showToast(`Order placed successfully! Order ID: ${orderRef.id.slice(-6)}`, 'success', 'Order Confirmed');
+
+            if (order.channel === 'whatsapp') {
+                const opened = sendOrderViaWhatsApp(order);
+                if (opened) {
+                    showToast(`Order saved! Opening WhatsApp to confirm Order #${orderRef.id.slice(-6)}...`, 'success', 'Order Confirmed');
+                } else {
+                    showToast(`Order placed successfully! Order ID: ${orderRef.id.slice(-6)}`, 'success', 'Order Confirmed');
+                }
+            } else {
+                showToast(`Order placed successfully! Order ID: ${orderRef.id.slice(-6)}`, 'success', 'Order Confirmed');
+            }
             
         } catch (error) {
             console.error('Error placing order:', error);
@@ -6497,7 +6585,7 @@ function updateShopHeaderDisplay(shopData) {
                                     <span class="order-id">Order #${order.id.slice(-6)}</span>
                                     <span class="order-status-badge ${statusClass}">${statusText}</span>
                                 </div>
-                                <div class="order-card-meta">${order.items.length} item${order.items.length === 1 ? '' : 's'} &middot; <span class="order-total">$${order.total.toFixed(2)}</span></div>
+                                <div class="order-card-meta">${order.items.length} item${order.items.length === 1 ? '' : 's'} &middot; <span class="order-total">$${order.total.toFixed(2)}</span>${order.channel === 'whatsapp' ? ' &middot; <i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp' : ''}</div>
                                 <div class="order-card-date">${date}</div>
                             </div>
                             <i class="fas fa-chevron-right order-card-chevron"></i>
