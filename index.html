@@ -429,22 +429,18 @@
     overflow:visible; 
     margin-bottom:0; 
     position: relative;
-    padding: 0 20px;
-    box-sizing: border-box;
-    filter: drop-shadow(0 12px 28px rgba(20,20,30,0.14));
+    filter: drop-shadow(0 10px 24px rgba(20,20,30,0.16));
 }
 
 .banner-container { 
     position:relative; 
     width:100%; 
-    max-width: var(--max-content-width);
-    margin: 0 auto;
     min-height:60px;
     background: linear-gradient(135deg, #17171a 0%, #232326 55%, #1a1a1d 100%);
     overflow: hidden;
-    border-radius: 28px;
+    border-radius: 0 0 28px 28px;
     isolation: isolate;
-    transition: height 0.3s ease, border-radius 0.3s ease;
+    transition: height 0.3s ease;
 }
 
 /* Ambient gradient-mesh signature, sits behind the image / bar in both
@@ -516,9 +512,9 @@
             bottom:0; 
             left:0; 
             right:0; 
-            background:linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.22) 60%, transparent 100%); 
+            background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 55%, transparent 100%); 
             color:white; 
-            padding: 22px 22px 20px; 
+            padding: 22px max(20px, calc((100% - var(--max-content-width)) / 2 + 20px)) 20px; 
             box-sizing: border-box;
             z-index: 3;
         }
@@ -535,24 +531,24 @@
         }
         
         .banner-title h2 {
-            font-size: 1.9rem;
-            font-weight: 800;
+            font-size: 1.95rem;
+            font-weight: 700;
             margin-bottom: 4px;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.025em;
             text-shadow: 0 2px 16px rgba(0,0,0,0.35);
         }
         
         .banner-title p {
             font-size: 0.92rem;
             opacity: 0.88;
-            font-weight: 500;
+            font-weight: 400;
             text-shadow: 0 1px 8px rgba(0,0,0,0.3);
         }
         
         .banner-skeleton { 
             width:100%; 
             height:225px; 
-            border-radius: 28px;
+            border-radius: 0 0 28px 28px;
             background:
                 linear-gradient(120deg, rgba(107,135,148,0.35) 0%, rgba(79,109,122,0.35) 50%, rgba(51,71,79,0.3) 100%),
                 linear-gradient(90deg, rgba(255,255,255,0.12) 25%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.12) 75%);
@@ -3661,14 +3657,14 @@
             #sidebarCategoryList {
                 display: flex;
                 flex-direction: column;
-                gap: 2px;
+                gap: 0px;
             }
 
             .sidebar-filter-cat {
                 display: flex;
                 align-items: center;
                 gap: 10px;
-                padding: 8px 9px;
+                padding: 5px 9px;
                 border-radius: 10px;
                 font-size: 13px;
                 font-weight: 500;
@@ -4382,6 +4378,12 @@
            ====================================================================== */
         @media (min-width: 768px) {
             .search-wrapper { max-width: 480px; }
+        }
+        @media (min-width: 1180px) {
+            /* On the desktop app-shell (sidebar layout), stretch the search
+               bar to fill the full width of the content column instead of
+               staying capped at the narrower tablet width. */
+            .search-wrapper { max-width: none; width: 100%; }
         }
         @media (hover: hover) and (min-width: 768px) {
             .order-card:hover {
