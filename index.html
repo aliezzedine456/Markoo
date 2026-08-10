@@ -3133,7 +3133,7 @@
             margin-right: 8px;
         }
 
-        /* Social Modal */
+        /* Social Modal — iOS action-sheet style "Connect With Us" panel */
         .social-modal {
             position: fixed;
             top: 0;
@@ -3149,6 +3149,7 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s;
+            padding: 20px;
         }
 
         .social-modal.show {
@@ -3157,123 +3158,177 @@
         }
 
         .social-modal-content {
-            background: white;
-            border-radius: var(--border-radius-lg);
-            padding: 24px;
-            width: 90%;
-            max-width: 320px;
+            background: var(--ios-card-bg, white);
+            border-radius: var(--ios-radius-xl, 28px);
+            padding: 22px 18px 18px;
+            width: 100%;
+            max-width: 360px;
             transform: scale(0.9);
             transition: transform 0.3s;
             box-shadow: var(--shadow-xl);
+            position: relative;
         }
 
         .social-modal.show .social-modal-content {
             transform: scale(1);
         }
 
-        .social-modal-header {
-            text-align: center;
-            margin-bottom: 20px;
+        .social-modal-close-x {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--ios-fill);
+            color: var(--ios-secondary-label);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.18s var(--ios-tap), background 0.2s ease;
         }
 
-        .social-modal-header i {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 10px;
+        .social-modal-close-x:active {
+            transform: scale(0.9);
+            background: var(--ios-fill-strong);
+        }
+
+        .social-modal-header {
+            text-align: center;
+            margin-bottom: 18px;
+            padding: 4px 24px 0;
+        }
+
+        .social-modal-header .social-modal-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--brand-gradient);
+            box-shadow: var(--glow-shadow);
+        }
+
+        .social-modal-header .social-modal-icon i {
+            font-size: 22px;
+            color: white;
         }
 
         .social-modal-header h3 {
-            font-size: 1.3rem;
-            margin-bottom: 5px;
-            color: var(--primary-color);
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            margin-bottom: 4px;
+            color: var(--ios-label);
         }
 
         .social-modal-header p {
-            color: var(--gray-600);
-            font-size: 0.9rem;
+            color: var(--ios-secondary-label);
+            font-size: 0.85rem;
         }
 
         .social-links-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
+            background: var(--ios-card-bg);
+            border-radius: var(--ios-radius-md, 16px);
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 1px solid var(--ios-separator);
         }
 
         .social-link-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 16px;
-            border-radius: var(--border-radius-md);
-            background: var(--gray-100);
+            padding: 12px 14px;
+            background: var(--ios-card-bg);
             text-decoration: none;
-            color: var(--text-color);
-            transition: var(--transition-smooth);
+            color: var(--ios-label);
+            transition: background 0.15s ease;
+            position: relative;
+        }
+
+        .social-link-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 58px;
+            right: 0;
+            bottom: 0;
+            height: 1px;
+            background: var(--ios-separator);
         }
 
         .social-link-item:active {
-            transform: translateX(5px);
-            background: var(--gray-200);
+            background: var(--ios-gray6);
         }
 
-        .social-link-item.whatsapp {
-            background: #25D366;
+        .social-link-item .link-icon-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .social-link-item .link-icon-badge i {
+            font-size: 17px;
             color: white;
         }
 
-        .social-link-item.whatsapp:active {
-            background: #20bd5a;
-        }
-
-        .social-link-item.instagram {
-            background: linear-gradient(45deg, #f09433, #d62976, #962fbf);
-            color: white;
-        }
-
-        .social-link-item.instagram:active {
-            background: linear-gradient(45deg, #e08a2e, #c12468, #8526a8);
-        }
-
-        .social-link-item.tiktok {
-            background: #000000;
-            color: white;
-        }
-
-        .social-link-item.tiktok:active {
-            background: #222222;
-        }
-
-        .social-link-item i {
-            font-size: 1.5rem;
-            width: 30px;
-            text-align: center;
-        }
+        .social-link-item.whatsapp .link-icon-badge { background: #25D366; }
+        .social-link-item.instagram .link-icon-badge { background: linear-gradient(45deg, #f09433, #d62976, #962fbf); }
+        .social-link-item.tiktok .link-icon-badge { background: #000000; }
 
         .social-link-item .link-text {
             flex: 1;
-            font-weight: 500;
+            min-width: 0;
+        }
+
+        .social-link-item .link-text > div:first-child {
+            font-weight: 590;
+            font-size: 0.95rem;
+            color: var(--ios-label);
         }
 
         .social-link-item .link-value {
+            font-size: 0.8rem;
+            color: var(--ios-secondary-label);
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .social-link-item .link-chevron {
             font-size: 0.85rem;
-            opacity: 0.8;
+            color: var(--ios-gray3);
+            flex-shrink: 0;
         }
 
         .close-modal-btn {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             border: none;
             border-radius: 980px;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
+            background: var(--ios-fill);
+            color: var(--ios-teal);
             font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: transform 0.18s var(--ios-tap), background 0.2s ease;
         }
 
         .close-modal-btn:active {
             transform: scale(0.98);
+            background: var(--ios-fill-strong);
         }
         
         /* Google Maps Link */
@@ -3726,6 +3781,38 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+            }
+
+            /* Standalone "Connect With Us" button — sits on its own above the
+               Filters section, full sidebar width to match the Sort By
+               control below it. */
+            .sidebar-connect-btn {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                padding: 11px 12px;
+                margin-bottom: 20px;
+                border: none;
+                border-radius: var(--ios-radius-sm, 12px);
+                background: var(--brand-gradient);
+                color: white;
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: -0.01em;
+                cursor: pointer;
+                box-shadow: var(--glow-shadow);
+                transition: transform 0.18s var(--ios-tap), box-shadow 0.2s ease, filter 0.2s ease;
+            }
+
+            .sidebar-connect-btn:hover {
+                filter: brightness(1.06);
+                transform: translateY(-1px);
+            }
+
+            .sidebar-connect-btn:active {
+                transform: translateY(0) scale(0.98);
             }
 
             /* Sidebar filters - fills the rest of the rail, AliExpress-style:
@@ -4786,8 +4873,11 @@
 <!-- Social Links Modal -->
 <div class="social-modal" id="socialModal">
     <div class="social-modal-content">
+        <button class="social-modal-close-x" id="closeSocialModalX" aria-label="Close">
+            <i class="fas fa-xmark"></i>
+        </button>
         <div class="social-modal-header">
-            <i class="fas fa-store"></i>
+            <div class="social-modal-icon"><i class="fas fa-store"></i></div>
             <h3>Connect With Us</h3>
             <p>Reach out through your preferred channel</p>
         </div>
@@ -4796,13 +4886,12 @@
             <!-- Links will be dynamically added here -->
         </div>
         
-        <button class="close-modal-btn" id="closeSocialModal">
-            <i class="fas fa-times me-2"></i>Close
-        </button>
+        <button class="close-modal-btn" id="closeSocialModal">Close</button>
     </div>
 </div>
 
 <!-- main content -->
+
 <div class="container mt-3 mb-5" id="mainContent">
     <!-- search rectangle -->
     <div class="search-wrapper mb-2">
@@ -4867,6 +4956,9 @@
     </a>
   </div>
   <div class="sidebar-filters" id="sidebarFilters">
+    <button type="button" class="sidebar-connect-btn" id="sidebarConnectBtn" style="display:none;">
+        <i class="fas fa-share-alt"></i> Connect With Us
+    </button>
     <div class="sidebar-filters-title">Filters <a class="sidebar-filters-clear" id="sidebarFiltersClear">Clear</a></div>
     <div class="sidebar-filter-group">
         <div class="sidebar-filter-group-label">Sort By</div>
@@ -5846,6 +5938,11 @@ function updateShopHeaderDisplay(shopData) {
         } else {
             navConnect.style.display = 'none';
         }
+
+        const sidebarConnectBtn = document.getElementById('sidebarConnectBtn');
+        if (sidebarConnectBtn) {
+            sidebarConnectBtn.style.display = hasSocial ? 'flex' : 'none';
+        }
     }
 
     function showSocialModal() {
@@ -5856,12 +5953,12 @@ function updateShopHeaderDisplay(shopData) {
             const whatsappUrl = `https://wa.me/${phone.replace('+', '')}`;
             html += `
                 <a href="${whatsappUrl}" target="_blank" class="social-link-item whatsapp">
-                    <i class="fab fa-whatsapp"></i>
+                    <div class="link-icon-badge"><i class="fab fa-whatsapp"></i></div>
                     <div class="link-text">
                         <div>WhatsApp</div>
                         <small class="link-value">${shopData.ownerPhone}</small>
                     </div>
-                    <i class="fas fa-external-link-alt" style="font-size: 1rem;"></i>
+                    <i class="fas fa-chevron-right link-chevron"></i>
                 </a>
             `;
         }
@@ -5869,12 +5966,12 @@ function updateShopHeaderDisplay(shopData) {
         if (shopData && shopData.instagram) {
             html += `
                 <a href="${shopData.instagram}" target="_blank" class="social-link-item instagram">
-                    <i class="fab fa-instagram"></i>
+                    <div class="link-icon-badge"><i class="fab fa-instagram"></i></div>
                     <div class="link-text">
                         <div>Instagram</div>
                         <small class="link-value">@${shopData.instagram.split('/').pop() || 'username'}</small>
                     </div>
-                    <i class="fas fa-external-link-alt" style="font-size: 1rem;"></i>
+                    <i class="fas fa-chevron-right link-chevron"></i>
                 </a>
             `;
         }
@@ -5882,12 +5979,12 @@ function updateShopHeaderDisplay(shopData) {
         if (shopData && shopData.tiktok) {
             html += `
                 <a href="${shopData.tiktok}" target="_blank" class="social-link-item tiktok">
-                    <i class="fab fa-tiktok"></i>
+                    <div class="link-icon-badge"><i class="fab fa-tiktok"></i></div>
                     <div class="link-text">
                         <div>TikTok</div>
                         <small class="link-value">@${shopData.tiktok.split('/').pop() || 'username'}</small>
                     </div>
-                    <i class="fas fa-external-link-alt" style="font-size: 1rem;"></i>
+                    <i class="fas fa-chevron-right link-chevron"></i>
                 </a>
             `;
         }
@@ -5901,9 +5998,16 @@ function updateShopHeaderDisplay(shopData) {
         e.preventDefault();
         showSocialModal();
     });
+    document.getElementById('sidebarConnectBtn')?.addEventListener('click', showSocialModal);
     closeSocialModal.addEventListener('click', () => {
         socialModal.classList.remove('show');
     });
+    const closeSocialModalX = document.getElementById('closeSocialModalX');
+    if (closeSocialModalX) {
+        closeSocialModalX.addEventListener('click', () => {
+            socialModal.classList.remove('show');
+        });
+    }
 
     socialModal.addEventListener('click', (e) => {
         if (e.target === socialModal) {
