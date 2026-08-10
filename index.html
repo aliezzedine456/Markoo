@@ -1559,77 +1559,120 @@
     to { transform: rotate(360deg); }
 }
 
-        /* Order Tracking Status Timeline */
-        .order-status-timeline {
-            padding: 20px 0;
+        /* ======================================================================
+           ORDER TRACKING — native iOS timeline (Wallet / Maps ETA card style):
+           filled tint circles, soft connecting rail, SF-style pulse on the
+           active step, muted labels for steps still to come.
+           ====================================================================== */
+        .order-track-hero {
+            padding: 6px 20px 18px;
         }
-        
+        .order-track-id {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ios-label, var(--text-color));
+        }
+        .order-track-sub {
+            font-size: 0.9rem;
+            color: var(--ios-secondary-label, var(--gray-500));
+            margin-top: 2px;
+        }
+        .order-track-card {
+            background: var(--ios-card-bg, #fff);
+            border-radius: var(--ios-radius-lg, 22px);
+            box-shadow: var(--ios-shadow, 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -12px rgba(0,0,0,0.12));
+            padding: 22px 18px 6px;
+        }
+
+        .order-status-timeline {
+            padding: 0;
+        }
+
         .status-step {
             display: flex;
             align-items: flex-start;
-            margin-bottom: 20px;
+            gap: 14px;
             position: relative;
+            padding-bottom: 26px;
         }
-        
+
+        .status-step:last-child {
+            padding-bottom: 4px;
+        }
+
         .status-step:not(:last-child):before {
             content: '';
             position: absolute;
-            left: 20px;
+            left: 19px;
             top: 40px;
-            bottom: -20px;
+            bottom: 0;
             width: 2px;
-            background: var(--gray-300);
+            background: var(--ios-gray5, #e5e5ea);
+            border-radius: 1px;
         }
-        
+
         .status-step.completed:not(:last-child):before {
-            background: var(--success);
+            background: var(--ios-green, #34c759);
         }
-        
+
         .status-icon {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: white;
-            border: 2px solid var(--gray-300);
+            background: var(--ios-gray6, #f2f2f7);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
             z-index: 1;
-            font-size: 1.2rem;
-            color: var(--gray-500);
+            font-size: 1.05rem;
+            color: var(--ios-gray3, #c7c7cc);
+            flex-shrink: 0;
+            transition: background 0.3s var(--ios-spring, ease), color 0.3s var(--ios-spring, ease), box-shadow 0.3s ease;
         }
-        
+
         .status-step.completed .status-icon {
-            border-color: var(--success);
-            background: var(--success);
-            color: white;
+            background: var(--ios-green, #34c759);
+            color: #fff;
         }
-        
+
         .status-step.active .status-icon {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-            animation: pulse 1.5s infinite;
+            background: var(--ios-blue, #007aff);
+            color: #fff;
+            animation: iosStatusPulse 1.8s infinite;
         }
-        
+
+        .status-step.cancelled-step .status-icon {
+            background: var(--ios-red, #ff3b30);
+            color: #fff;
+        }
+
         .status-content {
             flex: 1;
+            padding-top: 8px;
         }
-        
+
         .status-title {
             font-weight: 600;
-            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+            margin-bottom: 2px;
+            color: var(--ios-label, var(--text-color));
+            transition: color 0.3s ease;
         }
-        
+
+        .status-step:not(.completed):not(.active) .status-title {
+            color: var(--ios-gray, #8e8e93);
+        }
+
         .status-time {
-            font-size: 0.8rem;
-            color: var(--gray-600);
+            font-size: 0.82rem;
+            color: var(--ios-secondary-label, var(--gray-600));
         }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(79,109,122,0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(79,109,122,0); }
-            100% { box-shadow: 0 0 0 0 rgba(79,109,122,0); }
+
+        @keyframes iosStatusPulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,122,255,0.35); }
+            70% { box-shadow: 0 0 0 9px rgba(0,122,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,122,255,0); }
         }
 
         /* OTP Verification */
@@ -1726,68 +1769,142 @@
     z-index: 5;
 }
 
-        /* Order Card */
-        .order-card {
-            background: white;
-            border-radius: var(--border-radius-md);
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--gray-200);
-            cursor: pointer;
-            transition: var(--transition-smooth);
+        /* ======================================================================
+           MY ORDERS — native iOS list-row card: leading glyph, stacked
+           id/status/meta, trailing chevron. The whole row is the tap target,
+           matching Settings.app / Wallet order-history rows.
+           ====================================================================== */
+        .orders-hero {
+            padding: 6px 20px 16px;
         }
-        
+        .orders-hero-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin: 0;
+            color: var(--ios-label, var(--text-color));
+        }
+
+        .order-card {
+            background: var(--ios-card-bg, #fff);
+            border-radius: var(--ios-radius-md, 16px);
+            padding: 14px 14px 14px 14px;
+            margin-bottom: 12px;
+            box-shadow: var(--ios-shadow, 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px -12px rgba(0,0,0,0.12));
+            border: none;
+            cursor: pointer;
+            transition: transform 0.18s var(--ios-tap, ease), box-shadow 0.2s ease, background 0.15s ease;
+        }
+
         .order-card:active {
             transform: scale(0.98);
+            background: var(--ios-fill, rgba(118,118,128,0.08));
         }
-        
+
+        .order-card-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .order-card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--brand-gradient, var(--ios-blue));
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px -4px rgba(79,109,122,0.5);
+        }
+
+        .order-card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
         .order-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 4px;
         }
-        
+
         .order-id {
             font-weight: 700;
-            color: var(--primary-color);
+            letter-spacing: -0.01em;
+            color: var(--ios-label, var(--primary-color));
             font-size: 14px;
         }
-        
+
         .order-status-badge {
-            padding: 4px 12px;
-            border-radius: 30px;
+            padding: 4px 11px;
+            border-radius: 980px;
             font-size: 11px;
             font-weight: 600;
+            letter-spacing: -0.005em;
+            white-space: nowrap;
         }
-        
-        .status-accepted { background: #e3f2fd; color: #1976d2; }
-        .status-prepared { background: #fff3e0; color: #f57c00; }
-        .status-ontheway { background: #e8f5e9; color: #388e3c; }
-        .status-delivered { background: #e8eaf6; color: #3f51b5; }
-        .status-cancelled { background: #ffebee; color: #d32f2f; }
-        
+
+        .status-accepted  { background: rgba(0,122,255,0.12); color: var(--ios-blue, #007aff); }
+        .status-prepared  { background: rgba(255,149,0,0.12); color: var(--ios-orange, #ff9500); }
+        .status-ontheway  { background: rgba(52,199,89,0.12); color: var(--ios-green, #34c759); }
+        .status-delivered { background: rgba(175,82,222,0.12); color: var(--ios-purple, #af52de); }
+        .status-cancelled { background: rgba(255,59,48,0.12); color: var(--ios-red, #ff3b30); }
+
+        .order-card-meta {
+            font-size: 0.86rem;
+            color: var(--ios-secondary-label, var(--gray-600));
+        }
+
         .order-total {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary-color);
+            font-weight: 600;
+            color: var(--ios-label, var(--text-color));
         }
-        
+
+        .order-card-date {
+            font-size: 0.78rem;
+            color: var(--ios-gray, var(--gray-500));
+            margin-top: 2px;
+        }
+
+        .order-card-chevron {
+            color: var(--ios-gray3, #c7c7cc);
+            font-size: 0.8rem;
+            align-self: center;
+            flex-shrink: 0;
+        }
+
+        .order-card-address {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--ios-secondary-label, var(--gray-600));
+            margin: 10px 0 0 52px;
+        }
+
+        /* Legacy "Track Order" button — kept for any code path still
+           rendering it, but the card row itself is the primary tap target now. */
         .track-order-btn {
-            background: var(--primary-color);
+            background: var(--accent, var(--primary-color));
             color: white;
             border: none;
-            border-radius: 30px;
+            border-radius: 980px;
             padding: 8px 16px;
             font-size: 0.9rem;
             margin-top: 10px;
-            transition: var(--transition);
+            transition: transform 0.18s var(--ios-tap, ease), opacity 0.18s ease;
             cursor: pointer;
         }
-        
+
         .track-order-btn:active {
-            transform: scale(0.97);
+            transform: scale(0.96);
+            opacity: 0.8;
         }
 
         /* panels - IMPROVED SMOOTH TRANSITIONS */
@@ -4428,33 +4545,9 @@
         .list-item .left { font-weight: 500; letter-spacing: -0.005em; gap: 12px; }
         .list-item > i.fa-chevron-right { color: var(--ios-gray3); font-size: 0.8rem; }
 
-        /* ======================================================================
-           MY ORDERS — status pills recolored to true iOS tints + card polish
-           ====================================================================== */
-        .order-card {
-            border: none !important;
-            box-shadow: var(--ios-shadow) !important;
-            border-radius: var(--ios-radius-md) !important;
-            background: var(--ios-card-bg) !important;
-        }
-        .order-card:active { transform: scale(0.98) !important; }
-        .order-id { font-weight: 700; letter-spacing: -0.01em; }
-        .order-status-badge {
-            font-weight: 600;
-            letter-spacing: -0.005em;
-            padding: 5px 12px !important;
-        }
-        .status-accepted  { background: rgba(0,122,255,0.12) !important;  color: var(--ios-blue) !important; }
-        .status-prepared  { background: rgba(255,149,0,0.12) !important; color: var(--ios-orange) !important; }
-        .status-ontheway  { background: rgba(52,199,89,0.12) !important; color: var(--ios-green) !important; }
-        .status-delivered { background: rgba(175,82,222,0.12) !important; color: var(--ios-purple) !important; }
-        .status-cancelled { background: rgba(255,59,48,0.12) !important; color: var(--ios-red) !important; }
-        .track-order-btn {
-            border-radius: 980px !important;
-            background: var(--accent) !important;
-            transition: transform 0.18s var(--ios-tap), opacity 0.18s ease !important;
-        }
-        .track-order-btn:active { transform: scale(0.96) !important; opacity: 0.8; }
+        /* MY ORDERS — fully redefined above (order-card, order-card-row,
+           status pills, timeline) as native iOS list rows; nothing to
+           override here anymore. */
 
         /* ======================================================================
            FAVORITES — the list is built with inline/Bootstrap utility
@@ -4649,266 +4742,6 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
-    /* =====================================================================
-       NATIVE iOS OVERHAUL — appended override layer
-       Re-skins every surface (nav, buttons, cards, sheets, lists, forms,
-       toasts) to match iOS 17/18 system conventions on top of the brand's
-       teal accent, without touching any markup ids/classes the JS relies on.
-       ===================================================================== */
-
-    :root{
-        --ios-accent: var(--accent);
-        --ios-accent-rgb: 79,109,122;
-        --ios-card-radius: 18px;
-        --ios-btn-radius: 14px;
-        --ios-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    html, body{
-        background: var(--ios-gray6, #F2F2F7) !important;
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', Inter, sans-serif !important;
-        letter-spacing: -0.01em;
-    }
-
-    /* ---------- press feedback everywhere (native tap-down) ---------- */
-    button, .list-item, .bottom-nav-item, .product-card, a, .ios-select-trigger, .ios-select-option{
-        -webkit-tap-highlight-color: transparent;
-        transition: transform 0.15s var(--ios-spring), opacity 0.15s ease, background-color 0.15s ease !important;
-    }
-    button:active:not(:disabled), .list-item:active, .bottom-nav-item:active, .ios-select-trigger:active{
-        transform: scale(0.96);
-        opacity: 0.85;
-    }
-    .product-card:active{ transform: scale(0.97); }
-
-    /* ---------- top image banner -> reads like a large-title nav ---------- */
-    .image-banner{
-        border-radius: 0 0 28px 28px;
-        overflow: hidden;
-    }
-    .banner-overlay{
-        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%) !important;
-    }
-    .banner-title h2{
-        font-weight: 800 !important;
-        font-size: 1.7rem !important;
-        letter-spacing: -0.03em !important;
-    }
-    .shop-top-bar{
-        background: var(--ios-nav-blur, rgba(255,255,255,0.82)) !important;
-        -webkit-backdrop-filter: saturate(180%) blur(20px);
-        backdrop-filter: saturate(180%) blur(20px);
-        border-bottom: 0.5px solid var(--ios-separator);
-    }
-
-    /* ---------- search field: real iOS "Settings/App Store" pill ---------- */
-    .search-wrapper{
-        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
-        border: none !important;
-        border-radius: 12px !important;
-        box-shadow: none !important;
-    }
-    .search-wrapper input{
-        background: transparent !important;
-        font-size: 1rem;
-    }
-    .search-wrapper input::placeholder{ color: var(--ios-gray, #8E8E93); }
-
-    /* ---------- product cards -> iOS grouped card ---------- */
-    .product-card{
-        background: var(--ios-card-bg, #fff) !important;
-        border-radius: var(--ios-card-radius) !important;
-        border: none !important;
-        box-shadow: var(--ios-shadow) !important;
-    }
-
-    /* ---------- buttons: tinted / filled iOS pill buttons ---------- */
-    .btn-dark, .btn-green, button#saveAccountChanges, .add-to-cart-detail, .sidebar-filters-apply, .confirm-manual-address, #confirmManualAddress, #saveAddressBtn{
-        background: var(--ios-accent) !important;
-        border: none !important;
-        border-radius: 980px !important;
-        font-weight: 600 !important;
-        letter-spacing: -0.01em;
-        box-shadow: none !important;
-        color: #fff !important;
-    }
-    .btn-outline-red, #deleteLocationBtn{
-        background: rgba(255,59,48,0.12) !important;
-        border: none !important;
-        border-radius: 980px !important;
-        color: var(--ios-red) !important;
-        font-weight: 600 !important;
-    }
-    button#searchBtn{
-        background: var(--ios-accent) !important;
-        border-radius: 980px !important;
-        border: none !important;
-    }
-
-    /* quantity stepper -> iOS style rounded segmented control */
-    .qty-stepper{
-        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
-        border-radius: 980px !important;
-        border: none !important;
-    }
-    .qty-btn{
-        background: transparent !important;
-        color: var(--ios-accent) !important;
-        border-radius: 50% !important;
-    }
-
-    /* ---------- badges / pills ---------- */
-    .cart-badge, .connect-badge{
-        background: var(--ios-red) !important;
-        border-radius: 980px !important;
-        font-weight: 700;
-    }
-    .discount-badge{
-        background: rgba(255,59,48,0.12) !important;
-        color: var(--ios-red) !important;
-        border-radius: 8px;
-        padding: 2px 8px;
-    }
-
-    /* ---------- bottom tab bar: real iOS translucent tab bar ---------- */
-    .bottom-nav{
-        background: var(--ios-nav-blur, rgba(255,255,255,0.82)) !important;
-        -webkit-backdrop-filter: saturate(180%) blur(20px);
-        backdrop-filter: saturate(180%) blur(20px);
-        border-top: 0.5px solid var(--ios-separator) !important;
-        box-shadow: none !important;
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-    }
-    .bottom-nav-item{
-        color: var(--ios-gray, #8E8E93) !important;
-        font-weight: 500;
-    }
-    .bottom-nav-item span{ font-size: 0.68rem; letter-spacing: -0.01em; }
-    .bottom-nav-item.active, .bottom-nav-item.active svg{
-        color: var(--ios-accent) !important;
-    }
-
-    /* ---------- slide panels / sheets -> iOS modal sheet w/ grab handle ---------- */
-    .slide-panel, .product-detail-panel, .category-products-panel, .order-track-panel{
-        background: var(--ios-grouped-bg, #F2F2F7) !important;
-        border-radius: 20px 20px 0 0 !important;
-        box-shadow: var(--ios-shadow-sheet) !important;
-    }
-    .slide-panel::before, .category-products-panel::before, .order-track-panel::before, .product-detail-panel::before{
-        content: "";
-        display: block;
-        width: 36px;
-        height: 5px;
-        border-radius: 3px;
-        background: var(--ios-gray4, #D1D1D6);
-        margin: 8px auto 4px;
-    }
-    .panel-header, .cat-panel-header{
-        background: var(--ios-nav-blur, rgba(255,255,255,0.82)) !important;
-        -webkit-backdrop-filter: saturate(180%) blur(20px);
-        backdrop-filter: saturate(180%) blur(20px);
-        border-bottom: 0.5px solid var(--ios-separator) !important;
-        font-weight: 700 !important;
-        box-shadow: none !important;
-    }
-
-    /* ---------- grouped settings lists -> true iOS Settings.app rows ---------- */
-    .settings-group{
-        background: var(--ios-card-bg, #fff) !important;
-        border-radius: var(--ios-radius-md, 14px) !important;
-        overflow: hidden;
-        box-shadow: none !important;
-        border: none !important;
-    }
-    .list-item{
-        background: transparent !important;
-        border-bottom: 0.5px solid var(--ios-separator) !important;
-        padding-top: 12px;
-        padding-bottom: 12px;
-    }
-    .settings-group .list-item:last-child{ border-bottom: none !important; }
-    .list-item i.fa-chevron-right{
-        color: var(--ios-gray3, #C7C7CC) !important;
-        font-size: 0.8rem;
-    }
-    .list-icon-badge{
-        border-radius: 8px !important;
-        width: 29px; height: 29px;
-        display: inline-flex; align-items:center; justify-content:center;
-    }
-
-    /* ---------- ios-select dropdown -> action sheet style ---------- */
-    .ios-select-trigger{
-        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
-        border: none !important;
-        border-radius: 10px !important;
-    }
-    .ios-select-menu{
-        background: var(--ios-card-bg, #fff) !important;
-        border-radius: var(--ios-radius-md, 14px) !important;
-        box-shadow: var(--ios-shadow) !important;
-        border: none !important;
-    }
-    .ios-select-option{ border-bottom: 0.5px solid var(--ios-separator) !important; }
-    .ios-select-option:last-child{ border-bottom: none !important; }
-    .ios-select-option.is-selected{ color: var(--ios-accent) !important; }
-
-    /* ---------- form fields -> iOS text field ---------- */
-    .form-control, input[type=text], input[type=number], input[type=email], input[type=tel]{
-        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
-        border: none !important;
-        border-radius: 10px !important;
-        box-shadow: none !important;
-        padding: 12px 14px !important;
-    }
-    .form-control:focus{
-        background: #fff !important;
-        outline: 2px solid var(--ios-accent) !important;
-        outline-offset: 0;
-    }
-    label{
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: var(--ios-secondary-label, #3C3C43cc);
-        text-transform: none;
-        margin-top: 10px;
-        display: block;
-    }
-
-    /* ---------- toasts -> iOS notification banner (top, rounded) ---------- */
-    .toast-container{ top: max(env(safe-area-inset-top), 12px) !important; }
-    .toast-container .toast, .toast-container > div{
-        background: var(--ios-nav-blur, rgba(255,255,255,0.9)) !important;
-        -webkit-backdrop-filter: saturate(180%) blur(20px);
-        backdrop-filter: saturate(180%) blur(20px);
-        border-radius: 16px !important;
-        box-shadow: var(--ios-shadow) !important;
-        color: var(--ios-label, #1C1C1E) !important;
-        border: none !important;
-    }
-
-    /* ---------- account header ---------- */
-    .user-circle{
-        background: var(--brand-gradient) !important;
-        box-shadow: var(--glow-shadow);
-    }
-    .stats-card{
-        background: var(--ios-card-bg, #fff) !important;
-        border-radius: var(--ios-radius-md, 14px) !important;
-        box-shadow: none !important;
-        border: none !important;
-    }
-
-    /* ---------- category pills ---------- */
-    .categories-wrapper .cat-pill, .categories-wrapper button{
-        border-radius: 980px !important;
-    }
-
-    /* ---------- reduce Bootstrap's default sharp corners app-wide ---------- */
-    .modal-content, .dropdown-menu, .card{
-        border-radius: var(--ios-radius-md, 14px) !important;
-        border: none !important;
-    }
     </style>
 </head>
 <body>
@@ -5282,13 +5115,16 @@
 <!-- MY ORDERS PANEL -->
 <div class="slide-panel" id="myOrdersPanel">
     <div class="panel-header"><i class="fas fa-arrow-left" id="backFromMyOrders"></i> My Orders</div>
-    <div class="p-3" id="myOrdersList">Loading orders...</div>
+    <div class="orders-hero">
+        <h1 class="orders-hero-title">My Orders</h1>
+    </div>
+    <div class="p-3 pt-0" id="myOrdersList">Loading orders...</div>
 </div>
 
 <!-- ORDER TRACK PANEL -->
 <div class="order-track-panel" id="orderTrackPanel">
     <div class="panel-header"><i class="fas fa-arrow-left" id="backFromOrderTrack"></i> Track Order</div>
-    <div class="p-4" id="orderTrackContent"></div>
+    <div class="pb-4" id="orderTrackContent"></div>
 </div>
 
 <!-- PRIVACY PANEL -->
@@ -6589,98 +6425,118 @@ function updateShopHeaderDisplay(shopData) {
     }
 
     // ---------- Load Orders for User ----------
+    // Small glyph + accent per status, used for the leading icon on each
+    // order row (mirrors the tint used by that order's status pill).
+    const ORDER_STATUS_META = {
+        accepted:   { icon: 'fa-bag-shopping',  css: 'status-accepted'  },
+        prepared:   { icon: 'fa-box',           css: 'status-prepared'  },
+        ontheway:   { icon: 'fa-truck',         css: 'status-ontheway'  },
+        delivered:  { icon: 'fa-house-chimney', css: 'status-delivered' },
+        cancelled:  { icon: 'fa-xmark',         css: 'status-cancelled' }
+    };
+
     async function loadMyOrders() {
         const container = document.getElementById('myOrdersList');
-        
+
         if (!userProfile) {
-            container.innerHTML = '<div class="text-center py-5"><i class="fas fa-user-lock fa-3x text-muted"></i><h5 class="mt-3">Please sign in to view orders</h5></div>';
+            container.innerHTML = `
+                <div class="cart-empty-state">
+                    <div class="cart-empty-icon"><i class="fas fa-lock"></i></div>
+                    <h5>Please sign in</h5>
+                    <p>Sign in to view your order history</p>
+                </div>`;
             return;
         }
-        
+
         try {
             container.innerHTML = '<div class="loader-wrap"><div class="circular-loader"></div></div>';
-            
+
             const ordersRef = collection(db, 'orders');
-            let q;
-            
-            if (userProfile.orders && userProfile.orders.length) {
-                q = query(ordersRef, where('customer.email', '==', userProfile.email), orderBy('createdAt', 'desc'));
-            } else {
-                q = query(ordersRef, where('customer.email', '==', userProfile.email), orderBy('createdAt', 'desc'));
-            }
-            
+            const q = query(ordersRef, where('customer.email', '==', userProfile.email), orderBy('createdAt', 'desc'));
+
             const snapshot = await getDocs(q);
-            
+
             if (snapshot.empty) {
-                container.innerHTML = '<div class="text-center py-5"><i class="fas fa-box-open fa-3x text-muted"></i><h5 class="mt-3">No orders yet</h5><p class="text-muted">Your orders will appear here</p></div>';
+                container.innerHTML = `
+                    <div class="cart-empty-state">
+                        <div class="cart-empty-icon"><i class="fas fa-bag-shopping"></i></div>
+                        <h5>No orders yet</h5>
+                        <p>Your orders will appear here</p>
+                    </div>`;
                 return;
             }
-            
+
             let html = '';
             snapshot.forEach(doc => {
                 const order = doc.data();
                 order.id = doc.id;
-                
-                const statusClass = `status-${order.status || 'accepted'}`;
+
+                const status = order.status || 'accepted';
+                const statusClass = `status-${status}`;
+                const statusMeta = ORDER_STATUS_META[status] || ORDER_STATUS_META.accepted;
                 const statusText = {
                     'accepted': 'Accepted',
                     'prepared': 'Prepared',
                     'ontheway': 'On the way',
                     'delivered': 'Delivered',
                     'cancelled': 'Cancelled'
-                }[order.status] || 'Accepted';
-                
+                }[status] || 'Accepted';
+
                 const date = new Date(order.createdAt).toLocaleDateString('en-GB', {
                     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
-                
+
                 const isGpsAddress = order.customer?.address?.startsWith('lat:');
-                
+
                 html += `
                     <div class="order-card" data-order-id="${order.id}">
-                        <div class="order-header">
-                            <span class="order-id">#${order.id.slice(-6)}</span>
-                            <span class="order-status-badge ${statusClass}">${statusText}</span>
+                        <div class="order-card-row">
+                            <div class="order-card-icon"><i class="fas ${statusMeta.icon}"></i></div>
+                            <div class="order-card-info">
+                                <div class="order-header">
+                                    <span class="order-id">Order #${order.id.slice(-6)}</span>
+                                    <span class="order-status-badge ${statusClass}">${statusText}</span>
+                                </div>
+                                <div class="order-card-meta">${order.items.length} item${order.items.length === 1 ? '' : 's'} &middot; <span class="order-total">$${order.total.toFixed(2)}</span></div>
+                                <div class="order-card-date">${date}</div>
+                            </div>
+                            <i class="fas fa-chevron-right order-card-chevron"></i>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>${order.items.length} item(s)</span>
-                            <span class="order-total">$${order.total.toFixed(2)}</span>
-                        </div>
-                        <div class="small text-muted mb-2">${date}</div>
-                        
+
                         ${order.customer?.address && order.customer.address !== 'Not set' ? `
-                            <div class="small mb-2">
-                                <i class="fas fa-map-marker-alt"></i> 
-                                ${isGpsAddress ? '📍 GPS Location' : order.customer.address.substring(0, 50) + (order.customer.address.length > 50 ? '...' : '')}
+                            <div class="order-card-address">
+                                <i class="fas fa-location-dot"></i>
+                                <span>${isGpsAddress ? 'GPS location' : order.customer.address.substring(0, 50) + (order.customer.address.length > 50 ? '...' : '')}</span>
                                 ${isGpsAddress ? `
-    <span class="view-map-btn green" onclick="window.openGoogleMaps('${order.customer?.address}'); event.stopPropagation();" style="display: inline-flex; margin-left: 8px;">
-        <i class="fas fa-map-marker-alt"></i> View on Map
+    <span class="view-map-btn green" onclick="window.openGoogleMaps('${order.customer?.address}'); event.stopPropagation();" style="display: inline-flex; margin-left: 4px;">
+        <i class="fas fa-map-marker-alt"></i> Map
     </span>
 ` : ''}
                             </div>
                         ` : ''}
-                        
-                        <button class="track-order-btn w-100" onclick="window.trackOrder('${order.id}')">
-                            <i class="fas fa-truck me-1"></i> Track Order
-                        </button>
                     </div>
                 `;
             });
-            
+
             container.innerHTML = html;
-            
+
             container.querySelectorAll('.order-card').forEach(card => {
                 card.addEventListener('click', (e) => {
-                    if (!e.target.classList.contains('track-order-btn') && !e.target.closest('a')) {
+                    if (!e.target.closest('.view-map-btn') && !e.target.closest('a')) {
                         const orderId = card.dataset.orderId;
                         trackOrder(orderId);
                     }
                 });
             });
-            
+
         } catch (error) {
             console.error('Error loading orders:', error);
-            container.innerHTML = '<p class="text-danger text-center">Error loading orders</p>';
+            container.innerHTML = `
+                <div class="cart-empty-state">
+                    <div class="cart-empty-icon"><i class="fas fa-triangle-exclamation"></i></div>
+                    <h5>Couldn't load orders</h5>
+                    <p>Please try again in a moment</p>
+                </div>`;
         }
     }
 
@@ -6704,45 +6560,59 @@ function updateShopHeaderDisplay(shopData) {
                 showToast('Order not found', 'error');
                 return;
             }
-            
+
             const order = orderDoc.data();
             order.id = orderDoc.id;
-            
+
             const statusSteps = [
-                { key: 'accepted', label: 'Order Accepted', icon: 'fa-check-circle' },
-                { key: 'prepared', label: 'Order Prepared', icon: 'fa-box-open' },
+                { key: 'accepted', label: 'Order Accepted', icon: 'fa-check' },
+                { key: 'prepared', label: 'Order Prepared', icon: 'fa-box' },
                 { key: 'ontheway', label: 'On the Way', icon: 'fa-truck' },
-                { key: 'delivered', label: 'Delivered', icon: 'fa-home' }
+                { key: 'delivered', label: 'Delivered', icon: 'fa-house-chimney' }
             ];
-            
+
             const currentStatus = order.status || 'accepted';
             const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
-            
-            let timelineHtml = '<div class="order-status-timeline">';
-            
+
+            const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-GB', {
+                day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+            }) : '';
+
+            // Hero + timeline card — native iOS "large title" + Wallet-style
+            // step tracker with filled tint icons and a soft connecting rail.
+            let pageHtml = `
+                <div class="order-track-hero">
+                    <div class="order-track-id">Order #${order.id.slice(-6)}</div>
+                    ${orderDate ? `<div class="order-track-sub">Placed ${orderDate}</div>` : ''}
+                </div>
+                <div class="px-3">
+                <div class="order-track-card">
+                    <div class="order-status-timeline">
+            `;
+
             statusSteps.forEach((step, index) => {
                 const isCompleted = index <= currentIndex && currentStatus !== 'cancelled';
                 const isActive = index === currentIndex && currentStatus !== 'cancelled';
                 const statusClass = isCompleted ? 'completed' : (isActive ? 'active' : '');
-                
+
                 const timelineEntry = order.statusTimeline?.find(t => t.status === step.key);
                 const timeStr = timelineEntry ? new Date(timelineEntry.time).toLocaleString() : '';
-                
-                timelineHtml += `
+
+                pageHtml += `
                     <div class="status-step ${statusClass}">
                         <div class="status-icon"><i class="fas ${step.icon}"></i></div>
                         <div class="status-content">
                             <div class="status-title">${step.label}</div>
-                            <div class="status-time">${timeStr || (isActive ? 'In progress...' : '')}</div>
+                            <div class="status-time">${timeStr || (isActive ? 'In progress&hellip;' : '')}</div>
                         </div>
                     </div>
                 `;
             });
-            
+
             if (order.status === 'cancelled') {
-                timelineHtml += `
-                    <div class="status-step">
-                        <div class="status-icon"><i class="fas fa-times-circle" style="color: #d32f2f;"></i></div>
+                pageHtml += `
+                    <div class="status-step cancelled-step completed">
+                        <div class="status-icon"><i class="fas fa-xmark"></i></div>
                         <div class="status-content">
                             <div class="status-title">Order Cancelled</div>
                             <div class="status-time">${order.cancelledAt ? new Date(order.cancelledAt).toLocaleString() : ''}</div>
@@ -6750,45 +6620,59 @@ function updateShopHeaderDisplay(shopData) {
                     </div>
                 `;
             }
-            
-            timelineHtml += '</div>';
-            
+
+            pageHtml += `
+                    </div>
+                </div>
+                </div>
+            `;
+
             const isGpsAddress = order.customer?.address?.startsWith('lat:');
-            
-            timelineHtml += `
-                <div class="card mt-4 p-3">
-                    <h6 class="fw-bold">Order Summary</h6>
+
+            // Order summary — grouped "table view" card, same visual
+            // language as the cart/checkout screen (ios-group-card / ios-row).
+            pageHtml += `
+                <div class="px-3 pt-4">
+                <div class="desc-label mb-2"><i class="fas fa-receipt"></i>Order Summary</div>
+                <div class="ios-group-card cart-summary-card mb-3">
                     ${order.items.map(item => `
-                        <div class="d-flex justify-content-between small mb-1">
-                            <span>${item.name} ${item.selectedVariants ? `(${item.selectedVariants.map(v => `${v.name}: ${v.value}`).join(', ')})` : ''} x${item.quantity}</span>
-                            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                        <div class="ios-row cart-summary-row">
+                            <span class="ios-row-label">${item.name}${item.selectedVariants ? ` <span style="color:var(--ios-gray, #8e8e93);">(${item.selectedVariants.map(v => `${v.name}: ${v.value}`).join(', ')})</span>` : ''} &times;${item.quantity}</span>
+                            <span class="ios-row-value">$${(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                     `).join('')}
-                    <hr class="my-2">
-                    <div class="d-flex justify-content-between fw-bold">
-                        <span>Total</span>
-                        <span>$${order.total.toFixed(2)}</span>
+                    <div class="ios-row cart-summary-row cart-summary-total">
+                        <span class="ios-row-label">Total</span>
+                        <span class="ios-row-value">$${order.total.toFixed(2)}</span>
                     </div>
-                    
-                    <hr class="my-2">
-                    <div>
-                        <h6 class="fw-bold">Delivery Information</h6>
-                        <p class="small mb-1"><i class="fas fa-user me-2"></i>${order.customer?.name || 'N/A'}</p>
-                        <p class="small mb-1"><i class="fas fa-phone me-2"></i>${order.customer?.phone || 'N/A'}</p>
-                        <p class="small mb-1"><i class="fas fa-map-marker-alt me-2"></i>${order.customer?.address || 'N/A'}</p>
+                </div>
+
+                <div class="desc-label mb-2"><i class="fas fa-truck"></i>Delivery Information</div>
+                <div class="ios-group-card mb-4">
+                    <div class="ios-row">
+                        <div class="ios-row-icon icon-blue"><i class="fas fa-user"></i></div>
+                        <span class="ios-row-label">${order.customer?.name || 'N/A'}</span>
+                    </div>
+                    <div class="ios-row">
+                        <div class="ios-row-icon icon-green"><i class="fas fa-phone"></i></div>
+                        <span class="ios-row-label">${order.customer?.phone || 'N/A'}</span>
+                    </div>
+                    <div class="ios-row">
+                        <div class="ios-row-icon icon-red"><i class="fas fa-map-marker-alt"></i></div>
+                        <span class="ios-row-label">${isGpsAddress ? 'GPS location' : (order.customer?.address || 'N/A')}</span>
                         ${isGpsAddress ? `
-    <button class="view-map-btn blue mt-2" onclick="window.openGoogleMaps('${order.customer?.address}')">
-        <i class="fas fa-map-marker-alt"></i> View on Map
-        <i class="fas fa-external-link-alt" style="font-size: 0.7rem;"></i>
-    </button>
+    <span class="view-map-btn blue" onclick="window.openGoogleMaps('${order.customer?.address}')" style="margin-left:auto;">
+        <i class="fas fa-map-marker-alt"></i> Map
+    </span>
 ` : ''}
                     </div>
                 </div>
+                </div>
             `;
-            
-            document.getElementById('orderTrackContent').innerHTML = timelineHtml;
+
+            document.getElementById('orderTrackContent').innerHTML = pageHtml;
             openPanel(orderTrackPanel);
-            
+
         } catch (error) {
             console.error('Error tracking order:', error);
             showToast('Error loading order details', 'error');
