@@ -136,33 +136,6 @@
             --ios-shadow-sheet: 0 -2px 40px rgba(0,0,0,0.14);
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #000000;
-                --text-color: #F2F2F7;
-                --text-secondary: #98989F;
-                --card-bg: #1C1C1E;
-                --input-bg: #1C1C1E;
-                --gray-100: #1C1C1E;
-                --gray-200: #2C2C2E;
-                --gray-300: #3A3A3C;
-                --gray-400: #48484A;
-                --gray-500: #636366;
-                --gray-600: #98989F;
-                --gray-700: #AEAEB2;
-                --gray-800: #E5E5EA;
-                --ios-label: #F2F2F7;
-                --ios-secondary-label: #EBEBF599;
-                --ios-separator: rgba(84,84,88,0.65);
-                --ios-fill: rgba(120,120,128,0.24);
-                --ios-fill-strong: rgba(120,120,128,0.32);
-                --ios-card-bg: #1C1C1E;
-                --ios-grouped-bg: #000000;
-                --ios-nav-blur: rgba(28,28,30,0.78);
-            }
-            html, body { background: #000000; }
-        }
-        
         html, body { 
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, sans-serif; 
             background: var(--ios-grouped-bg, #ffffff);
@@ -4082,6 +4055,142 @@
         /* ---- Safe areas for iPhone notch / home indicator ---- */
         .image-banner { padding-top: env(safe-area-inset-top); }
         .bottom-nav { padding-bottom: max(8px, env(safe-area-inset-bottom)) !important; }
+
+        /* ======================================================================
+           APPLE-STYLE MOTION PACK — extra native-feeling animations layered
+           on top of the design system above. Pure CSS, so it applies to
+           content the moment it's rendered into the DOM (grids, panels,
+           badges, etc.) without touching any JS logic.
+           ====================================================================== */
+
+        /* Staggered card entrance — the App Store / Photos-style cascade
+           where grid items settle into place one after another. */
+        @keyframes iosCardIn {
+            from { opacity: 0; transform: translateY(14px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .product-card, .product-card-h {
+            animation: iosCardIn 0.5s var(--ios-spring) backwards;
+        }
+        .product-grid .product-card:nth-child(1)  { animation-delay: 0.02s; }
+        .product-grid .product-card:nth-child(2)  { animation-delay: 0.06s; }
+        .product-grid .product-card:nth-child(3)  { animation-delay: 0.10s; }
+        .product-grid .product-card:nth-child(4)  { animation-delay: 0.14s; }
+        .product-grid .product-card:nth-child(5)  { animation-delay: 0.18s; }
+        .product-grid .product-card:nth-child(6)  { animation-delay: 0.22s; }
+        .product-grid .product-card:nth-child(n+7) { animation-delay: 0.26s; }
+        .products-horizontal .product-card-h:nth-child(1) { animation-delay: 0.02s; }
+        .products-horizontal .product-card-h:nth-child(2) { animation-delay: 0.06s; }
+        .products-horizontal .product-card-h:nth-child(3) { animation-delay: 0.10s; }
+        .products-horizontal .product-card-h:nth-child(n+4) { animation-delay: 0.14s; }
+
+        /* Category avatars pop in like Springboard icons */
+        @keyframes iosIconPop {
+            from { opacity: 0; transform: scale(0.6); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .category-item { animation: iosIconPop 0.4s var(--ios-tap) backwards; }
+        .categories-wrapper .category-item:nth-child(1) { animation-delay: 0.02s; }
+        .categories-wrapper .category-item:nth-child(2) { animation-delay: 0.05s; }
+        .categories-wrapper .category-item:nth-child(3) { animation-delay: 0.08s; }
+        .categories-wrapper .category-item:nth-child(4) { animation-delay: 0.11s; }
+        .categories-wrapper .category-item:nth-child(5) { animation-delay: 0.14s; }
+        .categories-wrapper .category-item:nth-child(n+6) { animation-delay: 0.17s; }
+
+        /* Panel/sheet entrance gets a touch of native overshoot instead of
+           a flat linear slide (matches UINavigationController push). */
+        .slide-panel, .product-detail-panel, .category-products-panel, .order-track-panel {
+            transition: transform 0.46s var(--ios-spring) !important;
+        }
+
+        /* Tab bar icon: springy jump + label fade when a tab becomes active,
+           mirroring the iOS TabBar selection animation. */
+        @keyframes iosTabJump {
+            0%   { transform: translateY(0) scale(1); }
+            40%  { transform: translateY(-5px) scale(1.18); }
+            70%  { transform: translateY(1px) scale(0.96); }
+            100% { transform: translateY(-1px) scale(1.06); }
+        }
+        .bottom-nav-item.active i,
+        .bottom-nav-item.active .nav-icon-svg {
+            animation: iosTabJump 0.45s var(--ios-tap);
+        }
+
+        /* Buttons: soft sheen sweep across primary CTAs, like a highlight
+           pass — subtle, only on hover/press, never distracting. */
+        .btn-dark, .btn-green {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-dark::after, .btn-green::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.22) 45%, transparent 70%);
+            transform: translateX(-120%);
+            transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+        }
+        .btn-dark:active::after, .btn-green:active::after { transform: translateX(120%); }
+
+        /* Chevron nudge on list rows — a tiny forward hint on tap, the way
+           iOS Settings rows react. */
+        .list-item > i.fa-chevron-right,
+        .list-item .fa-chevron-right {
+            transition: transform 0.25s var(--ios-tap), color 0.2s ease;
+        }
+        .list-item:active > i.fa-chevron-right,
+        .list-item:active .fa-chevron-right { transform: translateX(3px); color: var(--accent); }
+
+        /* Modal / action-sheet backdrop fade-in */
+        @keyframes iosBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+        .social-modal.show { animation: iosBackdropIn 0.25s ease; }
+
+        /* Badges pop when they mount/update — small elastic bump */
+        @keyframes iosBadgePop {
+            0% { transform: scale(0.4); opacity: 0; }
+            60% { transform: scale(1.25); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .cart-badge, .connect-badge { animation: iosBadgePop 0.4s var(--ios-tap); }
+
+        /* Detail-panel image gallery: subtle parallax-style scale-in */
+        @keyframes iosGalleryIn { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
+        #detailActualContent .detail-gallery-container img { animation: iosGalleryIn 0.5s var(--ios-spring); }
+
+        /* Section headers slide up gently as content appears */
+        @keyframes iosSectionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .section-header { animation: iosSectionIn 0.4s ease-out backwards; }
+
+        /* Empty-state icons get a soft breathing pulse, like the App Store
+           empty-cart / no-results illustrations. */
+        @keyframes iosBreathe {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.06); opacity: 1; }
+        }
+        .no-products i, .empty-favorites i { animation: iosBreathe 2.4s ease-in-out infinite; }
+
+        /* Success / order-placed style checkmark draw-in, ready for any
+           element using the .ios-check-pop helper class. */
+        @keyframes iosCheckPop {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            60% { transform: scale(1.2) rotate(4deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0); }
+        }
+        .ios-check-pop { animation: iosCheckPop 0.55s var(--ios-tap); }
+
+        /* Fade + rise used generically for any dynamically injected block
+           (cart items, orders list, favorites list, address hero, etc.) */
+        @keyframes iosFadeRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .cart-item-card, .desc-card, .ios-group-card, .addr-hero, .stats-card {
+            animation: iosFadeRise 0.45s var(--ios-spring) backwards;
+        }
+
+        /* Global press feedback fallback: any element explicitly marked
+           tappable gets the same native "dim + shrink" iOS touch response. */
+        .category-circle:active, .view-map-btn:active, .close-modal-btn:active,
+        .social-btn-banner:active, .list-item:active .list-icon-badge {
+            filter: brightness(0.94);
+        }
 
         /* ---- Respect reduced motion ---- */
         @media (prefers-reduced-motion: reduce) {
