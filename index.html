@@ -1880,6 +1880,214 @@
         .product-detail-panel { 
             z-index:3000; 
         }
+
+        /* ===== Redesigned product detail page: full-bleed hero image with
+           floating back/heart buttons, a padded content body below, and a
+           sticky quantity + add-to-cart bar pinned to the bottom. ===== */
+        .detail-content {
+            padding: 0;
+        }
+
+        .detail-hero {
+            position: relative;
+            width: 100%;
+            border-radius: 0 0 28px 28px;
+            overflow: hidden;
+            background: var(--gray-100);
+        }
+
+        .detail-hero .detail-gallery-container {
+            margin-bottom: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .detail-float-btn {
+            position: absolute;
+            top: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px -4px rgba(20,20,30,0.4);
+            cursor: pointer;
+            z-index: 20;
+            color: var(--primary-color);
+            font-size: 1.05rem;
+            transition: var(--transition);
+        }
+
+        .detail-float-btn:active {
+            transform: scale(0.9);
+        }
+
+        .detail-float-back {
+            left: 16px;
+        }
+
+        .detail-float-heart {
+            right: 16px;
+            padding: 0;
+        }
+
+        .detail-float-heart #detailHeart {
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .detail-body {
+            padding: 18px 20px 24px;
+        }
+
+        .detail-price-row {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .detail-price-row #detailPrice {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .detail-name {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin: 6px 0 12px;
+            line-height: 1.35;
+            color: var(--text-color);
+        }
+
+        .detail-bottom-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .detail-bottom-bar .add-to-cart-detail {
+            flex: 1;
+            margin: 0 !important;
+        }
+
+        /* Shared quantity stepper - used in both the product detail page
+           and the cart list so the interaction feels identical everywhere. */
+        .qty-stepper {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid var(--gray-300);
+            border-radius: 30px;
+            overflow: hidden;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .qty-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: white;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .qty-btn:hover {
+            background: var(--gray-100);
+        }
+
+        .qty-btn:active {
+            transform: scale(0.9);
+        }
+
+        .qty-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .qty-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            user-select: none;
+        }
+
+        .detail-qty-stepper .qty-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        /* ===== Cart item cards ===== */
+        .cart-item-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius-md);
+            padding: 12px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+
+        .cart-item-card.out-of-stock {
+            opacity: 0.65;
+        }
+
+        .cart-item-img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: 10px;
+            flex-shrink: 0;
+            background: var(--gray-100);
+        }
+
+        .cart-item-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .cart-item-remove {
+            color: var(--gray-400);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 4px 2px 4px 10px;
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+
+        .cart-item-remove:hover {
+            color: var(--danger);
+        }
+
+        .cart-qty-stepper .qty-btn {
+            width: 28px;
+            height: 28px;
+            font-size: 0.7rem;
+        }
+
+        .cart-qty-stepper .qty-value {
+            min-width: 22px;
+            font-size: 0.85rem;
+        }
+
         .detail-panel-header { 
             background:white; 
             padding:16px 20px; 
@@ -3519,39 +3727,55 @@
 <!-- PRODUCT DETAIL PANEL -->
 
 <div class="product-detail-panel" id="productDetailPanel">
-    <div class="detail-panel-header"><i class="fas fa-arrow-left" id="closeDetailPanel"></i> Product details</div>
     <div class="detail-content" id="detailContent">
         <div id="detailLoadingPlaceholder" style="display: none;" class="loader-wrap">
             <div class="circular-loader md"></div>
         </div>
         <div id="detailActualContent" style="display: none;">
-            <div class="detail-gallery-container" id="detailGalleryContainer">
-                <div class="gallery-track" id="galleryTrack"></div>
-                <div class="image-counter" id="imageCounter" style="display:none;"></div>
-                <button type="button" class="gallery-nav-btn gallery-nav-prev" id="galleryPrevBtn" style="display:none;" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>
-                <button type="button" class="gallery-nav-btn gallery-nav-next" id="galleryNextBtn" style="display:none;" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>
+            <div class="detail-hero">
+                <div class="detail-gallery-container" id="detailGalleryContainer">
+                    <div class="gallery-track" id="galleryTrack"></div>
+                    <div class="image-counter" id="imageCounter" style="display:none;"></div>
+                    <button type="button" class="gallery-nav-btn gallery-nav-prev" id="galleryPrevBtn" style="display:none;" aria-label="Previous image"><i class="fas fa-chevron-left"></i></button>
+                    <button type="button" class="gallery-nav-btn gallery-nav-next" id="galleryNextBtn" style="display:none;" aria-label="Next image"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <i class="fas fa-arrow-left detail-float-btn detail-float-back" id="closeDetailPanel" aria-label="Back"></i>
+                <div class="detail-float-btn detail-float-heart">
+                    <i class="heart-icon fas fa-heart" id="detailHeart"></i>
+                </div>
             </div>
             <div class="image-dots" id="imageDots"></div>
-            <div class="d-flex align-items-center justify-content-between mt-2">
-                <div><span class="product-price" id="detailPrice"></span><span class="old-price ms-2 text-decoration-line-through text-muted" id="detailOldPrice"></span><span class="discount-badge ms-2 text-danger fw-bold" id="detailDiscount"></span></div>
-                <i class="heart-icon fas fa-heart" id="detailHeart" style="font-size:1.6rem; color:#ff6b6b; cursor:pointer;"></i>
+
+            <div class="detail-body">
+                <div class="detail-price-row">
+                    <span class="product-price" id="detailPrice"></span>
+                    <span class="old-price text-decoration-line-through text-muted" id="detailOldPrice"></span>
+                    <span class="discount-badge text-danger fw-bold" id="detailDiscount"></span>
+                </div>
+                <h1 id="detailName" class="detail-name"></h1>
+
+                <!-- Stock Badge -->
+                <div id="detailStockContainer" class="mb-2" style="display: none;"></div>
+
+                <!-- Variants Section -->
+                <div id="variantsContainer" class="variant-section" style="display: none;"></div>
+
+                <div class="desc-label mt-3"><i class="fas fa-align-left"></i>Description</div>
+                <p id="detailDesc" class="detail-desc-card"></p>
+
+                <!-- SIMILAR PRODUCTS SECTION -->
+                <div class="desc-label mt-4"><i class="fas fa-layer-group"></i>Similar products</div>
+                <div class="similar-wrapper" id="similarProductsContainer"></div>
             </div>
-            <h5 id="detailName" class="mt-2"></h5>
-            
-            <!-- Stock Badge -->
-            <div id="detailStockContainer" class="mt-2" style="display: none;"></div>
-            
-            <!-- Variants Section -->
-            <div id="variantsContainer" class="variant-section" style="display: none;"></div>
-            
-            <div class="desc-label mt-3"><i class="fas fa-align-left"></i>Description</div>
-            <p id="detailDesc" class="detail-desc-card"></p>
-            
-            <!-- SIMILAR PRODUCTS SECTION -->
-            <div class="desc-label mt-4"><i class="fas fa-layer-group"></i>Similar products</div>
-            <div class="similar-wrapper" id="similarProductsContainer"></div>
-            
-            <button class="btn-dark add-to-cart-detail w-100 py-3 mt-4" id="addToCartDetailBtn"><i class="fas fa-cart-plus"></i> Add to cart</button>
+
+            <div class="panel-bottom-bar detail-bottom-bar">
+                <div class="qty-stepper detail-qty-stepper">
+                    <button type="button" class="qty-btn" id="detailQtyMinus" aria-label="Decrease quantity"><i class="fas fa-minus"></i></button>
+                    <span class="qty-value" id="detailQtyValue">1</span>
+                    <button type="button" class="qty-btn" id="detailQtyPlus" aria-label="Increase quantity"><i class="fas fa-plus"></i></button>
+                </div>
+                <button class="btn-dark add-to-cart-detail" id="addToCartDetailBtn"><i class="fas fa-cart-plus"></i> Add to cart</button>
+            </div>
         </div>
     </div>
 </div>
@@ -3918,6 +4142,7 @@
     let products = [];
     let categories = [];
     let currentProduct = null;
+    let detailQty = 1;
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     let currentUser = null;
     let userProfile = null;
@@ -5640,6 +5865,23 @@ function updateShopHeaderDisplay(shopData) {
         btn.classList.add('pop');
     });
 
+    // Shared helper: works out the effective stock ceiling for a product
+    // (or a specific cart line, which may carry selected variants). Used by
+    // both the product-detail quantity stepper and the cart quantity
+    // steppers so "how many can I add" is calculated the same way
+    // everywhere. Returns null when there's no stock limit set (unlimited).
+    function getEffectiveMaxStock(entity) {
+        if (entity && entity.selectedVariants && entity.selectedVariants.length) {
+            const stocks = entity.selectedVariants
+                .map(v => v.stock)
+                .filter(s => s !== undefined && s !== null);
+            if (stocks.length) return Math.min(...stocks);
+            return null;
+        }
+        if (entity && entity.stock !== undefined && entity.stock !== null) return entity.stock;
+        return null;
+    }
+
     function addToCart(prod, qty=1) {
         if(!userProfile) { showAuthPanel(); return; }
         
@@ -5775,6 +6017,11 @@ async function showProductDetail(p) {
     if (detailActualContent) detailActualContent.style.display = 'none';
     
     currentProduct = p;
+    
+    // Reset the quantity stepper to 1 for every new product opened
+    detailQty = 1;
+    const detailQtyValueEl = document.getElementById('detailQtyValue');
+    if (detailQtyValueEl) detailQtyValueEl.textContent = '1';
     
     // Tear down any drag/keyboard listeners left over from the previous
     // product before rebuilding the gallery, so handlers never pile up.
@@ -6225,29 +6472,37 @@ async function showProductDetail(p) {
                 discountHtml = `<span class="badge bg-danger ms-2" style="font-size: 0.7rem;">-${discountPercent}%</span>`;
             }
             
-            // Check low stock warning
-            let lowStockWarning = '';
-            if (item.stock !== undefined && item.stock !== null && item.stock < 5 && item.stock > 0) {
-                lowStockWarning = `<div class="small text-warning mt-1"><i class="fas fa-exclamation-triangle"></i> Only ${item.stock} left in stock!</div>`;
-            }
-            
-            // Check if any variant has low stock
-            if (item.selectedVariants && item.selectedVariants.length > 0) {
-                for (const variant of item.selectedVariants) {
-                    if (variant.stock !== undefined && variant.stock !== null && variant.stock < 5 && variant.stock > 0) {
-                        lowStockWarning = `<div class="small text-warning mt-1"><i class="fas fa-exclamation-triangle"></i> ${variant.name}: ${variant.value} only ${variant.stock} left!</div>`;
-                    }
+            // ---- Stock status (variant-aware) ----
+            // getEffectiveMaxStock() looks at the selected variants' stock
+            // when there are any, otherwise falls back to the product's
+            // own stock - same rule the "+" button uses, so the badge and
+            // the button always agree with each other.
+            const maxStock = getEffectiveMaxStock(item);
+            let stockPillHtml = '';
+            if (maxStock !== null) {
+                if (maxStock <= 0) {
+                    stockPillHtml = `<span class="stock-badge out-stock"><i class="fas fa-times-circle"></i> Out of stock</span>`;
+                } else if (maxStock < 5) {
+                    stockPillHtml = `<span class="stock-badge low-stock"><i class="fas fa-exclamation-triangle"></i> Only ${maxStock} left</span>`;
+                } else {
+                    stockPillHtml = `<span class="stock-badge in-stock"><i class="fas fa-check-circle"></i> In stock</span>`;
                 }
+            } else {
+                stockPillHtml = `<span class="stock-badge in-stock"><i class="fas fa-check-circle"></i> In stock</span>`;
             }
+            const isOutOfStock = maxStock !== null && maxStock <= 0;
             
             html += `
-                <div class="d-flex align-items-center mb-3 p-2 border-bottom" style="gap: 12px;">
-                    <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://placehold.co/60'">
+                <div class="cart-item-card${isOutOfStock ? ' out-of-stock' : ''}" data-index="${i}">
+                    <img src="${img}" class="cart-item-img" onerror="this.src='https://placehold.co/60'">
                     <div class="flex-grow-1">
-                        <h6 class="mb-1" style="font-size: 0.95rem;">
-                            ${item.name}
-                            ${discountHtml}
-                        </h6>
+                        <div class="d-flex align-items-start justify-content-between">
+                            <h6 class="mb-1 cart-item-name">
+                                ${item.name}
+                                ${discountHtml}
+                            </h6>
+                            <i class="fas fa-trash cart-item-remove" data-index="${i}"></i>
+                        </div>
                         
                         ${item.selectedVariants && item.selectedVariants.length > 0 ? 
                             `<div class="mb-1">
@@ -6258,16 +6513,12 @@ async function showProductDetail(p) {
                                             (${v.priceAdjustment > 0 ? '+' : ''}$${v.priceAdjustment.toFixed(2)})
                                         </span>` : '';
                                     
-                                    // Variant low stock indicator
-                                    const variantLowStock = v.stock !== undefined && v.stock !== null && v.stock < 5 && v.stock > 0 ?
-                                        `<span class="badge bg-warning text-dark ms-1" style="font-size: 0.65rem;">Only ${v.stock} left</span>` : '';
-                                    
-                                    return `<small class="text-muted d-block">• ${v.name}: ${v.value} ${adjustmentText} ${variantLowStock}</small>`
+                                    return `<small class="text-muted d-block">• ${v.name}: ${v.value} ${adjustmentText}</small>`
                                 }).join('')}
                             </div>` 
                         : ''}
                         
-                        ${lowStockWarning}
+                        <div class="mb-1">${stockPillHtml}</div>
                         
                         <div class="mt-1">
                             ${hasAdjustments ? 
@@ -6281,21 +6532,20 @@ async function showProductDetail(p) {
                             : ''}
                         </div>
                         
-                        <div class="d-flex justify-content-between align-items-center mt-2">
-                            <div>
-                                ${item.originalPrice && item.originalPrice > item.price ? 
-                                    `<span class="text-muted text-decoration-line-through me-2">$${item.originalPrice.toFixed(2)}</span>` : ''
-                                }
-                                <span class="fw-bold">$${finalUnitPrice.toFixed(2)}</span>
-                                <span class="text-muted"> × ${item.quantity || 1}</span>
-                                ${hasAdjustments ? 
-                                    `<span class="text-muted ms-2">= $${(finalUnitPrice * (item.quantity || 1)).toFixed(2)}</span>` 
-                                : ''}
+                        <div class="d-flex align-items-center justify-content-between mt-2">
+                            <div class="qty-stepper cart-qty-stepper">
+                                <button type="button" class="qty-btn cart-qty-minus" data-index="${i}" aria-label="Decrease quantity"><i class="fas fa-minus"></i></button>
+                                <span class="qty-value">${item.quantity || 1}</span>
+                                <button type="button" class="qty-btn cart-qty-plus" data-index="${i}" aria-label="Increase quantity" ${isOutOfStock ? 'disabled' : ''}><i class="fas fa-plus"></i></button>
                             </div>
-                            <span class="fw-bold text-primary">$${itemTotal.toFixed(2)}</span>
+                            <div class="text-end">
+                                ${item.originalPrice && item.originalPrice > item.price ? 
+                                    `<div class="text-muted text-decoration-line-through" style="font-size:0.78rem;">$${item.originalPrice.toFixed(2)}</div>` : ''
+                                }
+                                <span class="fw-bold text-primary">$${itemTotal.toFixed(2)}</span>
+                            </div>
                         </div>
                     </div>
-                    <i class="fas fa-trash text-danger" data-index="${i}" style="cursor:pointer; font-size:1.1rem;"></i>
                 </div>
             `; 
         });
@@ -6358,13 +6608,46 @@ async function showProductDetail(p) {
         
         checkoutSection.style.display = 'block';
         
-        container.querySelectorAll('.fa-trash').forEach(btn => btn.addEventListener('click', (e) => { 
+        container.querySelectorAll('.cart-item-remove').forEach(btn => btn.addEventListener('click', (e) => { 
             e.stopPropagation();
-            let idx = e.target.dataset.index; 
+            let idx = e.currentTarget.dataset.index; 
             cart.splice(idx,1); 
             updateCartBadge(); 
             renderCartItems(); 
             showToast('Item removed from cart', 'info', 'Cart Updated');
+        }));
+        
+        // Quantity stepper: "-" removes the line once it hits 1, "+" is
+        // capped at the same stock ceiling addToCart() already enforces.
+        container.querySelectorAll('.cart-qty-minus').forEach(btn => btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = parseInt(e.currentTarget.dataset.index, 10);
+            const item = cart[idx];
+            if (!item) return;
+            if ((item.quantity || 1) <= 1) {
+                cart.splice(idx, 1);
+                showToast('Item removed from cart', 'info', 'Cart Updated');
+            } else {
+                item.quantity -= 1;
+            }
+            updateCartBadge();
+            renderCartItems();
+        }));
+        
+        container.querySelectorAll('.cart-qty-plus').forEach(btn => btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const idx = parseInt(e.currentTarget.dataset.index, 10);
+            const item = cart[idx];
+            if (!item) return;
+            const maxStock = getEffectiveMaxStock(item);
+            const currentQty = item.quantity || 1;
+            if (maxStock !== null && currentQty >= maxStock) {
+                showToast(maxStock <= 0 ? `${item.name} is out of stock` : `Only ${maxStock} in stock`, 'error', 'Stock Limit');
+                return;
+            }
+            item.quantity = currentQty + 1;
+            updateCartBadge();
+            renderCartItems();
         }));
     }
 }
@@ -6756,10 +7039,35 @@ async function showProductDetail(p) {
         addToCartDetailBtn.addEventListener('click', ()=>{ 
             if(currentProduct) { 
                 window.isAddingFromDetail = true;
-                addToCart(currentProduct); 
+                addToCart(currentProduct, detailQty); 
                 window.isAddingFromDetail = false;
                 closePanel(detailPanel); 
             } 
+        });
+    }
+
+    // Product-detail quantity stepper
+    const detailQtyMinusBtn = document.getElementById('detailQtyMinus');
+    const detailQtyPlusBtn = document.getElementById('detailQtyPlus');
+    if (detailQtyMinusBtn) {
+        detailQtyMinusBtn.addEventListener('click', () => {
+            if (detailQty > 1) {
+                detailQty--;
+                const el = document.getElementById('detailQtyValue');
+                if (el) el.textContent = detailQty;
+            }
+        });
+    }
+    if (detailQtyPlusBtn) {
+        detailQtyPlusBtn.addEventListener('click', () => {
+            const maxStock = currentProduct ? getEffectiveMaxStock(currentProduct) : null;
+            if (maxStock !== null && detailQty >= maxStock) {
+                showToast(`Only ${maxStock} in stock`, 'error', 'Stock Limit');
+                return;
+            }
+            detailQty++;
+            const el = document.getElementById('detailQtyValue');
+            if (el) el.textContent = detailQty;
         });
     }
 
