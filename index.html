@@ -5467,7 +5467,7 @@
     let userProfile = null;
     let shopId = new URLSearchParams(window.location.search).get('id') || 'demoShop';
     let shopData = null;
-    let shopOwnerPhone = '+96176647488';
+    let shopOwnerPhone = '';
     let shopOwnerEmail = 'aliezzshadi035@gmail.com';
     let currentUserInitial = 'G';
     
@@ -5886,7 +5886,7 @@ function updateShopHeaderDisplay(shopData) {
                 name: 'Demo Shop',
                 subtitle: 'Welcome to our store',
                 bannerImage: '',
-                ownerPhone: '+96176647488',
+                ownerPhone: '+96176647488', // demo WhatsApp number
                 instagram: null,
                 tiktok: null,
                 delivery: {
@@ -5936,8 +5936,8 @@ function updateShopHeaderDisplay(shopData) {
     
     function updateBannerWithSocial() {
         const hasSocial = shopData && (
-            (shopData.ownerPhone && shopData.ownerPhone !== '+96176647488') || 
-            shopData.instagram || 
+            (shopData.ownerPhone && shopData.ownerPhone.trim() !== '') ||
+            shopData.instagram ||
             shopData.tiktok
         );
         
@@ -5956,7 +5956,7 @@ function updateShopHeaderDisplay(shopData) {
     function showSocialModal() {
         let html = '';
         
-        if (shopData && shopData.ownerPhone && shopData.ownerPhone !== '+96176647488') {
+        if (shopData && shopData.ownerPhone && shopData.ownerPhone.trim() !== '') {
             const phone = shopData.ownerPhone.replace(/[^0-9+]/g, '');
             const whatsappUrl = `https://wa.me/${phone.replace('+', '')}`;
             html += `
