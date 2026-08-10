@@ -5269,7 +5269,7 @@
         </div>
         <div class="mb-3">
             <label>Phone Number <span class="text-danger">*</span></label>
-            <input type="tel" class="form-control" id="authPhone" placeholder="e.g., 76 647 488" required>
+            <input type="tel" class="form-control" id="authPhone" placeholder="e.g., 71234567" inputmode="numeric" maxlength="8" required>
             <small class="text-muted">Required for order updates. Lebanese number only.</small>
         </div>
         <div class="mb-3">
@@ -5277,7 +5277,7 @@
             <input type="email" class="form-control" id="authEmail" placeholder="your@email.com">
             <small class="text-muted" id="authEmailHint">Without an email, you won't be able to view your order tracking link.</small>
         </div>
-        <button class="btn-dark w-100" id="sendOtpBtn">Send Verification Code</button>
+        <button class="btn-dark w-100" id="sendOtpBtn">Continue</button>
     </div>
     
     <div id="authStep2" class="p-4" style="display: none;">
@@ -5703,18 +5703,74 @@
         return phone;
     }
 
-    // Lebanese mobile numbers: 7 or 8 local digits (after stripping a
-    // leading 0, +961, or 00961), starting with a real Lebanese mobile
-    // prefix (03/70/71/76/78/79/81/76 etc). This is intentionally a bit
-    // permissive on the exact prefix list rather than exhaustive, since
-    // carriers occasionally open new ranges - the goal is to catch obvious
-    // typos/garbage input, not to be a strict carrier lookup.
+    // Lebanese mobile numbers entered locally are 8 digits (e.g. 71234567,
+    // 03123456). The input itself is restricted to exactly 8 numeric
+    // characters (see the 'input' listener below), so this just confirms
+    // nothing slipped through with the wrong length.
     function isValidLebanesePhone(phone) {
         if (!phone) return false;
-        let digits = phone.replace(/[\s\-()]/g, '');
-        digits = digits.replace(/^\+961/, '').replace(/^00961/, '').replace(/^961/, '');
-        if (digits.startsWith('0')) digits = digits.substring(1);
-        return /^(3\d{6}|7\d{7}|8\d{7}|9\d{7})$/.test(digits);
+        const digits = phone.replace(/\D/g, '');
+        return /^\d{8}$/.test(digits);
+    }
+
+    // Gets the most precise GPS fix practical from a mobile browser.
+    // A single getCurrentPosition() call is often resolved from cell/WiFi
+    // triangulation (can be off by hundreds of meters to a couple of km).
+    // Real GPS chips take a few seconds to "warm up" and narrow down, so
+    // instead we watchPosition() and keep the best (lowest-accuracy-number)
+    // fix seen, resolving early once we hit a tight enough radius and
+    // otherwise using whatever's best by the time we hit the deadline.
+    function getAccurateLocation({ onProgress, desiredAccuracyMeters = 20, timeoutMs = 15000 } = {}) {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error('Geolocation not supported'));
+                return;
+            }
+
+            let best = null;
+            let watchId = null;
+            let settled = false;
+
+            const finish = (result, err) => {
+                if (settled) return;
+                settled = true;
+                if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+                clearTimeout(deadline);
+                if (result) resolve(result);
+                else reject(err || new Error('Unable to get location'));
+            };
+
+            const deadline = setTimeout(() => {
+                // Time's up - use the best fix collected so far if it's at
+                // least in a usable ballpark, otherwise fail so the caller
+                // can fall back to manual entry.
+                if (best && best.accuracy <= 100) finish(best);
+                else finish(null, new Error('Location timed out'));
+            }, timeoutMs);
+
+            watchId = navigator.geolocation.watchPosition(pos => {
+                const fix = {
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                    accuracy: pos.coords.accuracy
+                };
+                if (!best || fix.accuracy < best.accuracy) {
+                    best = fix;
+                    if (onProgress) onProgress(fix);
+                }
+                if (fix.accuracy <= desiredAccuracyMeters) {
+                    finish(fix);
+                }
+            }, err => {
+                if (!best) finish(null, err);
+                // If we already have a rough fix, keep waiting for a
+                // better one until the deadline rather than failing outright.
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 0,
+                timeout: timeoutMs
+            });
+        });
     }
 
        function setAddressDisplay(text) {
@@ -6114,6 +6170,22 @@ function updateShopHeaderDisplay(shopData) {
 
     setupOtpInputs(otpInputs, () => verifyOtpBtn.click());
 
+    // Button reads "Continue" while no email has been entered (no code will
+    // be sent), and switches to "Send Verification Code" the moment there's
+    // an email to actually send one to.
+    function updateSendOtpBtnLabel() {
+        if (sendOtpBtn.disabled) return; // don't clobber the "Sending..." state
+        sendOtpBtn.innerHTML = authEmail.value.trim() ? 'Send Verification Code' : 'Continue';
+    }
+    authEmail.addEventListener('input', updateSendOtpBtnLabel);
+
+    // Phone field: digits only, capped at 8 characters (Lebanese local
+    // mobile length), so it's physically impossible to type anything else.
+    authPhone.addEventListener('input', () => {
+        const digitsOnly = authPhone.value.replace(/\D/g, '').slice(0, 8);
+        if (digitsOnly !== authPhone.value) authPhone.value = digitsOnly;
+    });
+
     sendOtpBtn.addEventListener('click', async () => {
         const email = authEmail.value.trim();
         const name = authName.value.trim();
@@ -6161,7 +6233,7 @@ function updateShopHeaderDisplay(shopData) {
         }
         
         sendOtpBtn.disabled = false;
-        sendOtpBtn.innerHTML = 'Send Verification Code';
+        updateSendOtpBtnLabel();
     });
 
    verifyOtpBtn.addEventListener('click', async () => {
@@ -6267,16 +6339,20 @@ function updateShopHeaderDisplay(shopData) {
         selectedAddressMethod = 'location';
         
         if (navigator.geolocation) {
-            showToast('Getting your location...', 'info', 'Please wait');
-            navigator.geolocation.getCurrentPosition(pos => { 
-                currentLocationCoords = {
-                    lat: pos.coords.latitude,
-                    lng: pos.coords.longitude
-                };
-                pendingAddress = `lat:${currentLocationCoords.lat.toFixed(6)}, lng:${currentLocationCoords.lng.toFixed(6)}`;
-                showToast('Location captured successfully', 'success', 'Location Found');
-            }, error => {
-                showToast('Unable to get location. Please enter manually.', 'error');
+            showToast('Getting your precise location...', 'info', 'Please wait');
+            getAccurateLocation({
+                desiredAccuracyMeters: 20,
+                timeoutMs: 15000,
+                onProgress: (fix) => {
+                    currentLocationCoords = { lat: fix.lat, lng: fix.lng };
+                    pendingAddress = `lat:${fix.lat.toFixed(6)}, lng:${fix.lng.toFixed(6)}`;
+                }
+            }).then(fix => {
+                currentLocationCoords = { lat: fix.lat, lng: fix.lng };
+                pendingAddress = `lat:${fix.lat.toFixed(6)}, lng:${fix.lng.toFixed(6)}`;
+                showToast(`Location captured (±${Math.round(fix.accuracy)}m)`, 'success', 'Location Found');
+            }).catch(() => {
+                showToast('Unable to get an accurate location. Please enter manually.', 'error');
                 enterManualAddressOption.click();
             });
         } else {
@@ -8304,6 +8380,8 @@ async function showProductDetail(p) {
         authEmail.value = '';
         authName.value = '';
         authPhone.value = '';
+        sendOtpBtn.disabled = false;
+        updateSendOtpBtnLabel();
         
         openPanel(authPanel); 
     }
@@ -8398,15 +8476,15 @@ async function showProductDetail(p) {
     // Address functions
     document.getElementById('getLocationBtn').addEventListener('click', () => {
         if(navigator.geolocation) {
-            showToast('Getting your location...', 'info', 'Please wait');
-            navigator.geolocation.getCurrentPosition(pos => { 
-                const lat = pos.coords.latitude; const lng = pos.coords.longitude;
+            showToast('Getting your precise location...', 'info', 'Please wait');
+            getAccurateLocation({ desiredAccuracyMeters: 20, timeoutMs: 15000 }).then(fix => {
+                const lat = fix.lat; const lng = fix.lng;
                 const addr = `lat:${lat.toFixed(6)}, lng:${lng.toFixed(6)}`;
                 setAddressDisplay(addr);
                 window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
-                showToast('Location captured successfully', 'success', 'Location Found');
-            }, error => {
-                showToast('Unable to get location. Please enter manually.', 'error');
+                showToast(`Location captured (±${Math.round(fix.accuracy)}m)`, 'success', 'Location Found');
+            }).catch(() => {
+                showToast('Unable to get an accurate location. Please enter manually.', 'error');
             });
         } else showToast('Geolocation not supported', 'error');
     });
