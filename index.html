@@ -1231,19 +1231,21 @@
         
         .cart-badge { 
             position: absolute;
-            top: 2px;
-            right: 8px;
+            top: 1px;
+            right: 6px;
             background: var(--secondary);
             color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
+            border-radius: 999px;
+            min-width: 21px;
+            height: 21px;
+            padding: 0 5px;
+            font-size: 0.74rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
             border: 2px solid white;
+            box-sizing: border-box;
         }
         
         .connect-badge {
@@ -3719,14 +3721,16 @@
                other nav items. */
             .bottom-nav-item .cart-badge {
                 position: absolute;
-                top: -8px;
+                top: -9px;
                 left: calc(50% + 9px);
                 right: auto;
                 transform: translateX(-50%);
-                width: 16px;
-                height: 16px;
-                font-size: 0.65rem;
+                min-width: 19px;
+                height: 19px;
+                padding: 0 4px;
+                font-size: 0.68rem;
                 border-width: 1.5px;
+                box-sizing: border-box;
             }
 
             .bottom-nav-item .connect-badge {
@@ -6932,6 +6936,20 @@ async function showProductDetail(p) {
     document.getElementById('navCart').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); setActiveNavItem('navCart'); openCart(); });
     document.getElementById('navHome').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); setActiveNavItem('navHome'); });
     document.getElementById('navSearch').addEventListener('click', (e) => { e.preventDefault(); closeAllPanels(); setActiveNavItem('navSearch'); searchInput.focus(); });
+
+    // Search has no panel/backdrop of its own (it's just the always-visible
+    // input up top), so "click outside closes it" means: once the input
+    // loses focus, drop the Search tab's active state back to Home - same
+    // end result as clicking outside Cart/Settings. The small delay lets a
+    // click on the search button itself register first, so it doesn't
+    // flicker back to Home before that click's own handler runs.
+    searchInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            if (panelStack.length === 0 && document.activeElement !== searchInput) {
+                setActiveNavItem('navHome');
+            }
+        }, 150);
+    });
 
     // Account items
     document.getElementById('accountInfoItem').addEventListener('click',()=>{ closePanel(accountPanel); openPanel(accountInfoPanel); });
