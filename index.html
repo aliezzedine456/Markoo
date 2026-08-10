@@ -3742,6 +3742,14 @@
                 font-size: 18px;
             }
 
+            /* The standalone "Connect With Us" button now lives above the
+               Filters section, so the compact nav-row entry (between Search
+               and Cart) is redundant on desktop and hidden here; mobile
+               keeps it in the bottom tab bar as normal. */
+            #navConnect {
+                display: none !important;
+            }
+
             .bottom-nav-item .nav-icon-svg {
                 width: 19px;
                 height: 19px;
@@ -5956,7 +5964,6 @@ function updateShopHeaderDisplay(shopData) {
                     <div class="link-icon-badge"><i class="fab fa-whatsapp"></i></div>
                     <div class="link-text">
                         <div>WhatsApp</div>
-                        <small class="link-value">${shopData.ownerPhone}</small>
                     </div>
                     <i class="fas fa-chevron-right link-chevron"></i>
                 </a>
@@ -5969,7 +5976,6 @@ function updateShopHeaderDisplay(shopData) {
                     <div class="link-icon-badge"><i class="fab fa-instagram"></i></div>
                     <div class="link-text">
                         <div>Instagram</div>
-                        <small class="link-value">@${shopData.instagram.split('/').pop() || 'username'}</small>
                     </div>
                     <i class="fas fa-chevron-right link-chevron"></i>
                 </a>
@@ -5982,7 +5988,6 @@ function updateShopHeaderDisplay(shopData) {
                     <div class="link-icon-badge"><i class="fab fa-tiktok"></i></div>
                     <div class="link-text">
                         <div>TikTok</div>
-                        <small class="link-value">@${shopData.tiktok.split('/').pop() || 'username'}</small>
                     </div>
                     <i class="fas fa-chevron-right link-chevron"></i>
                 </a>
