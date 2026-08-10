@@ -4662,6 +4662,17 @@
   </div>
   <div class="sidebar-filters" id="sidebarFilters">
     <div class="sidebar-filters-title">Filters <a class="sidebar-filters-clear" id="sidebarFiltersClear">Clear</a></div>
+    <div class="sidebar-filter-group">
+        <div class="sidebar-filter-group-label">Sort By</div>
+        <select class="form-control" id="sidebarSortSelect">
+            <option value="">Relevance</option>
+            <option value="bestselling">Best Selling</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="newest">Newest</option>
+            <option value="name_asc">Name: A to Z</option>
+        </select>
+    </div>
     <div class="sidebar-filter-group" id="sidebarCategoryGroup" style="display:none;">
         <div class="sidebar-filter-group-label">Category</div>
         <div id="sidebarCategoryList"></div>
@@ -6498,11 +6509,15 @@ function updateShopHeaderDisplay(shopData) {
         const selectedCats = Array.from(document.querySelectorAll('.sidebar-cat-checkbox:checked')).map(cb => cb.value);
         const minVal = parseFloat(document.getElementById('sidebarPriceMin')?.value);
         const maxVal = parseFloat(document.getElementById('sidebarPriceMax')?.value);
+        const sortVal = document.getElementById('sidebarSortSelect')?.value || '';
 
         let filtered = products.slice();
         if (selectedCats.length > 0) filtered = filtered.filter(p => selectedCats.includes(p.categoryId));
         if (!isNaN(minVal)) filtered = filtered.filter(p => (p.price || 0) >= minVal);
         if (!isNaN(maxVal)) filtered = filtered.filter(p => (p.price || 0) <= maxVal);
+
+        const comparator = getSidebarSortComparator(sortVal);
+        if (comparator) filtered.sort(comparator);
 
         categorySections.style.display = 'none';
         if (filtered.length === 0) {
@@ -6515,6 +6530,39 @@ function updateShopHeaderDisplay(shopData) {
         }
     }
 
+    // Looks for a "units sold" style figure under whichever field name the
+    // admin dashboard happens to track it as - falls back to 0 (treated as
+    // "unranked") if the product has no sales data recorded at all.
+    function getSidebarProductSoldCount(p) {
+        return p.soldCount || p.salesCount || p.totalSold || p.unitsSold || p.orderCount || p.purchaseCount || 0;
+    }
+
+    function getSidebarProductCreatedTime(p) {
+        const t = p.createdAt;
+        if (!t) return 0;
+        if (typeof t.toMillis === 'function') return t.toMillis(); // Firestore Timestamp
+        if (typeof t.seconds === 'number') return t.seconds * 1000;
+        const d = new Date(t);
+        return isNaN(d.getTime()) ? 0 : d.getTime();
+    }
+
+    function getSidebarSortComparator(sortVal) {
+        switch (sortVal) {
+            case 'bestselling':
+                return (a, b) => getSidebarProductSoldCount(b) - getSidebarProductSoldCount(a);
+            case 'price_desc':
+                return (a, b) => (b.price || 0) - (a.price || 0);
+            case 'price_asc':
+                return (a, b) => (a.price || 0) - (b.price || 0);
+            case 'newest':
+                return (a, b) => getSidebarProductCreatedTime(b) - getSidebarProductCreatedTime(a);
+            case 'name_asc':
+                return (a, b) => (a.name || '').localeCompare(b.name || '');
+            default:
+                return null;
+        }
+    }
+
     function clearSidebarFilters() {
         closeAllPanels();
         setActiveNavItem('navHome');
@@ -6522,8 +6570,10 @@ function updateShopHeaderDisplay(shopData) {
         document.querySelectorAll('.sidebar-cat-checkbox').forEach(cb => cb.checked = false);
         const minEl = document.getElementById('sidebarPriceMin');
         const maxEl = document.getElementById('sidebarPriceMax');
+        const sortEl = document.getElementById('sidebarSortSelect');
         if (minEl) minEl.value = '';
         if (maxEl) maxEl.value = '';
+        if (sortEl) sortEl.value = '';
         noProducts.style.display = 'none';
         if (categories.length > 0) {
             categorySections.style.display = 'block';
@@ -6537,6 +6587,7 @@ function updateShopHeaderDisplay(shopData) {
 
     document.getElementById('sidebarFiltersApply')?.addEventListener('click', applySidebarFilters);
     document.getElementById('sidebarFiltersClear')?.addEventListener('click', (e) => { e.preventDefault(); clearSidebarFilters(); });
+    document.getElementById('sidebarSortSelect')?.addEventListener('change', applySidebarFilters);
 
     function renderCategories() {
         let html = ''; 
