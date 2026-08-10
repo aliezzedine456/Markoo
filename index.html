@@ -829,7 +829,6 @@
             width: 100%; 
             height: 140px; 
             object-fit: cover; 
-            will-change: transform;
             background: var(--gray-100);
             transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
@@ -894,7 +893,6 @@
             width: 100%;
             position: relative;
             box-sizing: border-box;
-            will-change: transform;
         }
         
         .product-card:hover {
@@ -921,7 +919,6 @@
             height: 100%; 
             object-fit: cover; 
             transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            will-change: transform;
         }
         
         .product-card:active .product-img { 
@@ -989,9 +986,13 @@
             height: 32px;
             padding: 0;
             margin: 0;
-            background: rgba(255,255,255,0.82);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            backdrop-filter: blur(20px) saturate(180%);
+            /* Solid near-opaque background instead of a per-card
+               backdrop-filter blur. A blur filter on every single "+"
+               button in a grid of dozens of products is very GPU-heavy on
+               phones, and was a major contributor to cards/buttons
+               intermittently failing to repaint (going invisible) during
+               fast scrolling on iOS Safari. */
+            background: rgba(255,255,255,0.94);
             color: var(--ios-label); 
             border: none; 
             border-radius: 50%; 
@@ -3112,6 +3113,25 @@
             font-size: 1.5rem;
             color: var(--primary-color);
             margin-right: 12px;
+        }
+
+        /* When the address-option is styled as a .list-item (sign-up's
+           delivery-address step), swap the plain border/background above
+           for the same selected treatment used elsewhere, and swap the
+           chevron for a checkmark. */
+        .list-item.address-option i {
+            font-size: inherit;
+            color: inherit;
+            margin-right: 0;
+        }
+        .list-item.address-option.selected {
+            background: rgba(79,109,122,0.06);
+        }
+        .list-item.address-option.selected .fa-chevron-right {
+            display: none;
+        }
+        .list-item.address-option:not(.selected) .addr-selected-check {
+            display: none !important;
         }
         
         .manual-address-inputs {
@@ -5239,13 +5259,9 @@
     
     <div id="authStep1" class="p-4">
         <div class="text-center mb-4">
-            <i class="fas fa-envelope fa-3x" style="color: var(--primary-color);"></i>
-            <h5 class="mt-3">Enter your email</h5>
-            <p class="text-muted">We'll send a verification code</p>
-        </div>
-        <div class="mb-3">
-            <label>Email Address</label>
-            <input type="email" class="form-control" id="authEmail" placeholder="your@email.com">
+            <i class="fas fa-user fa-3x" style="color: var(--primary-color);"></i>
+            <h5 class="mt-3">Create your account</h5>
+            <p class="text-muted">Name and phone are required to order</p>
         </div>
         <div class="mb-3">
             <label>Full Name <span class="text-danger">*</span></label>
@@ -5253,8 +5269,13 @@
         </div>
         <div class="mb-3">
             <label>Phone Number <span class="text-danger">*</span></label>
-            <input type="tel" class="form-control" id="authPhone" placeholder="e.g., 76647488" required>
-            <small class="text-muted">Required for order updates</small>
+            <input type="tel" class="form-control" id="authPhone" placeholder="e.g., 76 647 488" required>
+            <small class="text-muted">Required for order updates. Lebanese number only.</small>
+        </div>
+        <div class="mb-3">
+            <label>Email Address <span class="text-muted" style="font-weight:400;">(optional)</span></label>
+            <input type="email" class="form-control" id="authEmail" placeholder="your@email.com">
+            <small class="text-muted" id="authEmailHint">Without an email, you won't be able to view your order tracking link.</small>
         </div>
         <button class="btn-dark w-100" id="sendOtpBtn">Send Verification Code</button>
     </div>
@@ -5280,27 +5301,35 @@
     <div id="authStep3" class="p-4" style="display: none;">
         <div class="text-center mb-4">
             <i class="fas fa-map-marker-alt fa-3x" style="color: var(--primary-color);"></i>
-            <h5 class="mt-3">Select your address</h5>
-            <p class="text-muted">Choose how to set your delivery address</p>
+            <h5 class="mt-3">Set your delivery address</h5>
+            <p class="text-muted">Required so we know where to deliver your orders</p>
         </div>
-        
-        <div class="address-option" id="useCurrentLocationOption">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-location-arrow"></i>
-                <div>
-                    <h6 class="mb-1">Use Current Location</h6>
-                    <small class="text-muted">Get your current GPS coordinates</small>
+
+        <!-- Same list-item / icon-badge pattern as the account "Delivery
+             Address" panel, so the two location pickers in the app look
+             and behave identically. -->
+        <div class="settings-group mb-3">
+            <div class="list-item addr-method-row address-option" id="useCurrentLocationOption">
+                <div class="left">
+                    <span class="list-icon-badge" style="background:rgba(79,109,122,0.12); color:var(--accent);"><i class="fas fa-location-arrow"></i></span>
+                    <div>
+                        <div class="method-title">Use current location</div>
+                        <div class="method-sub">Auto-detect with GPS</div>
+                    </div>
                 </div>
+                <i class="fas fa-check-circle addr-selected-check" style="display:none; color: var(--accent);"></i>
+                <i class="fas fa-chevron-right"></i>
             </div>
-        </div>
-        
-        <div class="address-option" id="enterManualAddressOption">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-pen"></i>
-                <div>
-                    <h6 class="mb-1">Enter Address Manually</h6>
-                    <small class="text-muted">Type your full address</small>
+            <div class="list-item addr-method-row address-option" id="enterManualAddressOption">
+                <div class="left">
+                    <span class="list-icon-badge" style="background:rgba(79,109,122,0.12); color:var(--accent);"><i class="fas fa-pen"></i></span>
+                    <div>
+                        <div class="method-title">Enter manually</div>
+                        <div class="method-sub">Type your full address</div>
+                    </div>
                 </div>
+                <i class="fas fa-check-circle addr-selected-check" style="display:none; color: var(--accent);"></i>
+                <i class="fas fa-chevron-right"></i>
             </div>
         </div>
         
@@ -5324,7 +5353,6 @@
         </div>
         
         <button class="btn-dark w-100 mt-3" id="completeSignupBtn">Complete Sign Up</button>
-        <button class="btn btn-link w-100 mt-2" id="skipAddressBtn">Skip for now</button>
     </div>
 </div>
 
@@ -5544,7 +5572,6 @@
     const signupManualArea = document.getElementById('signupManualArea');
     const signupManualDetails = document.getElementById('signupManualDetails');
     const completeSignupBtn = document.getElementById('completeSignupBtn');
-    const skipAddressBtn = document.getElementById('skipAddressBtn');
 
     // Checkout elements
     const checkoutSection = document.getElementById('checkoutSection');
@@ -5674,6 +5701,20 @@
             phone = '+961' + phone;
         }
         return phone;
+    }
+
+    // Lebanese mobile numbers: 7 or 8 local digits (after stripping a
+    // leading 0, +961, or 00961), starting with a real Lebanese mobile
+    // prefix (03/70/71/76/78/79/81/76 etc). This is intentionally a bit
+    // permissive on the exact prefix list rather than exhaustive, since
+    // carriers occasionally open new ranges - the goal is to catch obvious
+    // typos/garbage input, not to be a strict carrier lookup.
+    function isValidLebanesePhone(phone) {
+        if (!phone) return false;
+        let digits = phone.replace(/[\s\-()]/g, '');
+        digits = digits.replace(/^\+961/, '').replace(/^00961/, '').replace(/^961/, '');
+        if (digits.startsWith('0')) digits = digits.substring(1);
+        return /^(3\d{6}|7\d{7}|8\d{7}|9\d{7})$/.test(digits);
     }
 
        function setAddressDisplay(text) {
@@ -6078,16 +6119,33 @@ function updateShopHeaderDisplay(shopData) {
         const name = authName.value.trim();
         const phone = authPhone.value.trim();
         
-        if (!email) {
-            showToast('Please enter your email', 'warning', 'Missing Information');
-            return;
-        }
         if (!name) {
             showToast('Please enter your name', 'warning', 'Missing Information');
             return;
         }
         if (!phone) {
             showToast('Please enter your phone number', 'warning', 'Missing Information');
+            return;
+        }
+        if (!isValidLebanesePhone(phone)) {
+            showToast('Please enter a valid Lebanese phone number', 'warning', 'Invalid Phone');
+            return;
+        }
+        
+        // Email is optional. Without one there's no address to send a
+        // verification code to, so skip straight to the address step -
+        // the account is created without email verification, and the
+        // person is told up front (via the hint under the field) that
+        // skipping email means no order-tracking link.
+        if (!email) {
+            pendingEmail = '';
+            pendingName = name;
+            pendingPhone = phone;
+            authStep1.style.display = 'none';
+            authStep3.style.display = 'block';
+            document.querySelectorAll('.address-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelectorAll('.addr-selected-check').forEach(chk => chk.style.display = 'none');
+            manualAddressSignup.style.display = 'none';
             return;
         }
         
@@ -6201,7 +6259,9 @@ function updateShopHeaderDisplay(shopData) {
 });
     useCurrentLocationOption.addEventListener('click', () => {
         document.querySelectorAll('.address-option').forEach(opt => opt.classList.remove('selected'));
+        document.querySelectorAll('.addr-selected-check').forEach(chk => chk.style.display = 'none');
         useCurrentLocationOption.classList.add('selected');
+        useCurrentLocationOption.querySelector('.addr-selected-check') && (useCurrentLocationOption.querySelector('.addr-selected-check').style.display = 'inline-block');
         enterManualAddressOption.classList.remove('selected');
         manualAddressSignup.style.display = 'none';
         selectedAddressMethod = 'location';
@@ -6227,13 +6287,19 @@ function updateShopHeaderDisplay(shopData) {
 
     enterManualAddressOption.addEventListener('click', () => {
         document.querySelectorAll('.address-option').forEach(opt => opt.classList.remove('selected'));
+        document.querySelectorAll('.addr-selected-check').forEach(chk => chk.style.display = 'none');
         enterManualAddressOption.classList.add('selected');
+        enterManualAddressOption.querySelector('.addr-selected-check') && (enterManualAddressOption.querySelector('.addr-selected-check').style.display = 'inline-block');
         useCurrentLocationOption.classList.remove('selected');
         manualAddressSignup.style.display = 'block';
         selectedAddressMethod = 'manual';
     });
 
     completeSignupBtn.addEventListener('click', async () => {
+        if (!selectedAddressMethod) {
+            showToast('Please choose how to set your delivery address', 'warning', 'Address Required');
+            return;
+        }
         if (selectedAddressMethod === 'manual') {
             const street = signupManualStreet.value;
             const city = signupManualCity.value;
@@ -6285,42 +6351,6 @@ function updateShopHeaderDisplay(shopData) {
         } finally {
             completeSignupBtn.disabled = false;
             completeSignupBtn.innerHTML = 'Complete Sign Up';
-        }
-    });
-
-    skipAddressBtn.addEventListener('click', async () => {
-        try {
-            skipAddressBtn.disabled = true;
-            skipAddressBtn.innerHTML = '<span class="btn-spinner"></span> Creating...';
-            
-            const userData = {
-                name: pendingName,
-                email: pendingEmail,
-                phone: formatPhoneNumber(pendingPhone),
-                address: '',
-                favorites: [],
-                orders: [],
-                createdAt: new Date().toISOString()
-            };
-            
-            const docRef = await addDoc(collection(db, 'users'), userData);
-            userData.id = docRef.id;
-            
-            userProfile = userData;
-            currentUser = { email: pendingEmail, uid: docRef.id };
-            setUser(userData);
-            
-            localStorage.setItem('userProfile', JSON.stringify(userData));
-            
-            closeAllPanels();
-            showToast(`Welcome, ${userData.name}! You can add your address later.`, 'success', 'Account Created');
-            
-        } catch (error) {
-            console.error('Error creating user:', error);
-            showToast('Error creating account', 'error');
-        } finally {
-            skipAddressBtn.disabled = false;
-            skipAddressBtn.innerHTML = 'Skip for now';
         }
     });
 
