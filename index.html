@@ -2907,31 +2907,55 @@
            there's a visible gap to the surrounding bg box and to each
            other, with a touch more height to compensate. */
         #authStep3 .settings-group {
-            padding: 6px;
+            padding: 0;
             overflow: visible;
+            background: transparent;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
         #authStep3 .addr-method-row {
-            padding: 20px 18px;
-            margin: 0 6px;
+            padding: 16px 16px;
+            margin: 0;
             border-bottom: none;
-            border-radius: 12px;
-            background: var(--gray-100);
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: var(--ios-shadow);
+            border: 1.5px solid transparent;
+            transition: var(--transition);
+        }
+        #authStep3 .addr-method-row:active {
+            transform: scale(0.98);
+            background: #ffffff;
+        }
+        #authStep3 .addr-method-row.selected {
+            border-color: var(--accent);
+            background: rgba(79,109,122,0.06);
+        }
+        #authStep3 .addr-method-row .left {
+            gap: 14px;
         }
         #authStep3 .addr-method-row .list-icon-badge {
-            width: 46px;
-            height: 46px;
+            width: 42px;
+            height: 42px;
             border-radius: 12px;
-            font-size: 1.15rem;
-            background: transparent !important;
+            font-size: 1.05rem;
+            background: var(--brand-gradient) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 10px -3px rgba(79,109,122,0.5);
         }
         #authStep3 .addr-method-row .method-title {
-            font-size: 1rem;
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: var(--ios-label);
         }
         #authStep3 .addr-method-row .method-sub {
             font-size: 0.82rem;
+            color: var(--ios-secondary-label);
+        }
+        #authStep3 .addr-method-row > i.fa-chevron-right {
+            color: var(--ios-gray3);
+            font-size: 0.8rem;
         }
 
         /* Sticky action bar pinned to the bottom of the panel, always
