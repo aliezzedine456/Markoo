@@ -4395,6 +4395,126 @@
             .stats-card, .settings-group { margin-left: 4px; margin-right: 4px; }
         }
 
+        /* ======================================================================
+           SEARCH BAR — richer interactivity: glow-in focus ring, icon
+           motion, animated placeholder color, and a proper iOS-style
+           "clear" (⊗) button that fades/pops in once there's text, purely
+           via :placeholder-shown so it never needs extra JS state.
+           ====================================================================== */
+        .search-wrapper, .cat-search-wrapper {
+            transform-origin: center;
+            transition: background 0.25s ease, box-shadow 0.3s var(--ios-spring), transform 0.3s var(--ios-spring);
+        }
+        .search-wrapper:focus-within, .cat-search-wrapper:focus-within {
+            transform: scale(1.012);
+            animation: iosSearchGlow 1.8s ease-in-out infinite;
+        }
+        @keyframes iosSearchGlow {
+            0%, 100% { box-shadow: 0 0 0 3px rgba(79,109,122,0.22), 0 1px 2px rgba(0,0,0,0.04); }
+            50% { box-shadow: 0 0 0 5px rgba(79,109,122,0.14), 0 1px 2px rgba(0,0,0,0.04); }
+        }
+        .search-wrapper i.fa-search, .cat-search-wrapper i.fa-search {
+            transition: color 0.25s ease, transform 0.35s var(--ios-tap);
+        }
+        .search-wrapper:focus-within i.fa-search, .cat-search-wrapper:focus-within i.fa-search {
+            color: var(--accent) !important;
+            transform: scale(1.08);
+        }
+        .search-wrapper input, .cat-search-wrapper input {
+            transition: letter-spacing 0.2s ease;
+        }
+
+        .search-clear-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: transparent;
+            color: var(--ios-gray3);
+            font-size: 17px;
+            flex-shrink: 0;
+            margin: 0 2px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: transform 0.18s var(--ios-tap), color 0.2s ease;
+            animation: iosClearPop 0.22s var(--ios-tap);
+        }
+        .search-clear-btn:active { transform: scale(0.8); color: var(--ios-gray); }
+        @keyframes iosClearPop { from { opacity: 0; transform: scale(0.5) rotate(-45deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+        /* Show the clear button only once the field actually has a value -
+           :placeholder-shown is false exactly when there's text, no JS
+           state needed to keep it in sync. */
+        .search-wrapper input:not(:placeholder-shown) ~ .search-clear-btn,
+        .cat-search-wrapper input:not(:placeholder-shown) ~ .search-clear-btn {
+            display: flex;
+        }
+        .cat-search-wrapper .search-clear-btn { margin-right: 4px; }
+
+        /* Search submit button gets a tiny magnifier "press" motion and a
+           faint ripple-style pulse the first time it's revealed so it reads
+           as tappable rather than decorative. */
+        .search-wrapper button:not(.search-clear-btn) {
+            transition: transform 0.18s var(--ios-tap), background 0.2s ease, box-shadow 0.2s ease !important;
+        }
+        .search-wrapper button:not(.search-clear-btn):active {
+            transform: scale(0.88) !important;
+        }
+
+        /* ======================================================================
+           CATEGORY CIRCLES — Apple "Stories"/App-icon style avatars: soft
+           resting shadow with a faint ring, a two-tone gradient ring plus a
+           real white gap when selected (matches iOS Photos/Instagram-style
+           selection rings), a glassy top highlight, and a springier press.
+           ====================================================================== */
+        .category-item { padding: 2px; }
+        .category-circle {
+            position: relative;
+            border: none !important;
+            background: var(--ios-card-bg) !important;
+            box-shadow:
+                0 0 0 1px var(--ios-gray5),
+                0 2px 6px rgba(0,0,0,0.05),
+                0 8px 18px -10px rgba(0,0,0,0.12) !important;
+            transition: box-shadow 0.3s var(--ios-spring), transform 0.3s var(--ios-tap) !important;
+        }
+        /* glassy top-light sheen, like a native app icon */
+        .category-circle::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(160deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 42%);
+            pointer-events: none;
+        }
+        .category-item:hover .category-circle { transform: translateY(-2px); }
+        .category-item:active .category-circle { transform: scale(0.92) !important; }
+
+        .category-circle.active {
+            background: var(--ios-card-bg) !important;
+            border: none !important;
+            transform: scale(1) !important;
+            /* white gap ring + gradient ring, iOS "story" style selection */
+            box-shadow:
+                0 0 0 3px var(--ios-card-bg),
+                0 0 0 5.5px var(--brand-2),
+                0 6px 16px -6px rgba(79,109,122,0.55) !important;
+            animation: iosRingPop 0.4s var(--ios-tap);
+        }
+        @keyframes iosRingPop {
+            0% { box-shadow: 0 0 0 3px var(--ios-card-bg), 0 0 0 3px var(--brand-2), 0 6px 16px -6px rgba(79,109,122,0.4); }
+            60% { box-shadow: 0 0 0 3px var(--ios-card-bg), 0 0 0 6.5px var(--brand-2), 0 6px 16px -6px rgba(79,109,122,0.6); }
+            100% { box-shadow: 0 0 0 3px var(--ios-card-bg), 0 0 0 5.5px var(--brand-2), 0 6px 16px -6px rgba(79,109,122,0.55); }
+        }
+        .category-name {
+            transition: color 0.25s ease, font-weight 0.25s ease;
+        }
+        .category-item:has(.category-circle.active) .category-name {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
         /* ---- Respect reduced motion ---- */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
@@ -4465,6 +4585,7 @@
     <div class="search-wrapper mb-2">
         <i class="fas fa-search"></i>
         <input type="text" id="searchInput" placeholder="Search products...">
+        <button type="button" class="search-clear-btn" id="searchClearBtn" aria-label="Clear search"><i class="fas fa-circle-xmark"></i></button>
         <button id="searchBtn">Search</button>
     </div>
     
@@ -4608,6 +4729,7 @@
     <div class="cat-search-wrapper">
         <i class="fas fa-search"></i>
         <input type="text" id="categorySearchInput" placeholder="Search in this category...">
+        <button type="button" class="search-clear-btn" id="categorySearchClearBtn" aria-label="Clear search"><i class="fas fa-circle-xmark"></i></button>
     </div>
     <div id="categoryProductsArea">
         <div id="categoryLoadingPlaceholder" style="display: none;" class="loader-wrap">
@@ -7884,6 +8006,14 @@ async function showProductDetail(p) {
             if (catId) loadCategoryProducts(catId, e.target.value);
         });
     }
+    const categorySearchClearBtn = document.getElementById('categorySearchClearBtn');
+    if (categorySearchClearBtn && categorySearchInput) {
+        categorySearchClearBtn.addEventListener('click', () => {
+            categorySearchInput.value = '';
+            categorySearchInput.dispatchEvent(new Event('input'));
+            categorySearchInput.focus();
+        });
+    }
 
     function filterSearch() {
         let term = searchInput.value.toLowerCase();
@@ -7904,6 +8034,14 @@ async function showProductDetail(p) {
     }
     searchBtn.addEventListener('click', filterSearch);
     searchInput.addEventListener('input', filterSearch);
+    const searchClearBtn = document.getElementById('searchClearBtn');
+    if (searchClearBtn) {
+        searchClearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            filterSearch();
+            searchInput.focus();
+        });
+    }
 
     if (addToCartDetailBtn) {
         addToCartDetailBtn.addEventListener('click', ()=>{ 
