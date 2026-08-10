@@ -7352,6 +7352,11 @@ function updateShopHeaderDisplay(shopData) {
    async function renderProducts(arr) {
     if (!productsGrid) return;
     productsGrid.innerHTML = '';
+    // Build every card in an off-screen fragment and append once. Appending
+    // cards one-by-one straight into the live grid forces the browser to
+    // recalculate layout on every single insert, which is what made larger
+    // catalogs feel heavy/laggy to render.
+    const fragment = document.createDocumentFragment();
     for (let p of arr) {
         const img = (p.imageUrls && p.imageUrls[0]) || p.imageUrl || '';
         const card = document.createElement('div');
@@ -7406,7 +7411,7 @@ function updateShopHeaderDisplay(shopData) {
         const addBtn = card.querySelector('.add-to-cart-btn');
         addBtn.addEventListener('click', (e) => { e.stopPropagation(); addToCart(p); });
         card.addEventListener('click', () => showProductDetail(p));
-        productsGrid.appendChild(card);
+        fragment.appendChild(card);
         
         const imgElement = card.querySelector('.product-img');
         if (imgElement && img) {
@@ -7415,6 +7420,7 @@ function updateShopHeaderDisplay(shopData) {
             };
         }
     }
+    productsGrid.appendChild(fragment);
 }
 
     function escapeHtml(text) {
@@ -7606,6 +7612,11 @@ async function showProductDetail(p) {
     // spinner stays centered instead of jumping to the left)
     if (detailLoadingPlaceholder) detailLoadingPlaceholder.style.display = 'flex';
     if (detailActualContent) detailActualContent.style.display = 'none';
+    
+    // Open the panel immediately so the person sees the loading spinner the
+    // instant they tap a product, instead of the UI appearing to do nothing
+    // for a beat while data loads in the background.
+    openPanel(detailPanel);
     
     currentProduct = p;
     
@@ -7994,43 +8005,56 @@ async function showProductDetail(p) {
         } 
     };
     
-    // Similar products loading
-    if (p.categoryId) {
-        try {
-            const q = query(collection(db,'products'), where('shopId','==',shopId), where('categoryId','==',p.categoryId), where('active','==',true), limit(10));
-            const snap = await getDocs(q);
-            let similar = [];
-            snap.forEach(d=>{ 
-                const data=d.data(); 
-                if(data.price) data.price=parseFloat(data.price); 
-                if(d.id !== p.id) similar.push({id:d.id, ...data}); 
-            });
-            let similarHtml = '';
-            similar.forEach(sp => {
-                const img = (sp.imageUrls && sp.imageUrls[0]) || sp.imageUrl || 'https://placehold.co/120';
-                similarHtml += `<div class="similar-card" data-product-id="${sp.id}"><div class="similar-img-wrap"><img src="${img}" class="similar-img" loading="lazy" decoding="async"></div><div class="similar-name">${escapeHtml(sp.name)}</div><div class="similar-price">$${(sp.price||0).toFixed(2)}</div></div>`;
-            });
-            similarContainer.innerHTML = similarHtml || '<p class="text-muted">No similar products</p>';
-            similarContainer.querySelectorAll('.similar-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const prodId = card.dataset.productId;
-                    const prod = similar.find(s => s.id === prodId) || products.find(p=>p.id===prodId);
-                    if(prod) showProductDetail(prod);
-                });
-            });
-        } catch (error) {
-            console.error('Error loading similar products:', error);
-            similarContainer.innerHTML = '<p class="text-muted">Unable to load similar products</p>';
-        }
-    } else {
-        similarContainer.innerHTML = '';
-    }
-    
-    // Hide loading, show content
+    // Hide loading, show content. This used to happen AFTER the "similar
+    // products" fetch below finished, so the whole panel sat frozen on the
+    // spinner until that extra network round-trip completed - the moment it
+    // finally did, the gallery image (already downloaded in the background
+    // while we waited) would pop straight to fully-visible/animated, which
+    // is what looked like a fast "flash". Revealing the content immediately
+    // means the person sees the real gallery skeleton -> image fade-in as
+    // it actually happens, and the panel never appears to hang.
     if (detailLoadingPlaceholder) detailLoadingPlaceholder.style.display = 'none';
     if (detailActualContent) detailActualContent.style.display = 'block';
     
-    openPanel(detailPanel);
+    // Similar products loading - runs in the background and fills itself in
+    // whenever it's ready, instead of blocking the whole detail view.
+    if (p.categoryId) {
+        similarContainer.innerHTML = '<div class="loader-wrap" style="min-height:110px;"><div class="circular-loader"></div></div>';
+        (async () => {
+            try {
+                const q = query(collection(db,'products'), where('shopId','==',shopId), where('categoryId','==',p.categoryId), where('active','==',true), limit(10));
+                const snap = await getDocs(q);
+                // If the person already moved on to a different product
+                // while this was in flight, don't overwrite their new view.
+                if (sessionId !== currentDetailSession) return;
+                let similar = [];
+                snap.forEach(d=>{ 
+                    const data=d.data(); 
+                    if(data.price) data.price=parseFloat(data.price); 
+                    if(d.id !== p.id) similar.push({id:d.id, ...data}); 
+                });
+                let similarHtml = '';
+                similar.forEach(sp => {
+                    const img = (sp.imageUrls && sp.imageUrls[0]) || sp.imageUrl || 'https://placehold.co/120';
+                    similarHtml += `<div class="similar-card" data-product-id="${sp.id}"><div class="similar-img-wrap"><img src="${img}" class="similar-img" loading="lazy" decoding="async"></div><div class="similar-name">${escapeHtml(sp.name)}</div><div class="similar-price">$${(sp.price||0).toFixed(2)}</div></div>`;
+                });
+                similarContainer.innerHTML = similarHtml || '<p class="text-muted">No similar products</p>';
+                similarContainer.querySelectorAll('.similar-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const prodId = card.dataset.productId;
+                        const prod = similar.find(s => s.id === prodId) || products.find(p=>p.id===prodId);
+                        if(prod) showProductDetail(prod);
+                    });
+                });
+            } catch (error) {
+                if (sessionId !== currentDetailSession) return;
+                console.error('Error loading similar products:', error);
+                similarContainer.innerHTML = '<p class="text-muted">Unable to load similar products</p>';
+            }
+        })();
+    } else {
+        similarContainer.innerHTML = '';
+    }
 }
     function openCart() { 
         if(!userProfile) { showAuthPanel(); return; } 
