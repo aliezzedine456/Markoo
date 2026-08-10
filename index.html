@@ -424,23 +424,79 @@
             to { transform: rotate(360deg); } 
         }
 
+/* ---- Apple-style page header, sits above the hero banner ---- */
+.page-topbar {
+    width: 100%;
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    padding: max(18px, env(safe-area-inset-top)) 20px 16px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.page-topbar-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.page-topbar-eyebrow {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--ios-secondary-label);
+}
+
+.page-topbar-title {
+    font-size: 2.05rem;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    color: var(--ios-label);
+    line-height: 1.08;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.page-topbar-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ios-fill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ios-label);
+    font-size: 1rem;
+}
+
        .image-banner { 
     width:100%; 
     overflow:visible; 
     margin-bottom:0; 
     position: relative;
-    filter: drop-shadow(0 10px 24px rgba(20,20,30,0.16));
+    padding: 0 20px;
+    box-sizing: border-box;
+    filter: drop-shadow(0 12px 28px rgba(20,20,30,0.14));
 }
 
 .banner-container { 
     position:relative; 
     width:100%; 
+    max-width: var(--max-content-width);
+    margin: 0 auto;
     min-height:60px;
     background: linear-gradient(135deg, #17171a 0%, #232326 55%, #1a1a1d 100%);
     overflow: hidden;
-    border-radius: 0 0 28px 28px;
+    border-radius: 28px;
     isolation: isolate;
-    transition: height 0.3s ease;
+    transition: height 0.3s ease, border-radius 0.3s ease;
 }
 
 /* Ambient gradient-mesh signature, sits behind the image / bar in both
@@ -512,9 +568,9 @@
             bottom:0; 
             left:0; 
             right:0; 
-            background:linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.28) 55%, transparent 100%); 
+            background:linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.22) 60%, transparent 100%); 
             color:white; 
-            padding: 22px max(20px, calc((100% - var(--max-content-width)) / 2 + 20px)) 20px; 
+            padding: 22px 22px 20px; 
             box-sizing: border-box;
             z-index: 3;
         }
@@ -531,24 +587,24 @@
         }
         
         .banner-title h2 {
-            font-size: 1.95rem;
-            font-weight: 700;
+            font-size: 1.9rem;
+            font-weight: 800;
             margin-bottom: 4px;
-            letter-spacing: -0.025em;
+            letter-spacing: -0.03em;
             text-shadow: 0 2px 16px rgba(0,0,0,0.35);
         }
         
         .banner-title p {
             font-size: 0.92rem;
             opacity: 0.88;
-            font-weight: 400;
+            font-weight: 500;
             text-shadow: 0 1px 8px rgba(0,0,0,0.3);
         }
         
         .banner-skeleton { 
             width:100%; 
             height:225px; 
-            border-radius: 0 0 28px 28px;
+            border-radius: 28px;
             background:
                 linear-gradient(120deg, rgba(107,135,148,0.35) 0%, rgba(79,109,122,0.35) 50%, rgba(51,71,79,0.3) 100%),
                 linear-gradient(90deg, rgba(255,255,255,0.12) 25%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.12) 75%);
@@ -985,34 +1041,36 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             padding: 0;
             margin: 0;
-            background: var(--brand-gradient);
-            background-size: 160% 160%;
-            background-position: 0% 50%;
-            color: white; 
+            background: rgba(255,255,255,0.82);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            backdrop-filter: blur(20px) saturate(180%);
+            color: var(--ios-label); 
             border: none; 
             border-radius: 50%; 
-            font-size: 0.95rem; 
-            transition: var(--transition), background-position 0.4s ease; 
+            font-size: 0.85rem; 
+            transition: var(--transition); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-weight: 600;
             cursor: pointer;
             z-index: 3;
-            box-shadow: 0 4px 12px -2px rgba(79,109,122,0.5);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 4px 12px -2px rgba(0,0,0,0.18);
         }
         
         .add-to-cart-btn:hover {
-            background-position: 100% 50%;
-            box-shadow: 0 6px 16px -2px rgba(79,109,122,0.6);
+            background: rgba(255,255,255,0.95);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.14), 0 6px 16px -2px rgba(0,0,0,0.22);
             transform: scale(1.08);
         }
         
         .add-to-cart-btn:active {
+            background: var(--ios-label);
+            color: #fff;
             transform: scale(0.92);
         }
         
@@ -3368,6 +3426,9 @@
                 filter: drop-shadow(0 18px 40px rgba(20,20,30,0.16));
             }
 
+            .page-topbar { padding: 22px 24px 14px; }
+            .page-topbar-title { font-size: 2.3rem; }
+
             .banner-container.has-banner { height: 300px; border-radius: 28px; }
             .banner-container.no-banner { height: 104px; border-radius: 28px; }
             .banner-skeleton { height: 300px; border-radius: 28px; }
@@ -3828,6 +3889,8 @@
             .banner-title h2 { font-size: 1.6rem; }
             .banner-container.has-banner { height: 185px; }
             .banner-container.no-banner { height: 76px; }
+            .page-topbar-title { font-size: 1.7rem; }
+            .page-topbar { padding: 14px 18px 12px; }
         }
 
         /* Respect reduced-motion preferences */
@@ -3856,6 +3919,7 @@
         .banner-title h2,
         .cat-title,
         .cart-hero-title,
+        .page-topbar-title,
         .panel-header {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
             font-weight: 700;
@@ -4545,6 +4609,22 @@
 
 <!-- loading screen -->
 <div class="loading-screen" id="loadingScreen"><div class="loading-circle"></div></div>
+
+<!-- Apple-style page header, sits above the hero banner -->
+<div class="page-topbar" id="pageTopbar">
+    <div class="page-topbar-text">
+        <span class="page-topbar-eyebrow" id="topbarEyebrow">Welcome</span>
+        <h1 class="page-topbar-title" id="topbarTitle">Discover</h1>
+    </div>
+</div>
+<script>
+    (function () {
+        var hour = new Date().getHours();
+        var greeting = hour < 12 ? 'Good morning' : (hour < 18 ? 'Good afternoon' : 'Good evening');
+        var el = document.getElementById('topbarEyebrow');
+        if (el) el.textContent = greeting;
+    })();
+</script>
 
 <!-- banner or shop top bar -->
 <div class="image-banner" id="imageBanner">
@@ -5553,6 +5633,8 @@ function updateShopHeaderDisplay(shopData) {
             
             bannerTitle.innerText = shopData.name || 'Shop';
             bannerSubtitle.innerText = shopData.subtitle || '';
+            const topbarTitleEl0 = document.getElementById('topbarTitle');
+            if (topbarTitleEl0) topbarTitleEl0.textContent = shopData.name || 'Shop';
             
             await loadCategories();
             return;
@@ -5571,6 +5653,8 @@ function updateShopHeaderDisplay(shopData) {
             
             bannerTitle.innerText = shopData.name || 'Shop';
             bannerSubtitle.innerText = shopData.subtitle || '';
+            const topbarTitleEl = document.getElementById('topbarTitle');
+            if (topbarTitleEl) topbarTitleEl.textContent = shopData.name || 'Shop';
             
             updateBannerWithSocial();
             
