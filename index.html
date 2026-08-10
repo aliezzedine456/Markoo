@@ -4649,6 +4649,266 @@
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
+    /* =====================================================================
+       NATIVE iOS OVERHAUL — appended override layer
+       Re-skins every surface (nav, buttons, cards, sheets, lists, forms,
+       toasts) to match iOS 17/18 system conventions on top of the brand's
+       teal accent, without touching any markup ids/classes the JS relies on.
+       ===================================================================== */
+
+    :root{
+        --ios-accent: var(--accent);
+        --ios-accent-rgb: 79,109,122;
+        --ios-card-radius: 18px;
+        --ios-btn-radius: 14px;
+        --ios-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    html, body{
+        background: var(--ios-gray6, #F2F2F7) !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', Inter, sans-serif !important;
+        letter-spacing: -0.01em;
+    }
+
+    /* ---------- press feedback everywhere (native tap-down) ---------- */
+    button, .list-item, .bottom-nav-item, .product-card, a, .ios-select-trigger, .ios-select-option{
+        -webkit-tap-highlight-color: transparent;
+        transition: transform 0.15s var(--ios-spring), opacity 0.15s ease, background-color 0.15s ease !important;
+    }
+    button:active:not(:disabled), .list-item:active, .bottom-nav-item:active, .ios-select-trigger:active{
+        transform: scale(0.96);
+        opacity: 0.85;
+    }
+    .product-card:active{ transform: scale(0.97); }
+
+    /* ---------- top image banner -> reads like a large-title nav ---------- */
+    .image-banner{
+        border-radius: 0 0 28px 28px;
+        overflow: hidden;
+    }
+    .banner-overlay{
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.55) 100%) !important;
+    }
+    .banner-title h2{
+        font-weight: 800 !important;
+        font-size: 1.7rem !important;
+        letter-spacing: -0.03em !important;
+    }
+    .shop-top-bar{
+        background: var(--ios-nav-blur, rgba(255,255,255,0.82)) !important;
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 0.5px solid var(--ios-separator);
+    }
+
+    /* ---------- search field: real iOS "Settings/App Store" pill ---------- */
+    .search-wrapper{
+        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+    }
+    .search-wrapper input{
+        background: transparent !important;
+        font-size: 1rem;
+    }
+    .search-wrapper input::placeholder{ color: var(--ios-gray, #8E8E93); }
+
+    /* ---------- product cards -> iOS grouped card ---------- */
+    .product-card{
+        background: var(--ios-card-bg, #fff) !important;
+        border-radius: var(--ios-card-radius) !important;
+        border: none !important;
+        box-shadow: var(--ios-shadow) !important;
+    }
+
+    /* ---------- buttons: tinted / filled iOS pill buttons ---------- */
+    .btn-dark, .btn-green, button#saveAccountChanges, .add-to-cart-detail, .sidebar-filters-apply, .confirm-manual-address, #confirmManualAddress, #saveAddressBtn{
+        background: var(--ios-accent) !important;
+        border: none !important;
+        border-radius: 980px !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.01em;
+        box-shadow: none !important;
+        color: #fff !important;
+    }
+    .btn-outline-red, #deleteLocationBtn{
+        background: rgba(255,59,48,0.12) !important;
+        border: none !important;
+        border-radius: 980px !important;
+        color: var(--ios-red) !important;
+        font-weight: 600 !important;
+    }
+    button#searchBtn{
+        background: var(--ios-accent) !important;
+        border-radius: 980px !important;
+        border: none !important;
+    }
+
+    /* quantity stepper -> iOS style rounded segmented control */
+    .qty-stepper{
+        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
+        border-radius: 980px !important;
+        border: none !important;
+    }
+    .qty-btn{
+        background: transparent !important;
+        color: var(--ios-accent) !important;
+        border-radius: 50% !important;
+    }
+
+    /* ---------- badges / pills ---------- */
+    .cart-badge, .connect-badge{
+        background: var(--ios-red) !important;
+        border-radius: 980px !important;
+        font-weight: 700;
+    }
+    .discount-badge{
+        background: rgba(255,59,48,0.12) !important;
+        color: var(--ios-red) !important;
+        border-radius: 8px;
+        padding: 2px 8px;
+    }
+
+    /* ---------- bottom tab bar: real iOS translucent tab bar ---------- */
+    .bottom-nav{
+        background: var(--ios-nav-blur, rgba(255,255,255,0.82)) !important;
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        backdrop-filter: saturate(180%) blur(20px);
+        border-top: 0.5px solid var(--ios-separator) !important;
+        box-shadow: none !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .bottom-nav-item{
+        color: var(--ios-gray, #8E8E93) !important;
+        font-weight: 500;
+    }
+    .bottom-nav-item span{ font-size: 0.68rem; letter-spacing: -0.01em; }
+    .bottom-nav-item.active, .bottom-nav-item.active svg{
+        color: var(--ios-accent) !important;
+    }
+
+    /* ---------- slide panels / sheets -> iOS modal sheet w/ grab handle ---------- */
+    .slide-panel, .product-detail-panel, .category-products-panel, .order-track-panel{
+        background: var(--ios-grouped-bg, #F2F2F7) !important;
+        border-radius: 20px 20px 0 0 !important;
+        box-shadow: var(--ios-shadow-sheet) !important;
+    }
+    .slide-panel::before, .category-products-panel::before, .order-track-panel::before, .product-detail-panel::before{
+        content: "";
+        display: block;
+        width: 36px;
+        height: 5px;
+        border-radius: 3px;
+        background: var(--ios-gray4, #D1D1D6);
+        margin: 8px auto 4px;
+    }
+    .panel-header, .cat-panel-header{
+        background: var(--ios-nav-blur, rgba(255,255,255,0.82)) !important;
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        backdrop-filter: saturate(180%) blur(20px);
+        border-bottom: 0.5px solid var(--ios-separator) !important;
+        font-weight: 700 !important;
+        box-shadow: none !important;
+    }
+
+    /* ---------- grouped settings lists -> true iOS Settings.app rows ---------- */
+    .settings-group{
+        background: var(--ios-card-bg, #fff) !important;
+        border-radius: var(--ios-radius-md, 14px) !important;
+        overflow: hidden;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    .list-item{
+        background: transparent !important;
+        border-bottom: 0.5px solid var(--ios-separator) !important;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+    .settings-group .list-item:last-child{ border-bottom: none !important; }
+    .list-item i.fa-chevron-right{
+        color: var(--ios-gray3, #C7C7CC) !important;
+        font-size: 0.8rem;
+    }
+    .list-icon-badge{
+        border-radius: 8px !important;
+        width: 29px; height: 29px;
+        display: inline-flex; align-items:center; justify-content:center;
+    }
+
+    /* ---------- ios-select dropdown -> action sheet style ---------- */
+    .ios-select-trigger{
+        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
+        border: none !important;
+        border-radius: 10px !important;
+    }
+    .ios-select-menu{
+        background: var(--ios-card-bg, #fff) !important;
+        border-radius: var(--ios-radius-md, 14px) !important;
+        box-shadow: var(--ios-shadow) !important;
+        border: none !important;
+    }
+    .ios-select-option{ border-bottom: 0.5px solid var(--ios-separator) !important; }
+    .ios-select-option:last-child{ border-bottom: none !important; }
+    .ios-select-option.is-selected{ color: var(--ios-accent) !important; }
+
+    /* ---------- form fields -> iOS text field ---------- */
+    .form-control, input[type=text], input[type=number], input[type=email], input[type=tel]{
+        background: var(--ios-fill, rgba(118,118,128,0.12)) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+        padding: 12px 14px !important;
+    }
+    .form-control:focus{
+        background: #fff !important;
+        outline: 2px solid var(--ios-accent) !important;
+        outline-offset: 0;
+    }
+    label{
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--ios-secondary-label, #3C3C43cc);
+        text-transform: none;
+        margin-top: 10px;
+        display: block;
+    }
+
+    /* ---------- toasts -> iOS notification banner (top, rounded) ---------- */
+    .toast-container{ top: max(env(safe-area-inset-top), 12px) !important; }
+    .toast-container .toast, .toast-container > div{
+        background: var(--ios-nav-blur, rgba(255,255,255,0.9)) !important;
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        backdrop-filter: saturate(180%) blur(20px);
+        border-radius: 16px !important;
+        box-shadow: var(--ios-shadow) !important;
+        color: var(--ios-label, #1C1C1E) !important;
+        border: none !important;
+    }
+
+    /* ---------- account header ---------- */
+    .user-circle{
+        background: var(--brand-gradient) !important;
+        box-shadow: var(--glow-shadow);
+    }
+    .stats-card{
+        background: var(--ios-card-bg, #fff) !important;
+        border-radius: var(--ios-radius-md, 14px) !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+
+    /* ---------- category pills ---------- */
+    .categories-wrapper .cat-pill, .categories-wrapper button{
+        border-radius: 980px !important;
+    }
+
+    /* ---------- reduce Bootstrap's default sharp corners app-wide ---------- */
+    .modal-content, .dropdown-menu, .card{
+        border-radius: var(--ios-radius-md, 14px) !important;
+        border: none !important;
+    }
     </style>
 </head>
 <body>
