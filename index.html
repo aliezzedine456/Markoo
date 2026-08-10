@@ -3875,7 +3875,13 @@
         .btn-green { letter-spacing: -0.01em; font-weight: 600; }
 
         /* ---- Inputs: iOS filled fields, no visible border ---- */
-        .form-control, input[type="text"], input[type="email"], input[type="tel"],
+        /* NOTE: intentionally excludes .search-wrapper / .cat-search-wrapper
+           inputs — those already live inside their own pill container and
+           get a dedicated search-field treatment further below. Applying
+           this generic filled style to them was creating a "pill inside a
+           pill" double-background look, which is what looked broken. */
+        .form-control,
+        input[type="text"], input[type="email"], input[type="tel"],
         input[type="number"], input[type="password"], textarea, select.form-control {
             background: var(--ios-fill) !important;
             border: none !important;
@@ -3910,8 +3916,69 @@
             color: #fff; font-size: 11px;
         }
 
-        /* ---- Search bar: refined iOS search field ---- */
-        .search-wrapper input { font-family: inherit; letter-spacing: -0.01em; }
+        /* ======================================================================
+           SEARCH BAR — real native iOS search field (Settings/App Store style):
+           a soft rounded-rect fill, muted glass icon, and a compact circular
+           accent "go" affordance instead of a mismatched solid pill button.
+           Applies to both the home search bar and the in-category search.
+           ====================================================================== */
+        .search-wrapper, .cat-search-wrapper {
+            background: var(--ios-fill) !important;
+            border: none !important;
+            border-radius: var(--ios-radius-sm) !important;
+            padding: 5px 6px 5px 16px !important;
+            box-shadow: none !important;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+        .search-wrapper:focus-within, .cat-search-wrapper:focus-within {
+            background: var(--ios-card-bg) !important;
+            box-shadow: 0 0 0 3px rgba(79,109,122,0.22), 0 1px 2px rgba(0,0,0,0.04) !important;
+            border-color: transparent !important;
+        }
+        .search-wrapper i, .cat-search-wrapper i {
+            color: var(--ios-gray) !important;
+            font-size: 0.92rem !important;
+        }
+        .search-wrapper input, .cat-search-wrapper input {
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 10px 0 !important;
+            font-family: inherit;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+            box-shadow: none !important;
+        }
+        .search-wrapper input:focus, .cat-search-wrapper input:focus {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        /* The visible "Search" button becomes a compact circular accent
+           affordance (magnifying-glass icon) instead of a full pill —
+           matches the trailing search/"go" control seen in native iOS
+           search fields (Maps, Photos, Spotlight). Text is kept in the
+           DOM for accessibility/JS but visually replaced by the icon. */
+        .search-wrapper button {
+            width: 38px !important;
+            height: 38px !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            background: var(--accent) !important;
+            font-size: 0 !important;
+            flex-shrink: 0;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px -2px rgba(79,109,122,0.5) !important;
+        }
+        .search-wrapper button::before {
+            content: "\f002";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 14px;
+            color: #fff;
+        }
+        .search-wrapper button:hover { background: var(--accent-dark) !important; }
 
         /* ---- Bottom tab bar: authentic iOS translucent tab bar ---- */
         .bottom-nav {
@@ -4190,6 +4257,142 @@
         .category-circle:active, .view-map-btn:active, .close-modal-btn:active,
         .social-btn-banner:active, .list-item:active .list-icon-badge {
             filter: brightness(0.94);
+        }
+
+        /* ======================================================================
+           BANNER — refined hero header: crisper glass overlay, safe-area
+           aware, and a touch more "large title" typographic confidence.
+           ====================================================================== */
+        .banner-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.32) 60%, transparent 100%);
+            -webkit-backdrop-filter: saturate(140%);
+        }
+        .banner-title h2 { font-weight: 800; }
+        .banner-title p { letter-spacing: -0.005em; }
+        .social-btn-banner {
+            border-radius: 980px !important;
+            background: rgba(255,255,255,0.22) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            transition: transform 0.18s var(--ios-tap), background 0.2s ease !important;
+        }
+        .social-btn-banner:active { transform: scale(0.94) !important; background: rgba(255,255,255,0.32) !important; }
+
+        /* ======================================================================
+           ACCOUNT — profile header, stats, and settings rows
+           ====================================================================== */
+        .account-top-bar { padding-top: max(32px, calc(env(safe-area-inset-top) + 16px)); }
+        .user-circle {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2), inset 0 0 0 1px rgba(255,255,255,0.25) !important;
+        }
+        #accountName { font-weight: 700; letter-spacing: -0.01em; }
+        .stats-card {
+            background: var(--ios-card-bg) !important;
+            padding: 16px 18px !important;
+        }
+        .qr-placeholder {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--ios-fill);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--ios-gray);
+        }
+        .settings-group { margin-top: 14px; }
+        .list-item .left { font-weight: 500; letter-spacing: -0.005em; gap: 12px; }
+        .list-item > i.fa-chevron-right { color: var(--ios-gray3); font-size: 0.8rem; }
+
+        /* ======================================================================
+           MY ORDERS — status pills recolored to true iOS tints + card polish
+           ====================================================================== */
+        .order-card {
+            border: none !important;
+            box-shadow: var(--ios-shadow) !important;
+            border-radius: var(--ios-radius-md) !important;
+            background: var(--ios-card-bg) !important;
+        }
+        .order-card:active { transform: scale(0.98) !important; }
+        .order-id { font-weight: 700; letter-spacing: -0.01em; }
+        .order-status-badge {
+            font-weight: 600;
+            letter-spacing: -0.005em;
+            padding: 5px 12px !important;
+        }
+        .status-accepted  { background: rgba(0,122,255,0.12) !important;  color: var(--ios-blue) !important; }
+        .status-prepared  { background: rgba(255,149,0,0.12) !important; color: var(--ios-orange) !important; }
+        .status-ontheway  { background: rgba(52,199,89,0.12) !important; color: var(--ios-green) !important; }
+        .status-delivered { background: rgba(175,82,222,0.12) !important; color: var(--ios-purple) !important; }
+        .status-cancelled { background: rgba(255,59,48,0.12) !important; color: var(--ios-red) !important; }
+        .track-order-btn {
+            border-radius: 980px !important;
+            background: var(--accent) !important;
+            transition: transform 0.18s var(--ios-tap), opacity 0.18s ease !important;
+        }
+        .track-order-btn:active { transform: scale(0.96) !important; opacity: 0.8; }
+
+        /* ======================================================================
+           FAVORITES — the list is built with inline/Bootstrap utility
+           classes rather than dedicated ones, so it's reskinned generically
+           by scoping to the #favoritesList container.
+           ====================================================================== */
+        #favoritesList { padding-top: 6px !important; }
+        #favoritesList [data-prod-id] {
+            background: var(--ios-card-bg);
+            border-radius: var(--ios-radius-sm) !important;
+            border-bottom: none !important;
+            margin-bottom: 10px !important;
+            padding: 10px !important;
+            box-shadow: var(--ios-shadow);
+            transition: transform 0.18s var(--ios-tap), box-shadow 0.2s ease, background 0.15s ease;
+        }
+        #favoritesList [data-prod-id]:active { background: var(--ios-fill) !important; transform: scale(0.98); }
+        #favoritesList [data-prod-id] img {
+            border-radius: 12px !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        #favoritesList [data-prod-id] h6 { font-weight: 600; letter-spacing: -0.01em; }
+        #favoritesList .badge.bg-danger { background: var(--ios-red) !important; border-radius: 6px !important; font-weight: 600; }
+        #favoritesList .badge.bg-warning { background: rgba(255,149,0,0.15) !important; color: var(--ios-orange) !important; border-radius: 6px !important; font-weight: 600; }
+        #favoritesList .text-primary { color: var(--text-color) !important; font-weight: 700 !important; }
+        #favoritesList .remove-fav {
+            color: var(--ios-red) !important;
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,59,48,0.08);
+            transition: transform 0.18s var(--ios-tap), background 0.15s ease;
+        }
+        #favoritesList .remove-fav:active { transform: scale(0.88); background: rgba(255,59,48,0.16); }
+
+        /* ======================================================================
+           DESKTOP — bring search, account, orders and favorites up to the
+           same polish at wider widths, with real hover states (guarded by
+           the hover media feature so touch devices never get stuck hovers).
+           ====================================================================== */
+        @media (min-width: 768px) {
+            .search-wrapper { max-width: 480px; }
+        }
+        @media (hover: hover) and (min-width: 768px) {
+            .order-card:hover {
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05), 0 18px 36px -16px rgba(0,0,0,0.2) !important;
+                transform: translateY(-2px);
+            }
+            #favoritesList [data-prod-id]:hover {
+                box-shadow: 0 4px 10px rgba(0,0,0,0.05), 0 18px 36px -16px rgba(0,0,0,0.2);
+                transform: translateY(-2px);
+            }
+            .list-item:hover { background: var(--ios-fill); }
+            .search-wrapper button:hover, .social-btn-banner:hover { filter: brightness(1.05); }
+        }
+        @media (min-width: 900px) {
+            /* Orders & favorites read better as a two-column grid once the
+               slide-panel drawer is wide enough on desktop. */
+            #myOrdersList .order-card,
+            #favoritesList .favorites-list [data-prod-id] {
+                break-inside: avoid;
+            }
+            #myOrdersList { columns: 2; column-gap: 16px; }
+            #myOrdersList .order-card { display: inline-block; width: 100%; }
+            #favoritesList .favorites-list { columns: 2; column-gap: 16px; }
+            #favoritesList .favorites-list [data-prod-id] { display: inline-block; width: 100%; }
+            .account-top-bar { padding-left: 28px; padding-right: 28px; }
+            .stats-card, .settings-group { margin-left: 4px; margin-right: 4px; }
         }
 
         /* ---- Respect reduced motion ---- */
