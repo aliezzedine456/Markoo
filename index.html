@@ -3716,6 +3716,124 @@
                 white-space: nowrap;
             }
 
+            /* ---- "Sort By" — native iOS action-sheet style dropdown ---- */
+            .ios-select {
+                position: relative;
+            }
+
+            .ios-select-trigger {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                background: var(--ios-fill);
+                border: none;
+                border-radius: var(--ios-radius-sm);
+                padding: 10px 12px;
+                font-family: inherit;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--ios-label);
+                cursor: pointer;
+                transition: background 0.15s ease;
+            }
+
+            .ios-select-trigger span {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .ios-select-trigger:hover {
+                background: var(--ios-fill-strong);
+            }
+
+            .ios-select-trigger i {
+                font-size: 11px;
+                color: var(--ios-gray);
+                flex-shrink: 0;
+                transition: transform 0.25s var(--ios-spring);
+            }
+
+            .ios-select.open .ios-select-trigger i {
+                transform: rotate(180deg);
+            }
+
+            .ios-select-menu {
+                position: absolute;
+                top: calc(100% + 6px);
+                left: 0;
+                right: 0;
+                background: var(--ios-card-bg);
+                border-radius: var(--ios-radius-md);
+                box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 12px 32px -8px rgba(0,0,0,0.22);
+                padding: 6px;
+                z-index: 40;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+                transform: translateY(-6px) scale(0.98);
+                transform-origin: top center;
+                transition: opacity 0.18s ease, transform 0.22s var(--ios-spring), visibility 0.18s;
+            }
+
+            .ios-select.open .ios-select-menu {
+                opacity: 1;
+                visibility: visible;
+                pointer-events: auto;
+                transform: translateY(0) scale(1);
+            }
+
+            .ios-select-option {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                background: none;
+                border: none;
+                text-align: left;
+                padding: 9px 10px;
+                border-radius: 8px;
+                font-family: inherit;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--ios-label);
+                cursor: pointer;
+                transition: background 0.15s ease;
+            }
+
+            .ios-select-option:hover {
+                background: var(--ios-fill);
+            }
+
+            .ios-select-option:active {
+                background: var(--ios-fill-strong);
+            }
+
+            .ios-select-option i {
+                font-size: 11px;
+                color: var(--accent);
+                opacity: 0;
+                transform: scale(0.6);
+                transition: opacity 0.15s ease, transform 0.15s var(--ios-tap);
+            }
+
+            .ios-select-option.is-selected {
+                color: var(--accent);
+                font-weight: 700;
+            }
+
+            .ios-select-option.is-selected i {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            .ios-select-option + .ios-select-option {
+                margin-top: 1px;
+            }
+
             /* The circular category rail under the search bar is replaced by
                the sidebar category list on desktop, so hide it here. */
             .categories-wrapper {
@@ -3943,7 +4061,7 @@
         }
         .search-wrapper:focus-within, .cat-search-wrapper:focus-within {
             background: var(--ios-card-bg) !important;
-            box-shadow: 0 0 0 3px rgba(79,109,122,0.22), 0 1px 2px rgba(0,0,0,0.04) !important;
+            box-shadow: none !important;
             border-color: transparent !important;
         }
         .search-wrapper i, .cat-search-wrapper i {
@@ -4424,11 +4542,6 @@
         }
         .search-wrapper:focus-within, .cat-search-wrapper:focus-within {
             transform: scale(1.012);
-            animation: iosSearchGlow 1.8s ease-in-out infinite;
-        }
-        @keyframes iosSearchGlow {
-            0%, 100% { box-shadow: 0 0 0 3px rgba(79,109,122,0.22), 0 1px 2px rgba(0,0,0,0.04); }
-            50% { box-shadow: 0 0 0 5px rgba(79,109,122,0.14), 0 1px 2px rgba(0,0,0,0.04); }
         }
         .search-wrapper i.fa-search, .cat-search-wrapper i.fa-search {
             transition: color 0.25s ease, transform 0.35s var(--ios-tap);
@@ -4664,14 +4777,33 @@
     <div class="sidebar-filters-title">Filters <a class="sidebar-filters-clear" id="sidebarFiltersClear">Clear</a></div>
     <div class="sidebar-filter-group">
         <div class="sidebar-filter-group-label">Sort By</div>
-        <select class="form-control" id="sidebarSortSelect">
-            <option value="">Relevance</option>
-            <option value="bestselling">Best Selling</option>
-            <option value="price_desc">Price: High to Low</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="newest">Newest</option>
-            <option value="name_asc">Name: A to Z</option>
-        </select>
+        <div class="ios-select" id="sidebarSortControl">
+            <button type="button" class="ios-select-trigger" id="sidebarSortTrigger" aria-haspopup="listbox" aria-expanded="false">
+                <span id="sidebarSortTriggerLabel">Relevance</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="ios-select-menu" id="sidebarSortMenu" role="listbox">
+                <button type="button" class="ios-select-option is-selected" data-value="" role="option" aria-selected="true">
+                    <span>Relevance</span><i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="ios-select-option" data-value="bestselling" role="option" aria-selected="false">
+                    <span>Best Selling</span><i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="ios-select-option" data-value="price_desc" role="option" aria-selected="false">
+                    <span>Price: High to Low</span><i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="ios-select-option" data-value="price_asc" role="option" aria-selected="false">
+                    <span>Price: Low to High</span><i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="ios-select-option" data-value="newest" role="option" aria-selected="false">
+                    <span>Newest</span><i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="ios-select-option" data-value="name_asc" role="option" aria-selected="false">
+                    <span>Name: A to Z</span><i class="fas fa-check"></i>
+                </button>
+            </div>
+            <input type="hidden" id="sidebarSortSelect" value="">
+        </div>
     </div>
     <div class="sidebar-filter-group" id="sidebarCategoryGroup" style="display:none;">
         <div class="sidebar-filter-group-label">Category</div>
@@ -6563,6 +6695,23 @@ function updateShopHeaderDisplay(shopData) {
         }
     }
 
+    // Resets the custom "Sort By" iOS-menu UI back to its default
+    // "Relevance" state (label + checkmark + hidden value).
+    function resetSidebarSortControl() {
+        const sortEl = document.getElementById('sidebarSortSelect');
+        const triggerLabel = document.getElementById('sidebarSortTriggerLabel');
+        const menu = document.getElementById('sidebarSortMenu');
+        if (sortEl) sortEl.value = '';
+        if (triggerLabel) triggerLabel.textContent = 'Relevance';
+        if (menu) {
+            menu.querySelectorAll('.ios-select-option').forEach(o => {
+                const isDefault = o.dataset.value === '';
+                o.classList.toggle('is-selected', isDefault);
+                o.setAttribute('aria-selected', isDefault ? 'true' : 'false');
+            });
+        }
+    }
+
     function clearSidebarFilters() {
         closeAllPanels();
         setActiveNavItem('navHome');
@@ -6570,10 +6719,9 @@ function updateShopHeaderDisplay(shopData) {
         document.querySelectorAll('.sidebar-cat-checkbox').forEach(cb => cb.checked = false);
         const minEl = document.getElementById('sidebarPriceMin');
         const maxEl = document.getElementById('sidebarPriceMax');
-        const sortEl = document.getElementById('sidebarSortSelect');
         if (minEl) minEl.value = '';
         if (maxEl) maxEl.value = '';
-        if (sortEl) sortEl.value = '';
+        resetSidebarSortControl();
         noProducts.style.display = 'none';
         if (categories.length > 0) {
             categorySections.style.display = 'block';
@@ -6588,6 +6736,54 @@ function updateShopHeaderDisplay(shopData) {
     document.getElementById('sidebarFiltersApply')?.addEventListener('click', applySidebarFilters);
     document.getElementById('sidebarFiltersClear')?.addEventListener('click', (e) => { e.preventDefault(); clearSidebarFilters(); });
     document.getElementById('sidebarSortSelect')?.addEventListener('change', applySidebarFilters);
+
+    // ---------- "Sort By" custom iOS action-sheet style dropdown ----------
+    (function initSidebarSortControl() {
+        const wrap = document.getElementById('sidebarSortControl');
+        const trigger = document.getElementById('sidebarSortTrigger');
+        const triggerLabel = document.getElementById('sidebarSortTriggerLabel');
+        const menu = document.getElementById('sidebarSortMenu');
+        const hiddenInput = document.getElementById('sidebarSortSelect');
+        if (!wrap || !trigger || !menu || !hiddenInput) return;
+
+        function closeMenu() {
+            wrap.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+        function openMenu() {
+            wrap.classList.add('open');
+            trigger.setAttribute('aria-expanded', 'true');
+        }
+
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (wrap.classList.contains('open')) closeMenu(); else openMenu();
+        });
+
+        menu.querySelectorAll('.ios-select-option').forEach(opt => {
+            opt.addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.querySelectorAll('.ios-select-option').forEach(o => {
+                    o.classList.remove('is-selected');
+                    o.setAttribute('aria-selected', 'false');
+                });
+                opt.classList.add('is-selected');
+                opt.setAttribute('aria-selected', 'true');
+                const labelSpan = opt.querySelector('span');
+                if (triggerLabel && labelSpan) triggerLabel.textContent = labelSpan.textContent;
+                hiddenInput.value = opt.dataset.value || '';
+                hiddenInput.dispatchEvent(new Event('change'));
+                closeMenu();
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!wrap.contains(e.target)) closeMenu();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMenu();
+        });
+    })();
 
     function renderCategories() {
         let html = ''; 
