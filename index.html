@@ -5332,6 +5332,13 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
         </div>
+
+        <!-- Same map-preview card the account "Delivery Address" panel
+             shows once a GPS fix is captured - keeps the confirmation UI
+             identical between the two places location gets set. -->
+        <div id="signupMapPreviewContainer" style="display:none; margin: 0 0 14px;">
+            <div class="map-preview" id="signupMapPreview" style="border-radius: var(--border-radius-md); overflow:hidden;"></div>
+        </div>
         
         <div id="manualAddressSignup" class="manual-address-inputs" style="display: none;">
             <div class="address-field mb-3">
@@ -5782,6 +5789,32 @@
         updateMapPreview(isEmpty ? '' : text);
     }
 
+    // Rotating globe card: a shaded 3D sphere with a slowly spinning
+    // landmass texture and a fixed pin, clickable through to Google Maps.
+    // Shared by both the account "Delivery Address" panel and the sign-up
+    // location step so a captured GPS fix looks identical in both places.
+    function buildGlobePreviewHtml(mapLinkUrl) {
+        return `
+            <a href="${mapLinkUrl}" target="_blank" style="text-decoration: none; display: block; width: 100%; height: 100%;">
+                <div class="map-sim">
+                    <div class="globe-wrap">
+                        <div class="globe-atmosphere"></div>
+                        <div class="globe-sphere">
+                            <div class="globe-sphere-map"></div>
+                            <div class="globe-sphere-shading"></div>
+                            <div class="globe-highlight"></div>
+                        </div>
+                    </div>
+                    <div class="globe-pin-wrap">
+                        <div class="globe-pin-pulse"></div>
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div class="globe-label"><i class="fas fa-external-link-alt"></i> Open in Google Maps</div>
+                </div>
+            </a>
+        `;
+    }
+
        function updateMapPreview(address) {
         const mapPreviewContainer = document.getElementById('mapPreviewContainer');
         const mapPreview = document.getElementById('mapPreview');
@@ -5815,25 +5848,7 @@
             // Rotating globe card: a shaded 3D sphere with a slowly
             // spinning landmass texture and a fixed pin, clickable
             // through to Google Maps
-            mapPreview.innerHTML = `
-                <a href="${mapLinkUrl}" target="_blank" style="text-decoration: none; display: block; width: 100%; height: 100%;">
-                    <div class="map-sim">
-                        <div class="globe-wrap">
-                            <div class="globe-atmosphere"></div>
-                            <div class="globe-sphere">
-                                <div class="globe-sphere-map"></div>
-                                <div class="globe-sphere-shading"></div>
-                                <div class="globe-highlight"></div>
-                            </div>
-                        </div>
-                        <div class="globe-pin-wrap">
-                            <div class="globe-pin-pulse"></div>
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="globe-label"><i class="fas fa-external-link-alt"></i> Open in Google Maps</div>
-                    </div>
-                </a>
-            `;
+            mapPreview.innerHTML = buildGlobePreviewHtml(mapLinkUrl);
             
             // Update the link for the address display card
             if (openGoogleMapsLink) {
@@ -6329,6 +6344,21 @@ function updateShopHeaderDisplay(shopData) {
         }
     }
 });
+    // Same globe-preview card as the account address panel, shown in the
+    // sign-up step right after a GPS fix is captured.
+    function showSignupLocationPreview(lat, lng) {
+        const container = document.getElementById('signupMapPreviewContainer');
+        const preview = document.getElementById('signupMapPreview');
+        if (!container || !preview) return;
+        const mapLinkUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+        preview.innerHTML = buildGlobePreviewHtml(mapLinkUrl);
+        container.style.display = 'block';
+    }
+    function hideSignupLocationPreview() {
+        const container = document.getElementById('signupMapPreviewContainer');
+        if (container) container.style.display = 'none';
+    }
+
     useCurrentLocationOption.addEventListener('click', () => {
         document.querySelectorAll('.address-option').forEach(opt => opt.classList.remove('selected'));
         document.querySelectorAll('.addr-selected-check').forEach(chk => chk.style.display = 'none');
@@ -6336,6 +6366,7 @@ function updateShopHeaderDisplay(shopData) {
         useCurrentLocationOption.querySelector('.addr-selected-check') && (useCurrentLocationOption.querySelector('.addr-selected-check').style.display = 'inline-block');
         enterManualAddressOption.classList.remove('selected');
         manualAddressSignup.style.display = 'none';
+        hideSignupLocationPreview();
         selectedAddressMethod = 'location';
         
         if (navigator.geolocation) {
@@ -6350,6 +6381,7 @@ function updateShopHeaderDisplay(shopData) {
             }).then(fix => {
                 currentLocationCoords = { lat: fix.lat, lng: fix.lng };
                 pendingAddress = `lat:${fix.lat.toFixed(6)}, lng:${fix.lng.toFixed(6)}`;
+                showSignupLocationPreview(fix.lat, fix.lng);
                 showToast(`Location captured (±${Math.round(fix.accuracy)}m)`, 'success', 'Location Found');
             }).catch(() => {
                 showToast('Unable to get an accurate location. Please enter manually.', 'error');
@@ -6368,6 +6400,7 @@ function updateShopHeaderDisplay(shopData) {
         enterManualAddressOption.querySelector('.addr-selected-check') && (enterManualAddressOption.querySelector('.addr-selected-check').style.display = 'inline-block');
         useCurrentLocationOption.classList.remove('selected');
         manualAddressSignup.style.display = 'block';
+        hideSignupLocationPreview();
         selectedAddressMethod = 'manual';
     });
 
@@ -8382,6 +8415,7 @@ async function showProductDetail(p) {
         authPhone.value = '';
         sendOtpBtn.disabled = false;
         updateSendOtpBtnLabel();
+        hideSignupLocationPreview();
         
         openPanel(authPanel); 
     }
