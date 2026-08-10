@@ -8,15 +8,31 @@
     <meta name="theme-color" content="#4F6D7A">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236b8794'/%3E%3Cstop offset='1' stop-color='%234F6D7A'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cpath d='M18 26h28l-2.6 20.2a4 4 0 0 1-4 3.4H24.6a4 4 0 0 1-4-3.4L18 26z' fill='white' fill-opacity='.95'/%3E%3Cpath d='M24 26v-4a8 8 0 0 1 16 0v4' stroke='white' stroke-width='3.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
     <!-- Bootstrap 5 + Font Awesome -->
-     <!-- Preload critical resources -->
-<link rel="preload" as="image" href="https://placehold.co/400" fetchpriority="high">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts (Inter & Poppins) -->
+    <!-- Perf: connect early to the CDNs/hosts we actually use -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <!-- Perf: Bootstrap CSS and Font Awesome are large stylesheets that used to
+         block first paint. They're loaded here with the "print" media trick so
+         the browser fetches them at low priority without blocking rendering,
+         then they're swapped to "all" the instant they finish (see below /
+         noscript fallback covers non-JS cases). -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </noscript>
+    <!-- Google Fonts: only Inter is actually referenced anywhere in this
+         page's CSS (the previously-loaded Poppins/Montserrat/Playfair
+         Display/Roboto Slab families were dead weight - not one element used
+         them - so they've been dropped; that alone was ~15 font files the
+         browser had no reason to download). -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700;800&family=Roboto+Slab:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Animate.css for toast animations -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Toast slide-in animation is now a few lines of plain CSS below
+         instead of pulling in the whole animate.css library for one effect. -->
     <!-- Firebase SDK (modular) -->
     <script type="module">
         // Import Firebase modular SDK
@@ -5502,7 +5518,11 @@
     function showToast(message, type = 'info', title = '', duration = 4000) {
         const container = document.getElementById('toastContainer');
         const toast = document.createElement('div');
-        toast.className = `toast-message ${type} animate__animated animate__slideInRight`;
+        // The .toast-message rule above already has its own slideInRight
+        // keyframe animation, so the animate.css classes here were pure dead
+        // weight (an entire extra stylesheet loaded for an effect the page
+        // already produced on its own).
+        toast.className = `toast-message ${type}`;
         
         const icons = {
             success: 'fa-check-circle',
@@ -7164,7 +7184,7 @@ function updateShopHeaderDisplay(shopData) {
         list.innerHTML = categories.map(cat => `
             <label class="sidebar-filter-cat">
                 <input type="checkbox" class="sidebar-cat-checkbox" value="${cat.id}">
-                <span class="sidebar-filter-cat-thumb"><img src="${cat.imageUrl || 'https://placehold.co/62'}" onerror="this.src='https://placehold.co/62'" alt=""></span>
+                <span class="sidebar-filter-cat-thumb"><img src="${cat.imageUrl || 'https://placehold.co/62'}" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/62'" alt=""></span>
                 <span>${escapeHtml(cat.name || '')}</span>
             </label>
         `).join('');
@@ -7327,7 +7347,7 @@ function updateShopHeaderDisplay(shopData) {
     function renderCategories() {
         let html = ''; 
         categories.forEach(cat => { 
-            html += `<div class="category-item" data-category-id="${cat.id}"><div class="category-circle"><img src="${cat.imageUrl||'https://placehold.co/62'}" onerror="this.src='https://placehold.co/62'"></div><div class="category-name">${cat.name}</div></div>`; 
+            html += `<div class="category-item" data-category-id="${cat.id}"><div class="category-circle"><img src="${cat.imageUrl||'https://placehold.co/62'}" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/62'"></div><div class="category-name">${cat.name}</div></div>`; 
         });
         categoriesContainer.innerHTML = html;
         document.querySelectorAll('.category-item').forEach(item => item.addEventListener('click',()=>{ const catId=item.dataset.categoryId; openCategoryPanel(catId); document.querySelectorAll('.category-circle').forEach(c=>c.classList.remove('active')); item.querySelector('.category-circle').classList.add('active'); }));
@@ -7502,7 +7522,7 @@ function updateShopHeaderDisplay(shopData) {
         
         productsHtml += `<div class="product-card-h" data-product-id="${p.id}" style="position: relative;">
             ${discountHtml}
-            <img src="${img}" class="product-img-h" onerror="this.src='https://placehold.co/130'">
+            <img src="${img}" class="product-img-h" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/130'">
             <div class="product-info-h">
                 <h6>${p.name||''}</h6>
                 <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -8306,7 +8326,7 @@ async function showProductDetail(p) {
             
             html += `
                 <div class="cart-item-card${isOutOfStock ? ' out-of-stock' : ''}" data-index="${i}">
-                    <img src="${img}" class="cart-item-img" onerror="this.src='https://placehold.co/60'">
+                    <img src="${img}" class="cart-item-img" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/60'">
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-start justify-content-between">
                             <h6 class="mb-1 cart-item-name">
@@ -8763,7 +8783,7 @@ async function showProductDetail(p) {
                 
                 html += `
                     <div class="d-flex align-items-center mb-3 p-2 border-bottom" style="gap: 12px; cursor: pointer;" data-prod-id="${prodId}">
-                        <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" onerror="this.src='https://placehold.co/60'">
+                        <img src="${img}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" loading="lazy" decoding="async" onerror="this.src='https://placehold.co/60'">
                         <div class="flex-grow-1">
                             <h6 class="mb-1" style="font-size: 0.95rem;">
                                 ${escapeHtml(prod.name)}
