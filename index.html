@@ -1014,12 +1014,12 @@
             position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 9px 18px;
+            gap: 4px;
+            padding: 6px 13px;
             border: 1.5px solid var(--gray-200);
-            border-radius: 30px;
+            border-radius: 24px;
             background: white;
-            font-size: 0.88rem;
+            font-size: 0.78rem;
             font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
@@ -1030,9 +1030,9 @@
         }
         
         .variant-option .price-adjustment {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             font-weight: 500;
-            padding: 2px 6px;
+            padding: 1px 5px;
             border-radius: 20px;
             background: rgba(0,0,0,0.05);
         }
@@ -1617,17 +1617,37 @@
     font-size: 0.85rem;
 }
 
+.desc-card {
+    margin: 18px 0;
+    padding: 16px;
+    background: var(--card-bg);
+    border-radius: 18px;
+    border: 1px solid var(--gray-100);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.desc-card-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-weight: 700;
+    font-size: 0.98rem;
+    letter-spacing: -0.01em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.desc-card-title i {
+    color: var(--accent, var(--primary-color));
+    font-size: 0.85rem;
+}
+
 .detail-desc-card {
     white-space: pre-line;
-    background: var(--card-bg);
-    border: 1px solid var(--gray-100);
-    padding: 16px 18px;
-    border-radius: 18px;
-    margin-top: 10px;
     font-size: 0.92rem;
     line-height: 1.65;
     color: var(--gray-700);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin: 0;
 }
 
 /* Swipe hint animation */
@@ -3690,15 +3710,17 @@
                 filter: brightness(1.08);
             }
 
-            /* On the desktop rail the icon+label sit stacked, so the count
-               reads better centered directly above the cart icon rather
-               than as a corner badge. The badge is absolutely positioned,
-               so it can float above the item without pushing the icon/label
-               down or throwing off alignment with the other nav items. */
+            /* On the desktop rail the icon+label sit stacked. The badge
+               sits slightly right of the icon's top edge (a typical
+               notification-badge position) rather than dead-center above
+               it, so it doesn't visually compete with the icon. It's
+               absolutely positioned, so it floats above the item without
+               pushing the icon/label down or affecting alignment with the
+               other nav items. */
             .bottom-nav-item .cart-badge {
                 position: absolute;
-                top: -9px;
-                left: 50%;
+                top: -8px;
+                left: calc(50% + 9px);
                 right: auto;
                 transform: translateX(-50%);
                 width: 16px;
@@ -3933,8 +3955,10 @@
                 <!-- Variants Section -->
                 <div id="variantsContainer" class="variant-section" style="display: none;"></div>
 
-                <div class="desc-label mt-3"><i class="fas fa-align-left"></i>Description</div>
-                <p id="detailDesc" class="detail-desc-card"></p>
+                <div class="desc-card">
+                    <div class="desc-card-title"><i class="fas fa-align-left"></i>Description</div>
+                    <p id="detailDesc" class="detail-desc-card"></p>
+                </div>
 
                 <!-- SIMILAR PRODUCTS SECTION -->
                 <div class="desc-label mt-4"><i class="fas fa-layer-group"></i>Similar products</div>
@@ -4483,13 +4507,21 @@
         panelStack = panelStack.filter(p => p !== panel);
         
         const openPanels = document.querySelectorAll('.slide-panel.show, .product-detail-panel.show, .category-products-panel.show, .order-track-panel.show').length;
-        if (openPanels === 0) setBodyScroll(false);
+        if (openPanels === 0) {
+            setBodyScroll(false);
+            // Back to the base page - the desktop nav rail's active
+            // underline should fall back to Home, whether the panel was
+            // closed via the arrow-back button, the physical/browser Back
+            // button, or clicking the dimmed backdrop outside the panel.
+            setActiveNavItem('navHome');
+        }
     }
 
     function closeAllPanels() { 
         document.querySelectorAll('.slide-panel, .product-detail-panel, .category-products-panel, .order-track-panel').forEach(p=>p.classList.remove('show')); 
         panelStack = [];
         setBodyScroll(false);
+        setActiveNavItem('navHome');
     }
 
     function setBodyScroll(disable) {
